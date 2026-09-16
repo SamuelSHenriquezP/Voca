@@ -59,16 +59,6 @@ class _CardBattleScreenState extends State<CardBattleScreen>
   List<LinguisticCard>? _rewardOptions;
   LinguisticCard? _selectedRewardCard;
 
-  // Pacing Timer (3 to 4 minutes max per level)
-  int _remainingSeconds = 210; // 3 min 30 sec
-  Timer? _encounterTimer;
-
-  String get _formattedTime {
-    final m = _remainingSeconds ~/ 60;
-    final s = _remainingSeconds % 60;
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-  }
-
   @override
   void initState() {
     super.initState();
@@ -78,47 +68,13 @@ class _CardBattleScreenState extends State<CardBattleScreen>
     _playerMaxHp = widget.playerMaxHp;
     _runDeck.addAll(widget.deck);
 
-    _startTimer();
     _initCombat();
   }
 
   @override
   void dispose() {
-    _encounterTimer?.cancel();
     _confettiController.dispose();
     super.dispose();
-  }
-
-  void _startTimer() {
-    _encounterTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_isVictory || _isDefeat) {
-        timer.cancel();
-        return;
-      }
-      if (_remainingSeconds > 0) {
-        if (mounted) {
-          setState(() => _remainingSeconds--);
-        }
-      } else {
-        timer.cancel();
-        _handleTimeExpired();
-      }
-    });
-  }
-
-  void _handleTimeExpired() {
-    if (_isVictory || _isDefeat) return;
-    VocaHaptics.error();
-    _showFloatingBanner('TIME EXPIRED! GUARDIAN ENRAGED', const Color(0xFFDC2626));
-    setState(() {
-      _playerHp = (_playerHp - 6).clamp(0, _playerMaxHp);
-      if (_playerHp <= 0) {
-        _isDefeat = true;
-      } else {
-        _remainingSeconds = 60; // 60s sudden death overtime
-        _startTimer();
-      }
-    });
   }
 
   void _initCombat() {
@@ -418,41 +374,6 @@ class _CardBattleScreenState extends State<CardBattleScreen>
                     fontWeight: FontWeight.w800,
                     fontSize: 12,
                     letterSpacing: 0.8,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: _remainingSeconds < 45
-                  ? const Color(0xFFEF4444).withOpacity(0.2)
-                  : Colors.white.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _remainingSeconds < 45
-                    ? const Color(0xFFEF4444)
-                    : const Color(0xFF38BDF8).withOpacity(0.4),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.timer_outlined,
-                  color: _remainingSeconds < 45
-                      ? const Color(0xFFEF4444)
-                      : const Color(0xFF38BDF8),
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  _formattedTime,
-                  style: TextStyle(
-                    color: _remainingSeconds < 45 ? const Color(0xFFEF4444) : Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                    fontFamily: 'Courier',
                   ),
                 ),
               ],
@@ -886,43 +807,10 @@ class _CriticalDrillModal extends StatefulWidget {
 }
 
 class _CriticalDrillModalState extends State<_CriticalDrillModal> {
-  Timer? _timer;
-  double _timeProgress = 1.0;
   int? _selectedIdx;
   bool _showTrick = false;
 
-  @override
-  void initState() {
-    super.initState();
-    const duration = Duration(milliseconds: 3800);
-    const interval = Duration(milliseconds: 40);
-    final totalSteps = duration.inMilliseconds / interval.inMilliseconds;
-    var currentStep = 0;
-
-    _timer = Timer.periodic(interval, (timer) {
-      currentStep++;
-      if (mounted) {
-        setState(() {
-          _timeProgress = (1.0 - (currentStep / totalSteps)).clamp(0.0, 1.0);
-        });
-      }
-      if (currentStep >= totalSteps) {
-        timer.cancel();
-        if (mounted) {
-          widget.onResolved(false); // Timeout = normal hit
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
   void _chooseOption(int index) {
-    _timer?.cancel();
     setState(() {
       _selectedIdx = index;
       _showTrick = true;
@@ -956,20 +844,6 @@ class _CriticalDrillModalState extends State<_CriticalDrillModal> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Timer Bar
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: _timeProgress,
-                backgroundColor: const Color(0xFF1E293B),
-                valueColor: AlwaysStoppedAnimation(
-                  _timeProgress > 0.3 ? const Color(0xFFFBBF24) : const Color(0xFFEF4444),
-                ),
-                minHeight: 5,
-              ),
-            ),
-            const SizedBox(height: 14),
-
             // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -979,7 +853,7 @@ class _CriticalDrillModalState extends State<_CriticalDrillModal> {
                     Icon(Icons.bolt_rounded, color: Color(0xFFFBBF24), size: 18),
                     SizedBox(width: 4),
                     Text(
-                      'CRITICAL TIMING REACTION',
+                      'CRITICAL VOCAB DRILL',
                       style: TextStyle(
                         color: Color(0xFFFBBF24),
                         fontWeight: FontWeight.w900,
