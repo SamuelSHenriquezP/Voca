@@ -32,7 +32,7 @@ class _PathScreenState extends State<PathScreen> {
     1: {
       'title': 'Basic Survival & Daily Food',
       'description': 'Build core spoken fluency for everyday real-world interactions.',
-      'progress': 0.60,
+      'progress': 0.0,
       'nodes': const [
         LevelNodeModel(
           id: 'u1_lvl_1',
@@ -40,8 +40,8 @@ class _PathScreenState extends State<PathScreen> {
           levelNumber: 1,
           title: 'Level 1-1: Hello & Greetings',
           subtitle: 'Master basic everyday greetings and farewells',
-          state: NodeState.completed,
-          stars: 3,
+          state: NodeState.active,
+          stars: 0,
           xpReward: 10,
           objectives: ['Say hello in 3 different contexts', 'Use proper polite responses', 'Shadow native speakers'],
           xOffset: 0.0,
@@ -52,8 +52,8 @@ class _PathScreenState extends State<PathScreen> {
           levelNumber: 2,
           title: 'Level 1-2: Numbers & Ordering',
           subtitle: 'Order coffee, snacks, and count items like a pro',
-          state: NodeState.completed,
-          stars: 3,
+          state: NodeState.locked,
+          stars: 0,
           xpReward: 10,
           objectives: ['Order 2 items at a counter', 'Understand prices and numbers', 'Practice clear vowels'],
           xOffset: -0.65,
@@ -64,7 +64,7 @@ class _PathScreenState extends State<PathScreen> {
           levelNumber: 3,
           title: 'Level 1-3: Food & Drinks',
           subtitle: 'Essential vocabulary for dining out and asking recommendations',
-          state: NodeState.active,
+          state: NodeState.locked,
           stars: 0,
           xpReward: 15,
           objectives: [
@@ -119,7 +119,7 @@ class _PathScreenState extends State<PathScreen> {
     2: {
       'title': 'Manhattan Cafe & Social Banter',
       'description': 'Natural small talk, ordering complex drinks, and casual idiom mastery.',
-      'progress': 0.15,
+      'progress': 0.0,
       'nodes': const [
         LevelNodeModel(
           id: 'u2_lvl_1',
@@ -127,8 +127,8 @@ class _PathScreenState extends State<PathScreen> {
           levelNumber: 1,
           title: 'Level 2-1: Espresso & Milk Craft',
           subtitle: 'Order bespoke coffee, oat milk, temperature, and syrups',
-          state: NodeState.completed,
-          stars: 3,
+          state: NodeState.locked,
+          stars: 0,
           xpReward: 15,
           objectives: ['Order flat white with oat milk', 'Ask for drink to go', 'Handle tip suggestions'],
           xOffset: 0.0,
@@ -139,7 +139,7 @@ class _PathScreenState extends State<PathScreen> {
           levelNumber: 2,
           title: 'Level 2-2: Table for Two',
           subtitle: 'Host seating, waiting lists, and reservation inquiries',
-          state: NodeState.active,
+          state: NodeState.locked,
           stars: 0,
           xpReward: 15,
           objectives: ['Ask for an outdoor patio table', 'Inquire about wait time'],

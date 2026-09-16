@@ -45,10 +45,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'initials': 'JW',
     },
     {
-      'name': 'Alex Rivera (You)',
-      'title': 'B1 • Street Conversationalist',
-      'xp': '1,450 XP',
-      'rank': '4',
+      'name': 'Alex Rivera (Tú)',
+      'title': 'A1 • Principiante desde cero',
+      'xp': '0 XP',
+      'rank': '24',
       'color': const Color(0xFF4F46E5),
       'initials': 'AR',
     },
@@ -58,34 +58,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BadgeItem(
       id: 'b1',
       name: '7-Day Streak',
-      description: 'Maintained 7 consecutive practice days',
+      description: 'Mantén 7 días consecutivos de práctica',
       icon: Icons.local_fire_department_rounded,
-      isUnlocked: true,
-      unlockDate: 'May 12',
+      isUnlocked: false,
       accentColor: Color(0xFFD97706),
     ),
     BadgeItem(
       id: 'b2',
       name: 'Customs Clear',
-      description: 'Passed Airport Customs spoken simulation',
+      description: 'Aprueba la simulación hablada de aduana en el aeropuerto',
       icon: Icons.shield_outlined,
-      isUnlocked: true,
-      unlockDate: 'May 14',
+      isUnlocked: false,
       accentColor: Color(0xFF4F46E5),
     ),
     BadgeItem(
       id: 'b3',
       name: 'Accent Precision',
-      description: 'Achieved >90% native pronunciation match',
+      description: 'Logra más del 90% de coincidencia en pronunciación nativa',
       icon: Icons.center_focus_strong_rounded,
-      isUnlocked: true,
-      unlockDate: 'May 15',
+      isUnlocked: false,
       accentColor: Color(0xFF0284C7),
     ),
     BadgeItem(
       id: 'b4',
       name: 'Spoken Hours',
-      description: 'Spoke English for 500+ total minutes',
+      description: 'Habla inglés durante más de 60 minutos en total',
       icon: Icons.mic_none_rounded,
       isUnlocked: false,
       accentColor: Color(0xFF059669),
@@ -93,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BadgeItem(
       id: 'b5',
       name: 'Polyglot Core',
-      description: 'Master 1,000 spoken English vocabulary words',
+      description: 'Domina 100 palabras de vocabulario en inglés hablado',
       icon: Icons.workspace_premium_rounded,
       isUnlocked: false,
       accentColor: Color(0xFFB45309),
@@ -178,10 +175,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisSpacing: 14,
                   childAspectRatio: 0.94,
                   children: [
-                    StatGridCard.buildStreakCard(streak: 14),
-                    StatGridCard.buildSpokenAudioCard(minutes: 342),
-                    StatGridCard.buildVocabularyCard(words: 850),
-                    StatGridCard.buildAccuracyCard(score: 88),
+                    StatGridCard.buildStreakCard(streak: 0),
+                    StatGridCard.buildSpokenAudioCard(minutes: 0),
+                    StatGridCard.buildVocabularyCard(words: 0),
+                    StatGridCard.buildAccuracyCard(score: 0),
                   ],
                 ),
               ),
@@ -191,7 +188,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Fluency Spider Matrix Chart (Canvas CustomPainter)
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: FluencyRadarChart(),
+                child: FluencyRadarChart(
+                  skills: {
+                    'Pronunciation': 0.15,
+                    'Fluency': 0.10,
+                    'Vocabulary': 0.20,
+                    'Grammar': 0.15,
+                    'Listening': 0.15,
+                  },
+                ),
               ),
 
               const SizedBox(height: 24),
@@ -199,7 +204,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Practice Velocity Bezier Curve (Canvas CustomPainter)
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: ActivityVelocityChart(),
+                child: ActivityVelocityChart(
+                  weeklyMinutes: [0, 0, 0, 0, 0, 0, 0],
+                ),
               ),
 
               const SizedBox(height: 24),
@@ -469,7 +476,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'B1 Conversationalist • Seattle, USA',
+                        'A1 • Principiante desde cero',
                         style: TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 12,
@@ -494,11 +501,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildHeaderMetric('14', 'DAYS STREAK'),
+                  _buildHeaderMetric('0', 'DAYS STREAK'),
                   Container(width: 1, height: 22, color: const Color(0xFF334155)),
-                  _buildHeaderMetric('342m', 'SPOKEN TIME'),
+                  _buildHeaderMetric('0m', 'SPOKEN TIME'),
                   Container(width: 1, height: 22, color: const Color(0xFF334155)),
-                  _buildHeaderMetric('850', 'WORDS'),
+                  _buildHeaderMetric('0', 'WORDS'),
                 ],
               ),
             ),

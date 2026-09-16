@@ -148,3 +148,4 @@ class _HarmonicWavePainter extends CustomPainter {
         oldDelegate.primaryColor != primaryColor;
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/theme/voca_theme.dart';
-import 'features/navigation/main_nav_screen.dart';
+import 'features/onboarding/screens/onboarding_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +23,7 @@ class VocaApp extends StatelessWidget {
       title: 'VOCA - Speak English',
       debugShowCheckedModeBanner: false,
       theme: VocaTheme.lightTheme,
-      home: const MainNavScreen(),
+      home: const OnboardingScreen(),
     );
   }
 }

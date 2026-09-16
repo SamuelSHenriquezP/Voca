@@ -16,9 +16,9 @@ class TopStickyBar extends StatelessWidget {
 
   const TopStickyBar({
     super.key,
-    this.streakDays = 14,
+    this.streakDays = 0,
     this.hearts = 5,
-    this.gems = 480,
+    this.gems = 0,
     this.languageCode = 'EN',
     this.onFlagTap,
     this.onStreakTap,
