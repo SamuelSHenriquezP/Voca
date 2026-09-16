@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/utils/audio_tts_service.dart';
+import '../../../core/utils/haptic_feedback_utils.dart';
+import '../../../core/widgets/bouncy_tap.dart';
 import '../models/chat_message.dart';
 
 class SpeechBubble extends StatelessWidget {
@@ -73,6 +76,28 @@ class SpeechBubble extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Audio speaker button
+                      BouncyTap(
+                        onTap: () {
+                          VocaHaptics.selection();
+                          AudioTtsService().speak(message.text);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: isUser
+                                ? Colors.white.withOpacity(0.18)
+                                : const Color(0xFFEEF2FF),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.volume_up_rounded,
+                            size: 13,
+                            color: isUser ? Colors.white : const Color(0xFF4F46E5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
                       Text(
                         message.time,
                         style: VocaTypography.caption.copyWith(
@@ -100,6 +125,61 @@ class SpeechBubble extends StatelessWidget {
                       ],
                     ],
                   ),
+                  if (message.coachGrammarTip != null || message.coachPronunciationTip != null) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isUser ? Colors.black.withOpacity(0.15) : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isUser ? Colors.white24 : const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (message.coachGrammarTip != null)
+                            Row(
+                              children: [
+                                const Icon(Icons.check_circle_outline_rounded, size: 12, color: Color(0xFF10B981)),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    message.coachGrammarTip!,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: isUser ? Colors.white.withOpacity(0.9) : const Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (message.coachPronunciationTip != null) ...[
+                            if (message.coachGrammarTip != null) const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.record_voice_over_rounded, size: 12, color: Color(0xFF38BDF8)),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    message.coachPronunciationTip!,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: isUser ? Colors.white.withOpacity(0.9) : const Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
