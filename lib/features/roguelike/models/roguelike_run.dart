@@ -132,3 +132,4 @@ class RoguelikeRunState {
     difficultyMultiplier += 0.35; // Roguelike scaling!
   }
 }
+

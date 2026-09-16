@@ -8,6 +8,7 @@ import '../../lesson/screens/lesson_screen.dart';
 import '../../roguelike/games/intonation_rider_game.dart';
 import '../../roguelike/games/minimal_pair_game.dart';
 import '../../roguelike/games/speed_blitz_game.dart';
+import '../../roguelike/screens/expedition_map_screen.dart';
 import '../../roguelike/screens/roguelike_run_screen.dart';
 
 class ArcadeScreen extends StatefulWidget {
@@ -449,40 +450,90 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Clear escalating floors, unlock legendary linguistic relics, and conquer unscripted boss encounters.',
+            'Procedural branching map, authentic English card deck-building, tactical boss duels, and acoustic mini-puzzles.',
             style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.4),
           ),
           const SizedBox(height: 16),
-          BouncyTap(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const RoguelikeRunScreen()),
-              );
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0284C7),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
-                  SizedBox(width: 6),
-                  Text(
-                    'START NEW RUN',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: BouncyTap(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ExpeditionMapScreen()),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0284C7), Color(0xFF0369A1)],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0284C7).withOpacity(0.4),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.map_rounded, color: Colors.white, size: 18),
+                        SizedBox(width: 6),
+                        Text(
+                          'PROCEDURAL MAP',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: BouncyTap(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const RoguelikeRunScreen()),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E293B),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFF334155)),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.bolt_rounded, color: Color(0xFFF59E0B), size: 16),
+                        SizedBox(width: 4),
+                        Text(
+                          'DRILLS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
