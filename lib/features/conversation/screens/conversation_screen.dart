@@ -7,6 +7,7 @@ import '../../../core/utils/sound_effects.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../models/chat_message.dart';
+import '../services/contextual_conversation_engine.dart';
 import '../widgets/coach_tip_card.dart';
 import '../widgets/harmonic_spectrum_visualizer.dart';
 import '../widgets/npc_avatar_card.dart';
@@ -56,6 +57,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
   String _currentGrammarTip = 'Use natural modal formulas like "Could I get..." or "I\'ll be staying...".';
   String _currentPronunciationTip = 'Maintain smooth connected speech rhythm.';
   int _currentFluencyScore = 92;
+  String? _dynamicSuggestedPhrase;
+  String? _dynamicHint;
 
   late ScenarioItem _activeScenario;
   late List<ChatMessage> _messages;
@@ -216,6 +219,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _currentGrammarTip = firstTurn.coachGrammarTip;
     _currentPronunciationTip = firstTurn.coachPronunciationTip;
     _currentFluencyScore = 92;
+    _dynamicSuggestedPhrase = firstTurn.suggestedUserResponse;
+    _dynamicHint = firstTurn.hintContext;
 
     _messages = [
       ChatMessage(
@@ -268,71 +273,80 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
-  void _processUserTurn() {
+  void _processUserTurn([String? customText]) {
     final turns = _activeTurns;
     final turn = _currentTurn;
+    final textToProcess = (customText != null && customText.trim().isNotEmpty)
+        ? customText.trim()
+        : (_dynamicSuggestedPhrase ?? turn.suggestedUserResponse);
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    final result = ContextualConversationEngine.processUserInput(
+      scenarioId: _activeScenario.id,
+      personaName: _activeScenario.personaName,
+      userText: textToProcess,
+      history: _messages,
+      topicTitle: _activeScenario.title,
+    );
+
+    SoundEffects.playSuccess();
+    VocaHaptics.medium();
+
+    setState(() {
+      _messages.add(
+        ChatMessage(
+          id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+          text: textToProcess,
+          isUser: true,
+          time: '14:04',
+          accuracyScore: result.accuracyScore,
+          coachGrammarTip: result.grammarTip,
+          coachPronunciationTip: result.pronunciationTip,
+        ),
+      );
+
+      _currentGrammarTip = result.grammarTip;
+      _currentPronunciationTip = result.pronunciationTip;
+      _currentFluencyScore = result.accuracyScore;
+      _dynamicSuggestedPhrase = result.suggestedFollowUp;
+      _dynamicHint = result.hint;
+      _statusText = '${_activeScenario.personaName} thinking...';
+      _scrollToBottom();
+    });
+
+    // NPC response after natural conversational pause
+    Future.delayed(const Duration(milliseconds: 900), () {
       if (!mounted) return;
 
-      SoundEffects.playSuccess();
-      VocaHaptics.medium();
-
       setState(() {
+        _isNpcSpeaking = true;
+        _statusText = '${_activeScenario.personaName} speaking...';
         _messages.add(
           ChatMessage(
-            id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-            text: turn.suggestedUserResponse,
-            isUser: true,
-            time: '14:04',
-            accuracyScore: (91 + (_currentTurnIndex * 3)).clamp(90, 98),
-            coachGrammarTip: turn.coachGrammarTip,
-            coachPronunciationTip: turn.coachPronunciationTip,
+            id: 'npc_${DateTime.now().millisecondsSinceEpoch}',
+            text: result.replyText,
+            isUser: false,
+            time: '14:05',
           ),
         );
-
-        _currentGrammarTip = turn.coachGrammarTip;
-        _currentPronunciationTip = turn.coachPronunciationTip;
-        _currentFluencyScore = (92 + _currentTurnIndex * 3).clamp(90, 99);
-        _statusText = '${_activeScenario.personaName} thinking...';
         _scrollToBottom();
       });
 
-      // NPC response after natural conversational pause
-      Future.delayed(const Duration(milliseconds: 1100), () {
+      // Trigger native voice synthesis for NPC response
+      AudioTtsService().speak(result.replyText);
+
+      Future.delayed(const Duration(milliseconds: 2200), () {
         if (!mounted) return;
 
         setState(() {
-          _isNpcSpeaking = true;
-          _statusText = '${_activeScenario.personaName} speaking...';
-          _messages.add(
-            ChatMessage(
-              id: 'npc_${DateTime.now().millisecondsSinceEpoch}',
-              text: turn.npcReply,
-              isUser: false,
-              time: '14:05',
-            ),
-          );
-          _scrollToBottom();
-        });
+          _isNpcSpeaking = false;
+          _currentTurnIndex++;
 
-        // Trigger native voice synthesis for NPC response
-        AudioTtsService().speak(turn.npcReply);
-
-        Future.delayed(const Duration(milliseconds: 2200), () {
-          if (!mounted) return;
-
-          setState(() {
-            _isNpcSpeaking = false;
-            _currentTurnIndex++;
-
-            if (_currentTurnIndex >= turns.length) {
-              _statusText = 'Dialogue Cleared!';
-              _handleDialogueCompleted();
-            } else {
-              _statusText = 'Turn ${_currentTurnIndex + 1} of ${turns.length}: Speak your next response';
-            }
-          });
+          if (_currentTurnIndex >= turns.length) {
+            _statusText = 'Dialogue Cleared!';
+            _handleDialogueCompleted();
+          } else {
+            _statusText = 'Turn ${_currentTurnIndex + 1} of ${turns.length}: Speak your next response';
+          }
         });
       });
     });
@@ -386,7 +400,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   void _handleHint() {
-    final turn = _currentTurn;
+    final phrase = _dynamicSuggestedPhrase ?? _currentTurn.suggestedUserResponse;
+    final hint = _dynamicHint ?? _currentTurn.hintContext;
 
     showModalBottomSheet(
       context: context,
@@ -422,7 +437,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      turn.suggestedUserResponse,
+                      phrase,
                       style: VocaTypography.bodyLarge.copyWith(
                         color: const Color(0xFF4F46E5),
                         fontWeight: FontWeight.w600,
@@ -431,7 +446,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ),
                   BouncyTap(
                     onTap: () {
-                      AudioTtsService().speak(turn.suggestedUserResponse);
+                      AudioTtsService().speak(phrase);
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),
@@ -452,7 +467,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    turn.hintContext,
+                    hint,
                     style: VocaTypography.bodySmall.copyWith(fontSize: 12),
                   ),
                 ),
@@ -695,7 +710,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   BouncyTap(
                     onTap: () {
                       VocaHaptics.selection();
-                      AudioTtsService().speak(turn.suggestedUserResponse);
+                      final p = _dynamicSuggestedPhrase ?? turn.suggestedUserResponse;
+                      AudioTtsService().speak(p);
                     },
                     child: Container(
                       padding: const EdgeInsets.all(6),
@@ -721,7 +737,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           ),
                         ),
                         Text(
-                          '"${turn.suggestedUserResponse}"',
+                          '"${_dynamicSuggestedPhrase ?? turn.suggestedUserResponse}"',
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -752,6 +768,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             onToggleRecording: _handleToggleRecording,
             onHint: _handleHint,
             onSurrender: _handleSurrender,
+            onSendText: (text) => _processUserTurn(text),
           ),
         ],
       ),
