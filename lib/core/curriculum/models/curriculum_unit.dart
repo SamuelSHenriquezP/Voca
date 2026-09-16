@@ -272,3 +272,4 @@ class BossFightScenario {
         'success_criteria_summary': successCriteriaSummary,
       };
 }
+

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/voca_colors.dart';
 import '../../core/widgets/bouncy_tap.dart';
+import '../arcade/screens/arcade_screen.dart';
 import '../conversation/screens/conversation_screen.dart';
-import '../lesson/screens/lesson_screen.dart';
 import '../path/screens/path_screen.dart';
 import '../profile/screens/profile_screen.dart';
 import '../vault/screens/vault_screen.dart';
@@ -28,9 +28,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
         onOpenLesson: () => _navigateToIndex(1),
         onOpenConversation: () => _navigateToIndex(2),
       ),
-      LessonScreen(
-        onCompleted: () => _navigateToIndex(0),
-      ),
+      const ArcadeScreen(),
       const ConversationScreen(),
       const VaultScreen(),
       const ProfileScreen(),
@@ -69,8 +67,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
               ),
               _buildNavItem(
                 index: 1,
-                icon: Icons.fitness_center_rounded,
-                label: 'DRILLS',
+                icon: Icons.sports_esports_rounded,
+                label: 'ARCADE',
                 activeColor: const Color(0xFF059669),
               ),
               _buildNavItem(
