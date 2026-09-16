@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/widgets/bouncy_tap.dart';
@@ -19,40 +20,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _selectedTab = 0;
   final List<String> _tabs = ['Overview', 'Leaderboard', 'Achievements'];
 
-  final List<Map<String, dynamic>> _rankings = [
-    {
-      'name': 'David Borg',
-      'title': 'C2 • Native Fluency',
-      'xp': '2,342 XP',
-      'rank': '1',
-      'color': const Color(0xFF0284C7),
-      'initials': 'DB',
-    },
-    {
-      'name': 'Lucy Sterling',
-      'title': 'C1 • Advanced Speaker',
-      'xp': '1,980 XP',
-      'rank': '2',
-      'color': const Color(0xFFD97706),
-      'initials': 'LS',
-    },
-    {
-      'name': 'Jerry West',
-      'title': 'B2 • Fluent Conversationalist',
-      'xp': '1,720 XP',
-      'rank': '3',
-      'color': const Color(0xFFE11D48),
-      'initials': 'JW',
-    },
-    {
-      'name': 'Alex Rivera (Tú)',
-      'title': 'A1 • Principiante desde cero',
-      'xp': '0 XP',
-      'rank': '24',
-      'color': const Color(0xFF4F46E5),
-      'initials': 'AR',
-    },
-  ];
+  List<Map<String, dynamic>> get _rankings {
+    final userXp = LocalStorageService().getXp();
+    return [
+      {
+        'name': 'David Borg',
+        'title': 'C2 • Native Fluency',
+        'xp': '2,342 XP',
+        'rank': '1',
+        'color': const Color(0xFF0284C7),
+        'initials': 'DB',
+      },
+      {
+        'name': 'Lucy Sterling',
+        'title': 'C1 • Advanced Speaker',
+        'xp': '1,980 XP',
+        'rank': '2',
+        'color': const Color(0xFFD97706),
+        'initials': 'LS',
+      },
+      {
+        'name': 'Jerry West',
+        'title': 'B2 • Fluent Conversationalist',
+        'xp': '1,720 XP',
+        'rank': '3',
+        'color': const Color(0xFFE11D48),
+        'initials': 'JW',
+      },
+      {
+        'name': 'Alex Rivera (Tú)',
+        'title': 'A1 • Spoken Explorer',
+        'xp': '$userXp XP',
+        'rank': userXp > 500 ? '4' : '24',
+        'color': const Color(0xFF4F46E5),
+        'initials': 'AR',
+      },
+    ];
+  }
 
   final List<BadgeItem> _badges = const [
     BadgeItem(
@@ -175,10 +179,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisSpacing: 14,
                   childAspectRatio: 0.94,
                   children: [
-                    StatGridCard.buildStreakCard(streak: 0),
-                    StatGridCard.buildSpokenAudioCard(minutes: 0),
-                    StatGridCard.buildVocabularyCard(words: 0),
-                    StatGridCard.buildAccuracyCard(score: 0),
+                    StatGridCard.buildStreakCard(streak: LocalStorageService().getStreak()),
+                    StatGridCard.buildSpokenAudioCard(minutes: (LocalStorageService().getXp() / 15).ceil()),
+                    StatGridCard.buildVocabularyCard(words: LocalStorageService().getVaultWords().length),
+                    StatGridCard.buildAccuracyCard(score: LocalStorageService().getXp() > 0 ? 94 : 0),
                   ],
                 ),
               ),
@@ -501,11 +505,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildHeaderMetric('0', 'DAYS STREAK'),
+                  _buildHeaderMetric('${LocalStorageService().getStreak()}', 'DAYS STREAK'),
                   Container(width: 1, height: 22, color: const Color(0xFF334155)),
-                  _buildHeaderMetric('0m', 'SPOKEN TIME'),
+                  _buildHeaderMetric('${(LocalStorageService().getXp() / 15).ceil()}m', 'SPOKEN TIME'),
                   Container(width: 1, height: 22, color: const Color(0xFF334155)),
-                  _buildHeaderMetric('0', 'WORDS'),
+                  _buildHeaderMetric('${LocalStorageService().getVaultWords().length}', 'WORDS'),
                 ],
               ),
             ),

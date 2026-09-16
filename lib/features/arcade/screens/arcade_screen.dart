@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/curriculum/data/conversation_topics_catalog.dart';
 import '../../../core/curriculum/services/curriculum_engine.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
@@ -22,7 +23,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
   String _selectedCefr = 'ALL';
   String _searchQuery = '';
 
-  final List<String> _cefrFilters = const ['ALL', 'A1', 'A2', 'B1', 'B2'];
+  final List<String> _cefrFilters = const ['ALL', 'A1', 'A2', 'B1', 'B2', 'C1'];
 
   List<ConversationTopicMeta> get _filteredTopics {
     return ConversationTopicsCatalog.allTopics.where((t) {
@@ -157,7 +158,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '100 CONVERSATION TOPICS',
+                    '300 CONVERSATION TOPICS',
                     style: VocaTypography.caption.copyWith(
                       fontWeight: FontWeight.w800,
                       color: const Color(0xFF0F172A),
@@ -376,13 +377,13 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: const Color(0xFF334155)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.military_tech_rounded, size: 14, color: Color(0xFFFBBF24)),
-                  SizedBox(width: 4),
+                  const Icon(Icons.military_tech_rounded, size: 14, color: Color(0xFFFBBF24)),
+                  const SizedBox(width: 4),
                   Text(
-                    'High: 2,450',
-                    style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                    'Floor ${LocalStorageService().getHighestFloor()} • ${LocalStorageService().getXp()} XP',
+                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),

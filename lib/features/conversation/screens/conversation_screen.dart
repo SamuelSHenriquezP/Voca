@@ -9,6 +9,7 @@ import '../../../core/widgets/voca_button.dart';
 import '../models/chat_message.dart';
 import '../services/contextual_conversation_engine.dart';
 import '../widgets/coach_tip_card.dart';
+import '../widgets/conversation_history_sheet.dart';
 import '../widgets/harmonic_spectrum_visualizer.dart';
 import '../widgets/npc_avatar_card.dart';
 import '../widgets/scenario_selector_sheet.dart';
@@ -354,6 +355,37 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   void _handleDialogueCompleted() {
     LocalStorageService().addXp(35);
+
+    // Save full transcript and coaching scores to SQLite
+    final sessionId = 'conv_${DateTime.now().millisecondsSinceEpoch}';
+    final messagesData = _messages.map((m) => {
+      'id': m.id,
+      'isUser': m.isUser,
+      'text': m.text,
+      'audioPath': null,
+      'fluencyScore': m.accuracyScore ?? 0,
+      'grammarTip': m.coachGrammarTip,
+      'pronunciationTip': m.coachPronunciationTip,
+    }).toList();
+
+    LocalStorageService().saveConversationHistory(
+      sessionId: sessionId,
+      scenarioId: _activeScenario.id,
+      scenarioTitle: _activeScenario.title,
+      personaName: _activeScenario.personaName,
+      personaRole: _activeScenario.personaRole,
+      totalTurns: _messages.length,
+      averageFluency: _currentFluencyScore,
+      messages: messagesData,
+    );
+
+    LocalStorageService().logPracticeActivity(
+      activityType: 'conversation',
+      durationMinutes: 3.0,
+      xpEarned: 35,
+      accuracyScore: _currentFluencyScore.toDouble(),
+    );
+
     SoundEffects.playCelebration();
     VocaHaptics.success();
 
@@ -588,26 +620,46 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ),
                       ),
 
-                      BouncyTap(
-                        onTap: () {
-                          ScenarioSelectorSheet.show(
-                            context,
-                            selectedId: _activeScenario.id,
-                            onSelect: _switchScenario,
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            shape: BoxShape.circle,
+                      Row(
+                        children: [
+                          BouncyTap(
+                            onTap: () => ConversationHistorySheet.show(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.history_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.tune_rounded,
-                            color: Colors.white,
-                            size: 18,
+                          const SizedBox(width: 8),
+                          BouncyTap(
+                            onTap: () {
+                              ScenarioSelectorSheet.show(
+                                context,
+                                selectedId: _activeScenario.id,
+                                onSelect: _switchScenario,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.tune_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

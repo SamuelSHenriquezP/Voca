@@ -169,7 +169,11 @@ class _PathScreenState extends State<PathScreen> {
       body: Column(
         children: [
           // Sticky Top Stats Bar
-          const TopStickyBar(),
+          TopStickyBar(
+            streakDays: LocalStorageService().getStreak(),
+            gems: LocalStorageService().getXp() ~/ 10,
+            hearts: LocalStorageService().getLives(),
+          ),
 
           // Unit Switcher Selector Strip
           _buildUnitSelector(),
