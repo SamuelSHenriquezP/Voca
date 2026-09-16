@@ -5,6 +5,7 @@ import '../conversation/screens/conversation_screen.dart';
 import '../lesson/screens/lesson_screen.dart';
 import '../path/screens/path_screen.dart';
 import '../profile/screens/profile_screen.dart';
+import '../vault/screens/vault_screen.dart';
 
 class MainNavScreen extends StatefulWidget {
   const MainNavScreen({super.key});
@@ -31,6 +32,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
         onCompleted: () => _navigateToIndex(0),
       ),
       const ConversationScreen(),
+      const VaultScreen(),
       const ProfileScreen(),
     ];
 
@@ -40,11 +42,11 @@ class _MainNavScreenState extends State<MainNavScreen> {
         children: screens,
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
         decoration: BoxDecoration(
           color: Colors.white,
           border: const Border(
-            top: BorderSide(color: VocaColors.borderLight, width: 2),
+            top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
           ),
           boxShadow: [
             BoxShadow(
@@ -63,25 +65,31 @@ class _MainNavScreenState extends State<MainNavScreen> {
                 index: 0,
                 icon: Icons.map_rounded,
                 label: 'PATH',
-                activeColor: VocaColors.primaryPurple,
+                activeColor: const Color(0xFF4F46E5),
               ),
               _buildNavItem(
                 index: 1,
                 icon: Icons.fitness_center_rounded,
                 label: 'DRILLS',
-                activeColor: VocaColors.emeraldGreen,
+                activeColor: const Color(0xFF059669),
               ),
               _buildNavItem(
                 index: 2,
                 icon: Icons.mic_external_on_rounded,
                 label: 'VOICE AI',
-                activeColor: VocaColors.accentPink,
+                activeColor: const Color(0xFFE11D48),
               ),
               _buildNavItem(
                 index: 3,
+                icon: Icons.style_rounded,
+                label: 'VAULT',
+                activeColor: const Color(0xFF0284C7),
+              ),
+              _buildNavItem(
+                index: 4,
                 icon: Icons.person_rounded,
                 label: 'PROFILE',
-                activeColor: VocaColors.sunOrange,
+                activeColor: const Color(0xFFD97706),
               ),
             ],
           ),

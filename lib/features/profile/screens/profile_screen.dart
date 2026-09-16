@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../widgets/activity_velocity_chart.dart';
+import '../widgets/fluency_radar_chart.dart';
 import '../widgets/badge_gallery.dart';
 import '../widgets/byok_modal.dart';
 import '../widgets/stat_grid_card.dart';
@@ -150,217 +152,235 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 20),
 
-            // 3. Metric Cards Grid
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'METRICS & MASTERY',
-                style: VocaTypography.caption.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: VocaColors.darkSlate,
-                  letterSpacing: 1.1,
+            // 3. Tab Content
+            if (_selectedTab == 0) ...[
+              // Overview: Metrics & Mastery Cards
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'METRICS & MASTERY',
+                  style: VocaTypography.caption.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: VocaColors.darkSlate,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GridView.count(
-                crossAxisCount: 2,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisSpacing: 14,
+                  mainAxisSpacing: 14,
+                  childAspectRatio: 0.94,
+                  children: [
+                    StatGridCard.buildStreakCard(streak: 14),
+                    StatGridCard.buildSpokenAudioCard(minutes: 342),
+                    StatGridCard.buildVocabularyCard(words: 850),
+                    StatGridCard.buildAccuracyCard(score: 88),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Fluency Spider Matrix Chart (Canvas CustomPainter)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: FluencyRadarChart(),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Practice Velocity Bezier Curve (Canvas CustomPainter)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: ActivityVelocityChart(),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Settings & BYOK
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: BouncyTap(
+                  onTap: () => ByokModal.show(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEEF2FF),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.key_rounded, color: Color(0xFF4F46E5), size: 18),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'AI Voice Engine (BYOK)',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Google Gemini 1.5, OpenAI GPT-4o, Azure Voice',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF64748B),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF94A3B8)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ] else if (_selectedTab == 1) ...[
+              // Leaderboard Tab
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'WEEKLY LEAGUE',
+                      style: VocaTypography.caption.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: VocaColors.darkSlate,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEEF2FF),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFF4F46E5).withOpacity(0.3)),
+                      ),
+                      child: const Text(
+                        'Division I • Top 3 Promoted',
+                        style: TextStyle(
+                          color: Color(0xFF4F46E5),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: 0.94,
-                children: [
-                  StatGridCard.buildStreakCard(streak: 14),
-                  StatGridCard.buildSpokenAudioCard(minutes: 342),
-                  StatGridCard.buildVocabularyCard(words: 850),
-                  StatGridCard.buildAccuracyCard(score: 88),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            // 4. Weekly League Ranking (Clean Minimalist Rows)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'WEEKLY LEADERBOARD',
-                    style: VocaTypography.caption.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: VocaColors.darkSlate,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  Text(
-                    'Division I',
-                    style: VocaTypography.caption.copyWith(
-                      color: const Color(0xFF4F46E5),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _rankings.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final user = _rankings[index];
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFFE2E8F0),
-                      width: 1.0,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      // Monogram Avatar
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFFF1F5F9),
-                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-                        ),
-                        child: Center(
-                          child: Text(
-                            user['initials'],
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF334155),
-                            ),
-                          ),
-                        ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: _rankings.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final user = _rankings[index];
+                  final isCurrent = user['name'].toString().contains('(You)');
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isCurrent ? const Color(0xFFF8FAFC) : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isCurrent ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+                        width: isCurrent ? 1.6 : 1.0,
                       ),
-                      const SizedBox(width: 12),
-
-                      // Name & Tier
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user['name'],
-                              style: const TextStyle(
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isCurrent ? const Color(0xFF4F46E5) : const Color(0xFFF1F5F9),
+                          ),
+                          child: Center(
+                            child: Text(
+                              user['initials'],
+                              style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F172A),
+                                fontWeight: FontWeight.w700,
+                                color: isCurrent ? Colors.white : const Color(0xFF334155),
                               ),
                             ),
-                            const SizedBox(height: 1),
-                            Text(
-                              user['title'],
-                              style: const TextStyle(
-                                color: Color(0xFF94A3B8),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Rank Pill Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-                        ),
-                        child: Text(
-                          '#${user['rank']} • ${user['xp']}',
-                          style: const TextStyle(
-                            color: Color(0xFF334155),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            // 5. Achievements Gallery
-            BadgeGallery(badges: _badges),
-
-            const SizedBox(height: 24),
-
-            // 6. Settings & BYOK
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: BouncyTap(
-                onTap: () => ByokModal.show(context),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEEF2FF),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.key_rounded, color: Color(0xFF4F46E5), size: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'AI Voice Engine (BYOK)',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF0F172A),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user['name'],
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF0F172A),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Google Gemini 1.5, OpenAI GPT-4o, Azure Voice',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF64748B),
-                                fontWeight: FontWeight.w500,
+                              const SizedBox(height: 1),
+                              Text(
+                                user['title'],
+                                style: const TextStyle(
+                                  color: Color(0xFF94A3B8),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF94A3B8)),
-                    ],
-                  ),
-                ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '#${user['rank']} • ${user['xp']}',
+                            style: const TextStyle(
+                              color: Color(0xFF334155),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ),
+            ] else ...[
+              // Achievements Tab
+              BadgeGallery(badges: _badges),
+            ],
           ],
         ),
       ),

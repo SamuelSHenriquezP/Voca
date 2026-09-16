@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/voca_colors.dart';
-import '../../../core/theme/voca_typography.dart';
 
 class StatGridCard extends StatelessWidget {
   final String title;

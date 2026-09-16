@@ -89,9 +89,9 @@ class NpcAvatarCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Center(
+                child: const Center(
                   child: CustomPaint(
-                    size: const Size(48, 48),
+                    size: Size(48, 48),
                     painter: OfficerVectorPainter(),
                   ),
                 ),
@@ -166,13 +166,17 @@ class NpcAvatarCard extends StatelessWidget {
 
 /// Custom Vector Illustration for the Officer Persona (No emojis)
 class OfficerVectorPainter extends CustomPainter {
+  final Color color;
+
+  const OfficerVectorPainter({this.color = const Color(0xFFE2E8F0)});
+
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
 
     final strokePaint = Paint()
-      ..color = const Color(0xFFE2E8F0)
+      ..color = color
       ..strokeWidth = 1.6
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

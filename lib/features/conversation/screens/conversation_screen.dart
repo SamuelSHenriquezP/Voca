@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/waveform_widget.dart';
 import '../models/chat_message.dart';
 import '../widgets/coach_tip_card.dart';
+import '../widgets/harmonic_spectrum_visualizer.dart';
 import '../widgets/npc_avatar_card.dart';
+import '../widgets/scenario_selector_sheet.dart';
 import '../widgets/speech_bubble.dart';
 import '../widgets/voice_controls.dart';
 
@@ -29,27 +29,34 @@ class _ConversationScreenState extends State<ConversationScreen> {
   bool _isNpcSpeaking = false;
   String _statusText = 'Ready to converse';
 
-  final List<ChatMessage> _messages = [
-    const ChatMessage(
-      id: 'm1',
-      text: 'Good afternoon. What is the primary purpose of your visit to the United States?',
-      isUser: false,
-      time: '14:02',
-    ),
-    const ChatMessage(
-      id: 'm2',
-      text: "I'm here for a vacation and visiting my family in Seattle.",
-      isUser: true,
-      time: '14:03',
-      accuracyScore: 94,
-    ),
-    const ChatMessage(
-      id: 'm3',
-      text: 'Understood. How long do you plan on staying, and where will you be residing?',
-      isUser: false,
-      time: '14:03',
-    ),
-  ];
+  late ScenarioItem _activeScenario;
+  late List<ChatMessage> _messages;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeScenario = ScenarioSelectorSheet.scenarios.first;
+    _initScenarioMessages();
+  }
+
+  void _initScenarioMessages() {
+    _messages = [
+      ChatMessage(
+        id: 'init_npc',
+        text: _activeScenario.openingMessage,
+        isUser: false,
+        time: '14:00',
+      ),
+    ];
+  }
+
+  void _switchScenario(ScenarioItem scenario) {
+    setState(() {
+      _activeScenario = scenario;
+      _initScenarioMessages();
+      _statusText = 'Ready with ${scenario.personaName}';
+    });
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -140,7 +147,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               children: [
                 const Icon(Icons.lightbulb_outline_rounded, color: Color(0xFFD97706), size: 24),
                 const SizedBox(width: 8),
-                Text('Suggested Phrase', style: VocaTypography.heading2),
+                Text('Suggested Response', style: VocaTypography.heading2),
               ],
             ),
             const SizedBox(height: 14),
@@ -151,7 +158,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Text(
-                '"I will be staying for two weeks at my brother\'s place in Seattle."',
+                _activeScenario.suggestedPhrase,
                 style: VocaTypography.bodyLarge.copyWith(color: const Color(0xFF4F46E5)),
               ),
             ),
@@ -162,7 +169,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Customs officers look for concise, direct answers with specific durations and locations.',
+                    _activeScenario.hintContext,
                     style: VocaTypography.bodySmall.copyWith(fontSize: 12),
                   ),
                 ),
@@ -209,7 +216,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         children: [
           // Minimalist Obsidian Header
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             decoration: const BoxDecoration(
               color: Color(0xFF0F172A),
               borderRadius: BorderRadius.only(
@@ -226,7 +233,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       BouncyTap(
-                        onTap: () => Navigator.of(context).pop(),
+                        onTap: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
+                        },
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -240,39 +251,60 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: VocaColors.accentPink.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: VocaColors.accentPink, width: 1.5),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.mic_external_on_rounded, color: Colors.white, size: 16),
-                            SizedBox(width: 6),
-                            Text(
-                              'VOICE BOSS BATTLE',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.1,
+
+                      // Interactive Scenario Switcher Trigger Pill
+                      BouncyTap(
+                        onTap: () {
+                          ScenarioSelectorSheet.show(
+                            context,
+                            selectedId: _activeScenario.id,
+                            onSelect: _switchScenario,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _activeScenario.accentColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: _activeScenario.accentColor, width: 1.5),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.swap_horiz_rounded, color: _activeScenario.accentColor, size: 16),
+                              const SizedBox(width: 6),
+                              Text(
+                                _activeScenario.title.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.more_vert_rounded,
-                          color: Colors.white,
-                          size: 20,
+
+                      BouncyTap(
+                        onTap: () {
+                          ScenarioSelectorSheet.show(
+                            context,
+                            selectedId: _activeScenario.id,
+                            onSelect: _switchScenario,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.tune_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ],
@@ -281,23 +313,71 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
                   // NPC Persona Avatar & Status Card
                   NpcAvatarCard(
-                    name: widget.personaName,
-                    role: widget.personaRole,
+                    name: _activeScenario.personaName,
+                    role: _activeScenario.personaRole,
                     isSpeaking: _isNpcSpeaking,
                     statusText: _statusText,
                   ),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
-                  // Live Waveform Visualizer
-                  WaveformWidget(
+                  // Animated Harmonic Spectrum Canvas (Multi-sine waves & sound particles)
+                  HarmonicSpectrumVisualizer(
                     isSpeaking: _isUserRecording || _isNpcSpeaking,
-                    barColor: _isUserRecording ? VocaColors.accentPink : VocaColors.electricCyan,
-                    barCount: 24,
-                    maxHeight: 38,
+                    primaryColor: _isUserRecording ? const Color(0xFFF43F5E) : _activeScenario.accentColor,
+                    secondaryColor: const Color(0xFF38BDF8),
+                    height: 44,
                   ),
                 ],
               ),
+            ),
+          ),
+
+          // Real-Time Speech Telemetry Bar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF1F5F9),
+              border: Border(
+                bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+              ),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.speed_rounded, size: 14, color: Color(0xFF0284C7)),
+                    SizedBox(width: 4),
+                    Text(
+                      'Pacing: 128 WPM',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                    ),
+                  ],
+                ),
+                Text('•', style: TextStyle(color: Color(0xFFCBD5E1))),
+                Row(
+                  children: [
+                    Icon(Icons.graphic_eq_rounded, size: 14, color: Color(0xFF059669)),
+                    SizedBox(width: 4),
+                    Text(
+                      'Pronunciation: 94%',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                    ),
+                  ],
+                ),
+                Text('•', style: TextStyle(color: Color(0xFFCBD5E1))),
+                Row(
+                  children: [
+                    Icon(Icons.verified_rounded, size: 14, color: Color(0xFF4F46E5)),
+                    SizedBox(width: 4),
+                    Text(
+                      'Standard US',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
 

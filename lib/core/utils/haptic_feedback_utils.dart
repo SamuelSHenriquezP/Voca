@@ -23,5 +23,11 @@ class HapticUtils {
   static void error() {
     HapticFeedback.vibrate();
   }
+
+  static void success() {
+    HapticFeedback.mediumImpact();
+  }
 }
+
+typedef VocaHaptics = HapticUtils;
 
