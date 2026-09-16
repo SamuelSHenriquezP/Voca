@@ -4,14 +4,14 @@ import '../theme/voca_typography.dart';
 import '../utils/haptic_feedback_utils.dart';
 
 enum VocaButtonVariant {
-  primary, // Purple
-  success, // Emerald Green
-  accent, // Pink
-  warning, // Orange
-  cyan, // Electric Cyan
-  danger, // Ruby Red
-  gold, // Gold / XP
-  neutral, // White with border
+  primary, // Indigo
+  success, // Emerald
+  accent, // Rose
+  warning, // Amber
+  cyan, // Sky Blue
+  danger, // Red
+  gold, // Bronze / Gold
+  neutral, // Clean White with subtle border
   ghost, // Transparent
 }
 
@@ -35,10 +35,10 @@ class VocaButton extends StatefulWidget {
     this.child,
     required this.onPressed,
     this.variant = VocaButtonVariant.primary,
-    this.height = 54,
+    this.height = 48,
     this.width,
-    this.depth = 5.0,
-    this.borderRadius = 18.0,
+    this.depth = 3.5,
+    this.borderRadius = 14.0,
     this.isFullWidth = false,
     this.isLoading = false,
   });
@@ -53,60 +53,58 @@ class _VocaButtonState extends State<VocaButton> {
   bool get _isEnabled => widget.onPressed != null && !widget.isLoading;
 
   Color get _surfaceColor {
-    if (!_isEnabled) return VocaColors.lockedGray;
+    if (!_isEnabled) return const Color(0xFFF4F4F5);
     switch (widget.variant) {
       case VocaButtonVariant.primary:
-        return VocaColors.primaryPurple;
+        return const Color(0xFF4F46E5);
       case VocaButtonVariant.success:
-        return VocaColors.emeraldGreen;
+        return const Color(0xFF059669);
       case VocaButtonVariant.accent:
-        return VocaColors.accentPink;
+        return const Color(0xFFE11D48);
       case VocaButtonVariant.warning:
-        return VocaColors.sunOrange;
+        return const Color(0xFFD97706);
       case VocaButtonVariant.cyan:
-        return VocaColors.electricCyan;
+        return const Color(0xFF0284C7);
       case VocaButtonVariant.danger:
-        return VocaColors.rubyRed;
+        return const Color(0xFFDC2626);
       case VocaButtonVariant.gold:
-        return VocaColors.goldXp;
+        return const Color(0xFFB45309);
       case VocaButtonVariant.neutral:
-        return VocaColors.cardBackground;
+        return Colors.white;
       case VocaButtonVariant.ghost:
         return Colors.transparent;
     }
   }
 
   Color get _shadowColor {
-    if (!_isEnabled) return VocaColors.lockedGrayShadow;
+    if (!_isEnabled) return const Color(0xFFE4E4E7);
     switch (widget.variant) {
       case VocaButtonVariant.primary:
-        return VocaColors.primaryPurpleShadow;
+        return const Color(0xFF3730A3);
       case VocaButtonVariant.success:
-        return VocaColors.emeraldGreenShadow;
+        return const Color(0xFF047857);
       case VocaButtonVariant.accent:
-        return VocaColors.accentPinkShadow;
+        return const Color(0xFFBE123C);
       case VocaButtonVariant.warning:
-        return VocaColors.sunOrangeShadow;
+        return const Color(0xFF92400E);
       case VocaButtonVariant.cyan:
-        return VocaColors.electricCyanShadow;
+        return const Color(0xFF0369A1);
       case VocaButtonVariant.danger:
-        return VocaColors.rubyRedShadow;
+        return const Color(0xFF991B1B);
       case VocaButtonVariant.gold:
-        return VocaColors.goldXpShadow;
+        return const Color(0xFF78350F);
       case VocaButtonVariant.neutral:
-        return VocaColors.borderSubtle;
+        return const Color(0xFFE4E4E7);
       case VocaButtonVariant.ghost:
         return Colors.transparent;
     }
   }
 
   Color get _textColor {
-    if (!_isEnabled) return Colors.white;
+    if (!_isEnabled) return const Color(0xFFA1A1AA);
     switch (widget.variant) {
       case VocaButtonVariant.neutral:
         return VocaColors.darkSlate;
-      case VocaButtonVariant.gold:
-        return const Color(0xFF6A4700);
       case VocaButtonVariant.ghost:
         return VocaColors.primaryPurple;
       default:
@@ -139,10 +137,10 @@ class _VocaButtonState extends State<VocaButton> {
 
     Widget content = widget.isLoading
         ? SizedBox(
-            height: 22,
-            width: 22,
+            height: 18,
+            width: 18,
             child: CircularProgressIndicator(
-              strokeWidth: 2.5,
+              strokeWidth: 2.0,
               valueColor: AlwaysStoppedAnimation<Color>(_textColor),
             ),
           )
@@ -160,13 +158,14 @@ class _VocaButtonState extends State<VocaButton> {
                     widget.text!,
                     style: VocaTypography.buttonText.copyWith(
                       color: _textColor,
-                      fontSize: widget.height < 48 ? 14 : 16,
+                      fontSize: widget.height < 46 ? 13 : 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
               ],
             );
 
-    Widget button = GestureDetector(
+    return GestureDetector(
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
@@ -176,7 +175,7 @@ class _VocaButtonState extends State<VocaButton> {
         height: totalHeight,
         child: Stack(
           children: [
-            // Bottom 3D Shadow Layer
+            // Minimalist 3D Lip
             if (effectiveDepth > 0)
               Positioned(
                 left: 0,
@@ -188,16 +187,16 @@ class _VocaButtonState extends State<VocaButton> {
                     color: _shadowColor,
                     borderRadius: BorderRadius.circular(widget.borderRadius),
                     border: widget.variant == VocaButtonVariant.neutral
-                        ? Border.all(color: VocaColors.borderSubtle, width: 2)
+                        ? Border.all(color: const Color(0xFFE4E4E7), width: 1)
                         : null,
                   ),
                 ),
               ),
 
-            // Top Pushable Surface Layer (Translates down when pressed)
+            // Top Pushable Face
             AnimatedPositioned(
-              duration: const Duration(milliseconds: 60),
-              curve: Curves.easeOutCubic,
+              duration: const Duration(milliseconds: 40),
+              curve: Curves.easeOut,
               left: 0,
               right: 0,
               top: currentOffset,
@@ -209,7 +208,7 @@ class _VocaButtonState extends State<VocaButton> {
                   color: _surfaceColor,
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                   border: widget.variant == VocaButtonVariant.neutral
-                      ? Border.all(color: VocaColors.borderLight, width: 2)
+                      ? Border.all(color: const Color(0xFFE4E4E7), width: 1)
                       : null,
                 ),
                 child: content,
@@ -219,8 +218,5 @@ class _VocaButtonState extends State<VocaButton> {
         ),
       ),
     );
-
-    return button;
   }
 }
-

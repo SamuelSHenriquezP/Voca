@@ -1,56 +1,52 @@
 import 'package:flutter/material.dart';
 
-/// VOCA Color Palette with 3D flat-depth shadow counterparts
+/// Ultra-minimalist, editorial palette for VOCA
 class VocaColors {
   VocaColors._();
 
-  // Primary Purple
-  static const Color primaryPurple = Color(0xFF6C5CE7);
-  static const Color primaryPurpleShadow = Color(0xFF5644D8);
-
-  // Accent Pink
-  static const Color accentPink = Color(0xFFFF4081);
-  static const Color accentPinkShadow = Color(0xFFE02868);
-
-  // Electric Cyan
-  static const Color electricCyan = Color(0xFF00D2D3);
-  static const Color electricCyanShadow = Color(0xFF01A3A4);
-
-  // Sun Orange
-  static const Color sunOrange = Color(0xFFFF9F43);
-  static const Color sunOrangeShadow = Color(0xFFEE801A);
-
-  // Emerald Green (Success)
-  static const Color emeraldGreen = Color(0xFF2ECC71);
-  static const Color emeraldGreenShadow = Color(0xFF27AE60);
-
-  // Ruby Red (Error / Hearts)
-  static const Color rubyRed = Color(0xFFFF5252);
-  static const Color rubyRedShadow = Color(0xFFD63031);
-
-  // Gold / XP
-  static const Color goldXp = Color(0xFFFECA57);
-  static const Color goldXpShadow = Color(0xFFE1A32A);
-
-  // Neutrals & Backgrounds
-  static const Color backgroundNeutral = Color(0xFFF8F9FE);
+  // Dark Canvas & Obsidian Neutrals
+  static const Color darkSlate = Color(0xFF09090B);
+  static const Color darkSurface = Color(0xFF18181B);
+  static const Color backgroundNeutral = Color(0xFFFBFBFC);
   static const Color cardBackground = Color(0xFFFFFFFF);
-  static const Color darkSlate = Color(0xFF2D3436);
-  static const Color textMuted = Color(0xFF636E72);
-  static const Color borderLight = Color(0xFFE9ECEF);
-  static const Color borderSubtle = Color(0xFFDFE6E9);
+  
+  // Borders & Dividers
+  static const Color borderSubtle = Color(0xFFE4E4E7);
+  static const Color borderLight = Color(0xFFF4F4F5);
+  static const Color textMuted = Color(0xFF71717A);
+  static const Color textSecondary = Color(0xFF52525B);
 
-  // Locked / Inactive
-  static const Color lockedGray = Color(0xFFB2BEC3);
-  static const Color lockedGrayShadow = Color(0xFF636E72);
+  // Precision Accents (Sophisticated, Non-Toy)
+  static const Color primaryPurple = Color(0xFF4F46E5); // Indigo 600
+  static const Color primaryPurpleShadow = Color(0xFF3730A3); // Indigo 800
 
-  // Soft Tint Fills
-  static const Color purpleTint = Color(0xFFF0EEFF);
-  static const Color greenTint = Color(0xFFE8F8F0);
-  static const Color redTint = Color(0xFFFFEAEA);
-  static const Color orangeTint = Color(0xFFFFF3E8);
-  static const Color cyanTint = Color(0xFFE6FAFA);
-  static const Color pinkTint = Color(0xFFFFE8F0);
-  static const Color goldTint = Color(0xFFFFF8E7);
+  static const Color accentPink = Color(0xFFE11D48); // Rose 600
+  static const Color accentPinkShadow = Color(0xFFBE123C);
+
+  static const Color electricCyan = Color(0xFF0284C7); // Sky 600
+  static const Color electricCyanShadow = Color(0xFF0369A1);
+
+  static const Color sunOrange = Color(0xFFD97706); // Amber 600
+  static const Color sunOrangeShadow = Color(0xFFB45309);
+
+  static const Color emeraldGreen = Color(0xFF059669); // Emerald 600
+  static const Color emeraldGreenShadow = Color(0xFF047857);
+
+  static const Color rubyRed = Color(0xFFDC2626); // Red 600
+  static const Color rubyRedShadow = Color(0xFFB91C1C);
+
+  static const Color goldXp = Color(0xFFD97706);
+  static const Color goldXpShadow = Color(0xFF92400E);
+
+  static const Color lockedGray = Color(0xFFD4D4D8);
+  static const Color lockedGrayShadow = Color(0xFFA1A1AA);
+
+  // Subtle Tints
+  static const Color purpleTint = Color(0xFFEEF2FF);
+  static const Color greenTint = Color(0xFFECFDF5);
+  static const Color redTint = Color(0xFFFEF2F2);
+  static const Color orangeTint = Color(0xFFFFFBEB);
+  static const Color cyanTint = Color(0xFFF0F9FF);
+  static const Color pinkTint = Color(0xFFFFF1F2);
+  static const Color goldTint = Color(0xFFFFFBEB);
 }
-

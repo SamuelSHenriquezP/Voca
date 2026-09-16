@@ -67,28 +67,24 @@ class _LessonScreenState extends State<LessonScreen> {
           PictureChoiceOption(
             id: 'opt_menu',
             label: 'The Menu',
-            emoji: '📜',
             audioPhonetic: '/ðə ˈmɛn.juː/',
             isCorrect: false,
           ),
           PictureChoiceOption(
             id: 'opt_bill',
             label: 'The Bill / Check',
-            emoji: '🧾',
             audioPhonetic: '/ðə tʃɛk/',
             isCorrect: true,
           ),
           PictureChoiceOption(
             id: 'opt_waiter',
             label: 'The Waiter',
-            emoji: '🧑‍🍳',
             audioPhonetic: '/ðə ˈweɪ.tər/',
             isCorrect: false,
           ),
           PictureChoiceOption(
             id: 'opt_fork',
             label: 'The Cutlery',
-            emoji: '🍴',
             audioPhonetic: '/ˈkʌt.lər.i/',
             isCorrect: false,
           ),
@@ -199,7 +195,18 @@ class _LessonScreenState extends State<LessonScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('🏆', style: TextStyle(fontSize: 64)),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFEEF2FF),
+                border: Border.all(color: const Color(0xFFC7D2FE), width: 1.5),
+              ),
+              child: const Center(
+                child: Icon(Icons.workspace_premium_rounded, color: Color(0xFF4F46E5), size: 34),
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               'Lesson Completed!',

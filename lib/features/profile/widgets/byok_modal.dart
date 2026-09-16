@@ -27,21 +27,21 @@ class _ByokModalState extends State<ByokModal> {
   final List<Map<String, dynamic>> _providers = [
     {
       'name': 'Google Gemini',
-      'icon': '✨',
+      'icon': Icons.auto_awesome_rounded,
       'model': 'gemini-1.5-flash',
-      'color': VocaColors.primaryPurple,
+      'color': const Color(0xFF4F46E5),
     },
     {
       'name': 'OpenAI',
-      'icon': '🤖',
+      'icon': Icons.psychology_rounded,
       'model': 'gpt-4o-mini',
-      'color': VocaColors.emeraldGreen,
+      'color': const Color(0xFF059669),
     },
     {
       'name': 'Azure Speech',
-      'icon': '☁️',
+      'icon': Icons.cloud_outlined,
       'model': 'neural-en-US',
-      'color': VocaColors.electricCyan,
+      'color': const Color(0xFF0284C7),
     },
   ];
 
@@ -132,8 +132,12 @@ class _ByokModalState extends State<ByokModal> {
                         ),
                         child: Column(
                           children: [
-                            Text(provider['icon'], style: const TextStyle(fontSize: 22)),
-                            const SizedBox(height: 4),
+                            Icon(
+                              provider['icon'] as IconData,
+                              size: 20,
+                              color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+                            ),
+                            const SizedBox(height: 6),
                             Text(
                               provider['name'],
                               style: VocaTypography.caption.copyWith(

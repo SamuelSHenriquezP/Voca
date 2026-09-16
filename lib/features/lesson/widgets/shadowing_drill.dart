@@ -249,7 +249,7 @@ class _ShadowingDrillState extends State<ShadowingDrill> {
             ),
             child: Row(
               children: [
-                const Text('💡', style: TextStyle(fontSize: 18)),
+                const Icon(Icons.lightbulb_outline_rounded, color: Color(0xFFB45309), size: 18),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

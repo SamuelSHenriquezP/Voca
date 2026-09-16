@@ -12,13 +12,11 @@ import '../widgets/voice_controls.dart';
 class ConversationScreen extends StatefulWidget {
   final String personaName;
   final String personaRole;
-  final String personaEmoji;
 
   const ConversationScreen({
     super.key,
     this.personaName = 'Officer Miller',
     this.personaRole = 'Airport Customs Inspection',
-    this.personaEmoji = '👮‍♂️',
   });
 
   @override
@@ -112,7 +110,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               if (!mounted) return;
               setState(() {
                 _isNpcSpeaking = false;
-                _statusText = 'Conversation Cleared! 🌟';
+                _statusText = 'Session Cleared';
               });
             });
           });
@@ -129,8 +127,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(28),
-            topRight: Radius.circular(28),
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
         ),
         padding: const EdgeInsets.all(24),
@@ -140,7 +138,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.lightbulb_rounded, color: VocaColors.goldXp, size: 28),
+                const Icon(Icons.lightbulb_outline_rounded, color: Color(0xFFD97706), size: 24),
                 const SizedBox(width: 8),
                 Text('Suggested Phrase', style: VocaTypography.heading2),
               ],
@@ -149,18 +147,26 @@ class _ConversationScreenState extends State<ConversationScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: VocaColors.purpleTint,
-                borderRadius: BorderRadius.circular(16),
+                color: const Color(0xFFEEF2FF),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Text(
                 '"I will be staying for two weeks at my brother\'s place in Seattle."',
-                style: VocaTypography.bodyLarge.copyWith(color: VocaColors.primaryPurple),
+                style: VocaTypography.bodyLarge.copyWith(color: const Color(0xFF4F46E5)),
               ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              '💡 Tip: Customs officers look for concise, direct answers with specific durations and locations.',
-              style: VocaTypography.bodySmall,
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF64748B)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Customs officers look for concise, direct answers with specific durations and locations.',
+                    style: VocaTypography.bodySmall.copyWith(fontSize: 12),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -172,8 +178,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text('Leave Boss Fight?', style: VocaTypography.heading2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Leave Session?', style: VocaTypography.heading2),
         content: Text(
           'You can resume this spoken conversation anytime from the level map.',
           style: VocaTypography.bodyMedium,
@@ -181,14 +187,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Keep Going', style: VocaTypography.buttonText.copyWith(color: VocaColors.primaryPurple)),
+            child: Text('Keep Going', style: VocaTypography.buttonText.copyWith(color: const Color(0xFF4F46E5))),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
               Navigator.of(context).pop();
             },
-            child: Text('Exit', style: VocaTypography.buttonText.copyWith(color: VocaColors.rubyRed)),
+            child: Text('Exit', style: VocaTypography.buttonText.copyWith(color: const Color(0xFFDC2626))),
           ),
         ],
       ),
@@ -198,25 +204,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: VocaColors.backgroundNeutral,
+      backgroundColor: const Color(0xFFFBFBFC),
       body: Column(
         children: [
-          // Immersive Deep Gradient Header (Midnight Purple to Neon Pink)
+          // Minimalist Obsidian Header
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF1E1035), // Midnight purple
-                  Color(0xFF4A154B), // Deep berry
-                  Color(0xFF6C5CE7), // Primary purple
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              color: Color(0xFF0F172A),
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(32),
-                bottomRight: Radius.circular(32),
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
               ),
             ),
             child: SafeArea(
@@ -285,7 +283,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   NpcAvatarCard(
                     name: widget.personaName,
                     role: widget.personaRole,
-                    avatarEmoji: widget.personaEmoji,
                     isSpeaking: _isNpcSpeaking,
                     statusText: _statusText,
                   ),

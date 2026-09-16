@@ -178,7 +178,7 @@ class _PathScreenState extends State<PathScreen> {
                     onTap: () => _handleNodeTap(_nodes[i]),
                   ),
                   if (i == 1) ...[
-                    // Duolingo Treasure Chest Milestone (Image 3 & 4)
+                    // Minimalist Milestone Bonus Node
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Center(
@@ -186,39 +186,39 @@ class _PathScreenState extends State<PathScreen> {
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('🎁 Bonus Chest Unlocked! +20 Gems & 1 Streak Freeze!'),
-                                backgroundColor: const Color(0xFFFFB800),
+                                content: const Text('Milestone Bonus Claimed! +20 Gems earned.'),
+                                backgroundColor: const Color(0xFF0F172A),
                                 behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFF4D4),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: const Color(0xFFFFB800), width: 2),
-                              boxShadow: const [
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFFE5A400),
-                                  offset: Offset(0, 3),
-                                  blurRadius: 0,
+                                  color: Colors.black.withOpacity(0.04),
+                                  offset: const Offset(0, 3),
+                                  blurRadius: 8,
                                 ),
                               ],
                             ),
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('🎁', style: TextStyle(fontSize: 22)),
+                                Icon(Icons.card_giftcard_rounded, size: 16, color: Color(0xFFD97706)),
                                 SizedBox(width: 8),
                                 Text(
-                                  'CLAIM CHEST',
+                                  'MILESTONE BONUS',
                                   style: TextStyle(
-                                    color: Color(0xFF8D5B00),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.0,
+                                    color: Color(0xFF0F172A),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.8,
                                   ),
                                 ),
                               ],
@@ -229,16 +229,16 @@ class _PathScreenState extends State<PathScreen> {
                     ),
                   ] else if (i < _nodes.length - 1)
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Center(
                         child: Container(
-                          width: 8,
+                          width: 2,
                           height: 24,
                           decoration: BoxDecoration(
                             color: _nodes[i].state == NodeState.completed
-                                ? const Color(0xFFFFC800)
-                                : const Color(0xFFE5E5E5),
-                            borderRadius: BorderRadius.circular(4),
+                                ? const Color(0xFF4F46E5)
+                                : const Color(0xFFE2E8F0),
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                       ),

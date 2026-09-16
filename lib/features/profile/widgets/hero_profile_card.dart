@@ -63,7 +63,7 @@ class HeroProfileCard extends StatelessWidget {
                     ],
                   ),
                   child: const Center(
-                    child: Text('🧑‍🚀', style: TextStyle(fontSize: 38)),
+                    child: Icon(Icons.person_rounded, size: 38, color: Colors.white),
                   ),
                 ),
                 Positioned(

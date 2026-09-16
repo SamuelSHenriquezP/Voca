@@ -14,7 +14,7 @@ class PictureChoiceOption {
   const PictureChoiceOption({
     required this.id,
     required this.label,
-    required this.emoji,
+    this.emoji = '',
     required this.audioPhonetic,
     required this.isCorrect,
   });

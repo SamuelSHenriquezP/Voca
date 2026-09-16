@@ -28,13 +28,13 @@ class _CoachTipCardState extends State<CoachTipCard> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: VocaColors.primaryPurple.withOpacity(0.2), width: 1.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: VocaColors.primaryPurple.withOpacity(0.08),
-            offset: const Offset(0, 4),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.02),
+            offset: const Offset(0, 3),
+            blurRadius: 8,
           ),
         ],
       ),
@@ -50,14 +50,14 @@ class _CoachTipCardState extends State<CoachTipCard> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: VocaColors.purpleTint,
-                      shape: BoxShape.circle,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEEF2FF),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.auto_awesome_rounded,
-                      color: VocaColors.primaryPurple,
-                      size: 18,
+                      color: Color(0xFF4F46E5),
+                      size: 16,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -66,37 +66,39 @@ class _CoachTipCardState extends State<CoachTipCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'AI Coach Insights',
+                          'AI Speech Insights',
                           style: VocaTypography.heading3.copyWith(
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
-                          'Tap to view silent feedback & tips',
-                          style: VocaTypography.caption.copyWith(fontSize: 11),
+                          'Silent pronunciation & syntax feedback',
+                          style: VocaTypography.caption.copyWith(fontSize: 10),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: VocaColors.greenTint,
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFFECFDF5),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       '${widget.fluencyScore}% Fluency',
-                      style: VocaTypography.caption.copyWith(
-                        color: VocaColors.emeraldGreenShadow,
-                        fontWeight: FontWeight.w800,
+                      style: const TextStyle(
+                        color: Color(0xFF059669),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Icon(
                     _isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                     color: VocaColors.textMuted,
+                    size: 20,
                   ),
                 ],
               ),
@@ -105,7 +107,7 @@ class _CoachTipCardState extends State<CoachTipCard> {
 
           // Expanded Content
           if (_isExpanded) ...[
-            const Divider(height: 1, color: VocaColors.borderLight),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -115,14 +117,14 @@ class _CoachTipCardState extends State<CoachTipCard> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('✍️', style: TextStyle(fontSize: 16)),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.spellcheck_rounded, size: 16, color: Color(0xFF4F46E5)),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Grammar Refinement',
+                              'Syntax & Form',
                               style: VocaTypography.caption.copyWith(
                                 color: VocaColors.darkSlate,
                                 fontWeight: FontWeight.w700,
@@ -133,7 +135,7 @@ class _CoachTipCardState extends State<CoachTipCard> {
                               widget.grammarTip,
                               style: VocaTypography.bodySmall.copyWith(
                                 color: VocaColors.textMuted,
-                                fontSize: 13,
+                                fontSize: 12,
                               ),
                             ),
                           ],
@@ -141,20 +143,20 @@ class _CoachTipCardState extends State<CoachTipCard> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
                   // Pronunciation Pointer
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('🎯', style: TextStyle(fontSize: 16)),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.record_voice_over_rounded, size: 16, color: Color(0xFF0284C7)),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Accent & Stress',
+                              'Phonetic Stress',
                               style: VocaTypography.caption.copyWith(
                                 color: VocaColors.darkSlate,
                                 fontWeight: FontWeight.w700,
@@ -165,7 +167,7 @@ class _CoachTipCardState extends State<CoachTipCard> {
                               widget.pronunciationTip,
                               style: VocaTypography.bodySmall.copyWith(
                                 color: VocaColors.textMuted,
-                                fontSize: 13,
+                                fontSize: 12,
                               ),
                             ),
                           ],
@@ -182,4 +184,3 @@ class _CoachTipCardState extends State<CoachTipCard> {
     );
   }
 }
-

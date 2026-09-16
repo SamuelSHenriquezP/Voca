@@ -19,7 +19,7 @@ class TopStickyBar extends StatelessWidget {
     this.streakDays = 14,
     this.hearts = 5,
     this.gems = 480,
-    this.languageCode = 'US',
+    this.languageCode = 'EN',
     this.onFlagTap,
     this.onStreakTap,
     this.onHeartsTap,
@@ -31,9 +31,9 @@ class TopStickyBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
-        color: VocaColors.cardBackground,
+        color: Colors.white,
         border: Border(
-          bottom: BorderSide(color: VocaColors.borderLight, width: 2),
+          bottom: BorderSide(color: Color(0xFFF1F5F9), width: 1.5),
         ),
       ),
       child: SafeArea(
@@ -41,26 +41,26 @@ class TopStickyBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Language Flag Badge
+            // Language Badge (Vector Icon)
             BouncyTap(
               onTap: onFlagTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: VocaColors.purpleTint,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: VocaColors.primaryPurple.withOpacity(0.2), width: 1.5),
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🇺🇸', style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: 5),
+                    const Icon(Icons.language_rounded, size: 16, color: VocaColors.primaryPurple),
+                    const SizedBox(width: 6),
                     Text(
-                      'EN',
-                      style: VocaTypography.buttonText.copyWith(
-                        color: VocaColors.primaryPurple,
-                        fontSize: 13,
+                      languageCode,
+                      style: VocaTypography.caption.copyWith(
+                        color: VocaColors.darkSlate,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -68,32 +68,36 @@ class TopStickyBar extends StatelessWidget {
               ),
             ),
 
-            // Streak Counter 🔥 with animated pulse
+            // Streak Counter
             BouncyTap(
               onTap: onStreakTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: VocaColors.orangeTint,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: VocaColors.sunOrange.withOpacity(0.2), width: 1.5),
+                  color: const Color(0xFFFFFBEB),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFDE68A), width: 1.2),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔥', style: TextStyle(fontSize: 18))
-                        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                    const Icon(
+                      Icons.local_fire_department_rounded,
+                      size: 16,
+                      color: Color(0xFFD97706),
+                    )
+                        .animate(onPlay: (c) => c.repeat(reverse: true))
                         .scale(
                           begin: const Offset(1, 1),
-                          end: const Offset(1.2, 1.2),
+                          end: const Offset(1.15, 1.15),
                           duration: const Duration(milliseconds: 900),
                         ),
-                    const SizedBox(width: 5),
+                    const SizedBox(width: 6),
                     Text(
                       '$streakDays',
-                      style: VocaTypography.buttonText.copyWith(
-                        color: VocaColors.sunOrangeShadow,
-                        fontSize: 14,
+                      style: VocaTypography.caption.copyWith(
+                        color: const Color(0xFF92400E),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -101,26 +105,30 @@ class TopStickyBar extends StatelessWidget {
               ),
             ),
 
-            // Heart / Lives ❤️
+            // Hearts Counter
             BouncyTap(
               onTap: onHeartsTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: VocaColors.redTint,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: VocaColors.rubyRed.withOpacity(0.2), width: 1.5),
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFECACA), width: 1.2),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('❤️', style: TextStyle(fontSize: 17)),
-                    const SizedBox(width: 5),
+                    const Icon(
+                      Icons.favorite_rounded,
+                      size: 15,
+                      color: Color(0xFFDC2626),
+                    ),
+                    const SizedBox(width: 6),
                     Text(
                       '$hearts',
-                      style: VocaTypography.buttonText.copyWith(
-                        color: VocaColors.rubyRed,
-                        fontSize: 14,
+                      style: VocaTypography.caption.copyWith(
+                        color: const Color(0xFF991B1B),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -128,26 +136,30 @@ class TopStickyBar extends StatelessWidget {
               ),
             ),
 
-            // Gems / Coins 💎
+            // Gems / Tokens
             BouncyTap(
               onTap: onGemsTap,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: VocaColors.cyanTint,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: VocaColors.electricCyan.withOpacity(0.2), width: 1.5),
+                  color: const Color(0xFFF0F9FF),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFBAE6FD), width: 1.2),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('💎', style: TextStyle(fontSize: 17)),
-                    const SizedBox(width: 5),
+                    const Icon(
+                      Icons.diamond_outlined,
+                      size: 15,
+                      color: Color(0xFF0284C7),
+                    ),
+                    const SizedBox(width: 6),
                     Text(
                       '$gems',
-                      style: VocaTypography.buttonText.copyWith(
-                        color: VocaColors.electricCyanShadow,
-                        fontSize: 14,
+                      style: VocaTypography.caption.copyWith(
+                        color: const Color(0xFF075985),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -160,4 +172,3 @@ class TopStickyBar extends StatelessWidget {
     );
   }
 }
-

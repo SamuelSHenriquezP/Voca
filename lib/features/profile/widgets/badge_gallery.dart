@@ -7,19 +7,19 @@ class BadgeItem {
   final String id;
   final String name;
   final String description;
-  final String emoji;
+  final IconData icon;
   final bool isUnlocked;
   final String? unlockDate;
-  final Color glowColor;
+  final Color accentColor;
 
   const BadgeItem({
     required this.id,
     required this.name,
     required this.description,
-    required this.emoji,
+    required this.icon,
     required this.isUnlocked,
     this.unlockDate,
-    this.glowColor = VocaColors.goldXp,
+    this.accentColor = const Color(0xFF4F46E5),
   });
 }
 
@@ -43,17 +43,17 @@ class BadgeGallery extends StatelessWidget {
             children: [
               Text(
                 'ACHIEVEMENTS',
-                style: VocaTypography.heading3.copyWith(
-                  fontSize: 15,
-                  letterSpacing: 1.2,
+                style: VocaTypography.caption.copyWith(
+                  letterSpacing: 1.1,
+                  fontWeight: FontWeight.w700,
                   color: VocaColors.darkSlate,
                 ),
               ),
               Text(
-                '${badges.where((b) => b.isUnlocked).length}/${badges.length} Unlocked',
+                '${badges.where((b) => b.isUnlocked).length} / ${badges.length}',
                 style: VocaTypography.caption.copyWith(
-                  color: VocaColors.primaryPurple,
-                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF4F46E5),
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -62,12 +62,12 @@ class BadgeGallery extends StatelessWidget {
         const SizedBox(height: 12),
 
         SizedBox(
-          height: 154,
+          height: 130,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 20),
             itemCount: badges.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 14),
+            separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
               final badge = badges[index];
 
@@ -77,63 +77,56 @@ class BadgeGallery extends StatelessWidget {
                     SnackBar(
                       content: Text('${badge.name}: ${badge.description}'),
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       duration: const Duration(seconds: 2),
                     ),
                   );
                 },
                 child: Container(
-                  width: 114,
+                  width: 110,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: badge.isUnlocked ? badge.glowColor.withOpacity(0.5) : VocaColors.borderLight,
-                      width: 2,
+                      color: badge.isUnlocked ? const Color(0xFFE2E8F0) : const Color(0xFFF1F5F9),
+                      width: 1.2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: badge.isUnlocked
-                            ? badge.glowColor.withOpacity(0.25)
-                            : VocaColors.borderSubtle.withOpacity(0.4),
-                        offset: const Offset(0, 4),
-                        blurRadius: 0,
+                        color: Colors.black.withOpacity(badge.isUnlocked ? 0.03 : 0.0),
+                        offset: const Offset(0, 3),
+                        blurRadius: 8,
                       ),
                     ],
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // 3D Medal Emoji Container
+                      // Minimalist Badge Emblem Icon (No Emojis)
                       Container(
-                        width: 52,
-                        height: 52,
+                        width: 44,
+                        height: 44,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: badge.isUnlocked ? badge.glowColor.withOpacity(0.15) : VocaColors.borderLight,
+                          color: badge.isUnlocked ? badge.accentColor.withOpacity(0.08) : const Color(0xFFF4F4F5),
                         ),
                         child: Center(
-                          child: ColorFiltered(
-                            colorFilter: badge.isUnlocked
-                                ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
-                                : const ColorFilter.mode(Colors.grey, BlendMode.saturation),
-                            child: Text(
-                              badge.emoji,
-                              style: const TextStyle(fontSize: 28),
-                            ),
+                          child: Icon(
+                            badge.icon,
+                            size: 20,
+                            color: badge.isUnlocked ? badge.accentColor : const Color(0xFFA1A1AA),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
 
-                      // Name
                       Text(
                         badge.name,
-                        style: VocaTypography.heading3.copyWith(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: badge.isUnlocked ? VocaColors.darkSlate : VocaColors.lockedGray,
-                          fontWeight: FontWeight.w700,
+                          color: badge.isUnlocked ? VocaColors.darkSlate : const Color(0xFFA1A1AA),
+                          fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -141,13 +134,12 @@ class BadgeGallery extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
 
-                      // Date or Locked
                       Text(
                         badge.isUnlocked ? (badge.unlockDate ?? 'Unlocked') : 'Locked',
-                        style: VocaTypography.caption.copyWith(
+                        style: TextStyle(
                           fontSize: 10,
-                          color: badge.isUnlocked ? VocaColors.primaryPurple : VocaColors.lockedGray,
-                          fontWeight: FontWeight.w700,
+                          color: badge.isUnlocked ? const Color(0xFF64748B) : const Color(0xFFCBD5E1),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

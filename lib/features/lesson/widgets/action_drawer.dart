@@ -28,7 +28,7 @@ class ActionDrawer extends StatelessWidget {
     required this.onGotIt,
     this.correctAnswer = '',
     this.tip = '',
-    this.encouragement = 'Outstanding pronunciation! +10 XP',
+    this.encouragement = 'High precision pronunciation match.',
   });
 
   @override
@@ -40,10 +40,10 @@ class ActionDrawer extends StatelessWidget {
         child: SafeArea(
           top: false,
           child: VocaButton(
-            text: 'CHECK',
-            variant: isCheckEnabled ? VocaButtonVariant.success : VocaButtonVariant.neutral,
+            text: 'CHECK ANSWER',
+            variant: isCheckEnabled ? VocaButtonVariant.primary : VocaButtonVariant.neutral,
             isFullWidth: true,
-            height: 50,
+            height: 48,
             onPressed: isCheckEnabled ? onCheck : null,
           ),
         ),
@@ -51,15 +51,14 @@ class ActionDrawer extends StatelessWidget {
     }
 
     if (state == DrawerState.success) {
-      // Duolingo Success Banner (Image 3)
       return Container(
         decoration: const BoxDecoration(
-          color: Color(0xFFD7FFB8), // Soft Duolingo green banner
+          color: Colors.white,
           border: Border(
-            top: BorderSide(color: Color(0xFF58CC02), width: 2.5),
+            top: BorderSide(color: Color(0xFF10B981), width: 2.0),
           ),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: SafeArea(
           top: false,
           child: Column(
@@ -71,30 +70,28 @@ class ActionDrawer extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: const BoxDecoration(
-                      color: Color(0xFF58CC02),
+                      color: Color(0xFFECFDF5),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check_rounded, color: Colors.white, size: 26),
+                    child: const Icon(Icons.check_rounded, color: Color(0xFF059669), size: 20),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Nicely done!',
-                          style: TextStyle(
-                            color: Color(0xFF58A700),
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
+                        Text(
+                          'Correct',
+                          style: VocaTypography.heading2.copyWith(
+                            color: const Color(0xFF059669),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
                           encouragement,
-                          style: const TextStyle(
-                            color: Color(0xFF58A700),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
+                          style: VocaTypography.bodySmall.copyWith(
+                            color: const Color(0xFF065F46),
                           ),
                         ),
                       ],
@@ -102,34 +99,34 @@ class ActionDrawer extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               VocaButton(
                 text: 'CONTINUE',
                 variant: VocaButtonVariant.success,
                 isFullWidth: true,
-                height: 50,
+                height: 48,
                 onPressed: onContinue,
               ),
             ],
           ),
         ),
       ).animate().slideY(
-            begin: 0.8,
+            begin: 0.5,
             end: 0,
-            duration: const Duration(milliseconds: 220),
+            duration: const Duration(milliseconds: 180),
             curve: Curves.easeOutCubic,
           );
     }
 
-    // DrawerState.error (Duolingo Red Error Banner)
+    // DrawerState.error
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFFFFDADC), // Duolingo soft red banner
+        color: Colors.white,
         border: Border(
-          top: BorderSide(color: Color(0xFFFF4B4B), width: 2.5),
+          top: BorderSide(color: Color(0xFFDC2626), width: 2.0),
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       child: SafeArea(
         top: false,
         child: Column(
@@ -141,31 +138,30 @@ class ActionDrawer extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFF4B4B),
+                    color: Color(0xFFFEF2F2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close_rounded, color: Colors.white, size: 26),
+                  child: const Icon(Icons.close_rounded, color: Color(0xFFDC2626), size: 20),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Incorrect',
-                        style: TextStyle(
-                          color: Color(0xFFEA2B2B),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
+                        style: VocaTypography.heading2.copyWith(
+                          color: const Color(0xFFDC2626),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       if (correctAnswer.isNotEmpty)
                         Text(
-                          'Correct solution: $correctAnswer',
-                          style: const TextStyle(
-                            color: Color(0xFFEA2B2B),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                          'Expected: $correctAnswer',
+                          style: VocaTypography.bodySmall.copyWith(
+                            color: const Color(0xFF991B1B),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                     ],
@@ -178,19 +174,20 @@ class ActionDrawer extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                 ),
                 child: Row(
                   children: [
-                    const Text('💡', style: TextStyle(fontSize: 14)),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFF64748B)),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         tip,
                         style: VocaTypography.caption.copyWith(
-                          color: const Color(0xFF4B4B4B),
-                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF475569),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -198,21 +195,21 @@ class ActionDrawer extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             VocaButton(
               text: 'GOT IT',
               variant: VocaButtonVariant.danger,
               isFullWidth: true,
-              height: 50,
+              height: 48,
               onPressed: onGotIt,
             ),
           ],
         ),
       ),
     ).animate().slideY(
-          begin: 0.8,
+          begin: 0.5,
           end: 0,
-          duration: const Duration(milliseconds: 220),
+          duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
         );
   }

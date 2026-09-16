@@ -1,54 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 
 class NpcAvatarCard extends StatelessWidget {
   final String name;
   final String role;
-  final String avatarEmoji;
   final bool isSpeaking;
-  final String statusText; // 'Listening...', 'Speaking...', 'Evaluating...'
+  final String statusText;
 
   const NpcAvatarCard({
     super.key,
     this.name = 'Agent Miller',
-    this.role = 'Airport Customs Officer',
-    this.avatarEmoji = '👮‍♂️',
+    this.role = 'Border & Customs Clearance',
     this.isSpeaking = false,
-    this.statusText = 'Listening...',
+    this.statusText = 'Ready',
   });
 
   @override
   Widget build(BuildContext context) {
     Color statusColor;
     if (statusText.contains('Speaking')) {
-      statusColor = VocaColors.accentPink;
+      statusColor = const Color(0xFF6366F1);
     } else if (statusText.contains('Listening')) {
-      statusColor = VocaColors.electricCyan;
+      statusColor = const Color(0xFF10B981);
     } else {
-      statusColor = VocaColors.goldXp;
+      statusColor = const Color(0xFF94A3B8);
     }
 
     return Column(
       children: [
-        // Concentric Ripple Rings & Avatar
+        // Concentric Ripple Rings & Vector Persona Avatar
         SizedBox(
-          width: 140,
-          height: 140,
+          width: 130,
+          height: 130,
           child: Stack(
             alignment: Alignment.center,
             children: [
               // Outer Ripple Ring
               if (isSpeaking)
                 Container(
-                  width: 136,
-                  height: 136,
+                  width: 126,
+                  height: 126,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: VocaColors.electricCyan.withOpacity(0.3),
-                      width: 2,
+                      color: const Color(0xFF6366F1).withOpacity(0.25),
+                      width: 1.5,
                     ),
                   ),
                 )
@@ -56,60 +53,53 @@ class NpcAvatarCard extends StatelessWidget {
                     .scale(
                       begin: const Offset(0.9, 0.9),
                       end: const Offset(1.15, 1.15),
-                      duration: const Duration(milliseconds: 1100),
+                      duration: const Duration(milliseconds: 1000),
                     ),
 
               // Middle Ripple Ring
               if (isSpeaking)
                 Container(
-                  width: 114,
-                  height: 114,
+                  width: 106,
+                  height: 106,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: VocaColors.electricCyan.withOpacity(0.12),
+                    color: const Color(0xFF6366F1).withOpacity(0.08),
                   ),
                 )
                     .animate(onPlay: (c) => c.repeat(reverse: true))
                     .scale(
                       begin: const Offset(0.95, 0.95),
                       end: const Offset(1.08, 1.08),
-                      duration: const Duration(milliseconds: 900),
+                      duration: const Duration(milliseconds: 800),
                     ),
 
-              // Core Avatar
+              // Core Vector Avatar Container
               Container(
-                width: 90,
-                height: 90,
+                width: 86,
+                height: 86,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF2C3E50),
-                      Color(0xFF4CA1AF),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  border: Border.all(color: Colors.white, width: 3.5),
+                  color: const Color(0xFF0F172A),
+                  border: Border.all(color: const Color(0xFF334155), width: 2.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
+                      color: Colors.black.withOpacity(0.2),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
                   ],
                 ),
                 child: Center(
-                  child: Text(
-                    avatarEmoji,
-                    style: const TextStyle(fontSize: 44),
+                  child: CustomPaint(
+                    size: const Size(48, 48),
+                    painter: OfficerVectorPainter(),
                   ),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
 
         // Name & Role
         Text(
@@ -117,32 +107,35 @@ class NpcAvatarCard extends StatelessWidget {
           style: VocaTypography.heading2.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w700,
+            fontSize: 18,
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           role,
-          style: VocaTypography.caption.copyWith(
-            color: Colors.white70,
+          style: const TextStyle(
+            color: Color(0xFF94A3B8),
             fontSize: 12,
-            letterSpacing: 0.5,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.3,
           ),
         ),
         const SizedBox(height: 12),
 
-        // Animated Status Pill Badge
+        // Minimalist Status Pill Badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.35),
+            color: const Color(0xFF1E293B),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor.withOpacity(0.6), width: 1.5),
+            border: Border.all(color: statusColor.withOpacity(0.4), width: 1.0),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: 6,
+                height: 6,
                 decoration: BoxDecoration(
                   color: statusColor,
                   shape: BoxShape.circle,
@@ -157,9 +150,10 @@ class NpcAvatarCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 statusText,
-                style: VocaTypography.caption.copyWith(
+                style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -170,3 +164,58 @@ class NpcAvatarCard extends StatelessWidget {
   }
 }
 
+/// Custom Vector Illustration for the Officer Persona (No emojis)
+class OfficerVectorPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final strokePaint = Paint()
+      ..color = const Color(0xFFE2E8F0)
+      ..strokeWidth = 1.6
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final fillPaint = Paint()
+      ..color = const Color(0xFF1E293B)
+      ..style = PaintingStyle.fill;
+
+    // Officer Cap Peak
+    final capPath = Path();
+    capPath.moveTo(w * 0.22, h * 0.36);
+    capPath.quadraticBezierTo(w * 0.5, h * 0.22, w * 0.78, h * 0.36);
+    capPath.lineTo(w * 0.85, h * 0.42);
+    capPath.quadraticBezierTo(w * 0.5, h * 0.38, w * 0.15, h * 0.42);
+    capPath.close();
+
+    canvas.drawPath(capPath, fillPaint);
+    canvas.drawPath(capPath, strokePaint);
+
+    // Cap Visor Arc
+    final visorPath = Path();
+    visorPath.moveTo(w * 0.2, h * 0.42);
+    visorPath.quadraticBezierTo(w * 0.5, h * 0.48, w * 0.8, h * 0.42);
+    canvas.drawPath(visorPath, strokePaint);
+
+    // Head Oval
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(w * 0.5, h * 0.54), width: w * 0.34, height: h * 0.36),
+      strokePaint,
+    );
+
+    // Officer Uniform Shoulders
+    final shoulderPath = Path();
+    shoulderPath.moveTo(w * 0.12, h * 0.94);
+    shoulderPath.quadraticBezierTo(w * 0.25, h * 0.76, w * 0.4, h * 0.74);
+    shoulderPath.lineTo(w * 0.6, h * 0.74);
+    shoulderPath.quadraticBezierTo(w * 0.75, h * 0.76, w * 0.88, h * 0.94);
+    canvas.drawPath(shoulderPath, strokePaint);
+
+    // Tie / Collar Line
+    canvas.drawLine(Offset(w * 0.5, h * 0.74), Offset(w * 0.5, h * 0.92), strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
