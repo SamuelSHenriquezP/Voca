@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../models/vocabulary_word.dart';
@@ -31,80 +33,90 @@ class _VaultScreenState extends State<VaultScreen> {
   @override
   void initState() {
     super.initState();
-    _words = [
-      const VocabularyWord(
-        id: 'v1',
-        word: 'Understated',
-        phonetic: '/ˌʌn.dɚˈsteɪ.t̬ɪd/',
-        partOfSpeech: 'adjective',
-        definition: 'Not attracting attention; subtle, sophisticated and restrained.',
-        exampleSentence: 'Her architectural design was wonderfully understated yet deeply functional.',
-        category: 'Social',
-        tier: MasteryTier.review,
-        daysUntilReview: 1,
-        accuracy: 91,
-      ),
-      const VocabularyWord(
-        id: 'v2',
-        word: 'Complimentary',
-        phonetic: '/ˌkɑːm.pləˈmen.t̬ɚ.i/',
-        partOfSpeech: 'adjective',
-        definition: 'Praising or approving; given free of charge as a courtesy.',
-        exampleSentence: 'The boutique hotel offered a complimentary espresso upon check-in.',
-        category: 'Travel',
-        tier: MasteryTier.learning,
-        daysUntilReview: 3,
-        accuracy: 88,
-      ),
-      const VocabularyWord(
-        id: 'v3',
-        word: 'Concur',
-        phonetic: '/kənˈkɝː/',
-        partOfSpeech: 'verb',
-        definition: 'To be of the same opinion; to agree with a proposed direction.',
-        exampleSentence: 'I fully concur with your assessment regarding the quarterly deliverables.',
-        category: 'Workplace',
-        tier: MasteryTier.mastered,
-        daysUntilReview: 7,
-        accuracy: 96,
-      ),
-      const VocabularyWord(
-        id: 'v4',
-        word: 'Sparkling',
-        phonetic: '/ˈspɑːr.klɪŋ/',
-        partOfSpeech: 'adjective',
-        definition: 'Shining with bright points of light; effervescent (carbonated).',
-        exampleSentence: 'Would you prefer still or sparkling water with your main course?',
-        category: 'Dining',
-        tier: MasteryTier.mastered,
-        daysUntilReview: 14,
-        accuracy: 95,
-      ),
-      const VocabularyWord(
-        id: 'v5',
-        word: 'Layover',
-        phonetic: '/ˈleɪˌoʊ.vɚ/',
-        partOfSpeech: 'noun',
-        definition: 'A period of rest or waiting before a further stage in a journey.',
-        exampleSentence: 'We have a three-hour layover at Tokyo Haneda before our onward flight.',
-        category: 'Travel',
-        tier: MasteryTier.learning,
-        daysUntilReview: 2,
-        accuracy: 84,
-      ),
-      const VocabularyWord(
-        id: 'v6',
-        word: 'Appetizer',
-        phonetic: '/ˈæp.ə.taɪ.zɚ/',
-        partOfSpeech: 'noun',
-        definition: 'A small dish of food served before the main course of a meal.',
-        exampleSentence: 'We ordered the smoked salmon crostini as a shared appetizer.',
-        category: 'Dining',
-        tier: MasteryTier.review,
-        daysUntilReview: 1,
-        accuracy: 89,
-      ),
-    ];
+    _loadWords();
+  }
+
+  void _loadWords() {
+    final rawWords = LocalStorageService().getVaultWords();
+    if (rawWords.isNotEmpty) {
+      _words = rawWords.map((map) => VocabularyWord.fromMap(map)).toList();
+    } else {
+      _words = [
+        const VocabularyWord(
+          id: 'v1',
+          word: 'Understated',
+          phonetic: '/ˌʌn.dɚˈsteɪ.t̬ɪd/',
+          partOfSpeech: 'adjective',
+          definition: 'Not attracting attention; subtle, sophisticated and restrained.',
+          exampleSentence: 'Her architectural design was wonderfully understated yet deeply functional.',
+          category: 'Social',
+          tier: MasteryTier.review,
+          daysUntilReview: 1,
+          accuracy: 91,
+        ),
+        const VocabularyWord(
+          id: 'v2',
+          word: 'Complimentary',
+          phonetic: '/ˌkɑːm.pləˈmen.t̬ɚ.i/',
+          partOfSpeech: 'adjective',
+          definition: 'Praising or approving; given free of charge as a courtesy.',
+          exampleSentence: 'The boutique hotel offered a complimentary espresso upon check-in.',
+          category: 'Travel',
+          tier: MasteryTier.learning,
+          daysUntilReview: 3,
+          accuracy: 88,
+        ),
+        const VocabularyWord(
+          id: 'v3',
+          word: 'Concur',
+          phonetic: '/kənˈkɝː/',
+          partOfSpeech: 'verb',
+          definition: 'To be of the same opinion; to agree with a proposed direction.',
+          exampleSentence: 'I fully concur with your assessment regarding the quarterly deliverables.',
+          category: 'Workplace',
+          tier: MasteryTier.mastered,
+          daysUntilReview: 7,
+          accuracy: 96,
+        ),
+        const VocabularyWord(
+          id: 'v4',
+          word: 'Sparkling',
+          phonetic: '/ˈspɑːr.klɪŋ/',
+          partOfSpeech: 'adjective',
+          definition: 'Shining with bright points of light; effervescent (carbonated).',
+          exampleSentence: 'Would you prefer still or sparkling water with your main course?',
+          category: 'Dining',
+          tier: MasteryTier.mastered,
+          daysUntilReview: 14,
+          accuracy: 95,
+        ),
+        const VocabularyWord(
+          id: 'v5',
+          word: 'Layover',
+          phonetic: '/ˈleɪˌoʊ.vɚ/',
+          partOfSpeech: 'noun',
+          definition: 'A period of rest or waiting before a further stage in a journey.',
+          exampleSentence: 'We have a three-hour layover at Tokyo Haneda before our onward flight.',
+          category: 'Travel',
+          tier: MasteryTier.learning,
+          daysUntilReview: 2,
+          accuracy: 84,
+        ),
+        const VocabularyWord(
+          id: 'v6',
+          word: 'Appetizer',
+          phonetic: '/ˈæp.ə.taɪ.zɚ/',
+          partOfSpeech: 'noun',
+          definition: 'A small dish of food served before the main course of a meal.',
+          exampleSentence: 'We ordered the smoked salmon crostini as a shared appetizer.',
+          category: 'Dining',
+          tier: MasteryTier.review,
+          daysUntilReview: 1,
+          accuracy: 89,
+        ),
+      ];
+      LocalStorageService().saveVaultWords(_words.map((w) => w.toMap()).toList());
+    }
   }
 
   List<VocabularyWord> get _filteredWords {
@@ -128,6 +140,7 @@ class _VaultScreenState extends State<VaultScreen> {
               ? 1
               : (newTier == MasteryTier.learning ? 3 : 7),
         );
+        LocalStorageService().saveVaultWords(_words.map((w) => w.toMap()).toList());
       }
       if (_currentCardIndex < _filteredWords.length - 1) {
         _currentCardIndex++;
@@ -545,13 +558,7 @@ class _VaultScreenState extends State<VaultScreen> {
               BouncyTap(
                 onTap: () {
                   VocaHaptics.selection();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Playing audio: "${word.word}" ${word.phonetic}'),
-                      backgroundColor: const Color(0xFF0F172A),
-                      duration: const Duration(milliseconds: 1000),
-                    ),
-                  );
+                  AudioTtsService().speak(word.word);
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),

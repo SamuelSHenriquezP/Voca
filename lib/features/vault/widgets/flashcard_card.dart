@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../models/vocabulary_word.dart';
@@ -168,32 +169,38 @@ class _FlashcardCardState extends State<FlashcardCard>
               const SizedBox(height: 20),
 
               // Canvas Soundwave Audio Visualizer
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.volume_up_rounded, color: Color(0xFF4F46E5), size: 18),
-                    const SizedBox(width: 8),
-                    CustomPaint(
-                      size: const Size(64, 18),
-                      painter: _MiniWaveformPainter(color: const Color(0xFF4F46E5)),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${widget.word.accuracy}% match',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF059669),
+              BouncyTap(
+                onTap: () {
+                  VocaHaptics.light();
+                  AudioTtsService().speak(widget.word.word);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.volume_up_rounded, color: Color(0xFF4F46E5), size: 18),
+                      const SizedBox(width: 8),
+                      CustomPaint(
+                        size: const Size(64, 18),
+                        painter: _MiniWaveformPainter(color: const Color(0xFF4F46E5)),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Text(
+                        '${widget.word.accuracy}% match',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF059669),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

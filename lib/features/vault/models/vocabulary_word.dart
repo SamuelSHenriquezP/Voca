@@ -47,5 +47,38 @@ class VocabularyWord {
       accuracy: accuracy ?? this.accuracy,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'word': word,
+      'phonetic': phonetic,
+      'partOfSpeech': partOfSpeech,
+      'definition': definition,
+      'exampleSentence': exampleSentence,
+      'category': category,
+      'tier': tier.name,
+      'daysUntilReview': daysUntilReview,
+      'accuracy': accuracy,
+    };
+  }
+
+  factory VocabularyWord.fromMap(Map<String, dynamic> map) {
+    return VocabularyWord(
+      id: map['id']?.toString() ?? '',
+      word: map['word']?.toString() ?? '',
+      phonetic: map['phonetic']?.toString() ?? '',
+      partOfSpeech: map['partOfSpeech']?.toString() ?? '',
+      definition: map['definition']?.toString() ?? '',
+      exampleSentence: map['exampleSentence']?.toString() ?? '',
+      category: map['category']?.toString() ?? 'General',
+      tier: MasteryTier.values.firstWhere(
+        (t) => t.name == map['tier'],
+        orElse: () => MasteryTier.learning,
+      ),
+      daysUntilReview: (map['daysUntilReview'] as num?)?.toInt() ?? 1,
+      accuracy: (map['accuracy'] as num?)?.toInt() ?? 90,
+    );
+  }
 }
 

@@ -2,20 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'voca_colors.dart';
 
-/// Clean, high-end typography for VOCA (Plus Jakarta Sans)
+/// Adapted, high-end typography pairings for VOCA:
+/// - Space Grotesk: Expressive display titles, biomes, bosses, cards.
+/// - Plus Jakarta Sans: Crystal-clear UI, buttons, prompts, options.
+/// - JetBrains Mono: Authentic phonetic notation (IPA), acoustic tokens.
+/// - Outfit: Spoken conversational dialogue and narrative lore.
 class VocaTypography {
   VocaTypography._();
 
-  static TextStyle get display => GoogleFonts.plusJakartaSans(
+  static TextStyle get display => GoogleFonts.spaceGrotesk(
         fontSize: 30,
         fontWeight: FontWeight.w800,
         color: VocaColors.darkSlate,
         letterSpacing: -0.8,
       );
 
+  static TextStyle get displayMedium => GoogleFonts.spaceGrotesk(
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        color: VocaColors.darkSlate,
+        letterSpacing: -0.5,
+      );
+
   static TextStyle get heading1 => GoogleFonts.plusJakartaSans(
         fontSize: 24,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: VocaColors.darkSlate,
         letterSpacing: -0.5,
       );
@@ -59,15 +70,22 @@ class VocaTypography {
 
   static TextStyle get caption => GoogleFonts.plusJakartaSans(
         fontSize: 11,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: VocaColors.textMuted,
         letterSpacing: 0.5,
       );
 
-  static TextStyle get phonetic => GoogleFonts.plusJakartaSans(
+  static TextStyle get phonetic => GoogleFonts.jetBrainsMono(
         fontSize: 13,
         fontWeight: FontWeight.w600,
         color: VocaColors.primaryPurple,
         letterSpacing: 0.5,
+      );
+
+  static TextStyle get dialogue => GoogleFonts.outfit(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: VocaColors.darkSlate,
+        height: 1.4,
       );
 }

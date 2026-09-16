@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/curriculum/data/conversation_topics_catalog.dart';
+import '../../../core/curriculum/services/adaptive_curriculum_engine.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
@@ -28,212 +31,72 @@ class PathScreen extends StatefulWidget {
 class _PathScreenState extends State<PathScreen> {
   int _selectedUnit = 1;
 
-  final Map<int, Map<String, dynamic>> _unitData = {
-    1: {
-      'title': 'Basic Survival & Daily Food',
-      'description': 'Build core spoken fluency for everyday real-world interactions.',
-      'progress': 0.0,
-      'nodes': const [
+  int get _totalUnits => (ConversationTopicsCatalog.allTopics.length / 6).ceil();
+
+  Map<String, dynamic> _getUnitData(int unitNumber) {
+    final allTopics = ConversationTopicsCatalog.allTopics;
+    final startIndex = (unitNumber - 1) * 6;
+    final endIndex = (startIndex + 6 <= allTopics.length) ? startIndex + 6 : allTopics.length;
+    final unitTopics = allTopics.sublist(startIndex, endIndex);
+
+    final unlockedIds = LocalStorageService().getUnlockedTopicIds();
+    final firstTopic = unitTopics.first;
+    final xOffsets = [0.0, -0.65, 0.65, 0.0, -0.65, 0.0];
+
+    int completedCount = 0;
+    final List<LevelNodeModel> nodes = [];
+
+    for (int i = 0; i < unitTopics.length; i++) {
+      final topic = unitTopics[i];
+      final isBoss = i == unitTopics.length - 1;
+      final isUnlocked = unlockedIds.contains(topic.id);
+
+      final nextTopicIndex = allTopics.indexWhere((t) => t.id == topic.id) + 1;
+      final isNextUnlocked = nextTopicIndex < allTopics.length && unlockedIds.contains(allTopics[nextTopicIndex].id);
+
+      NodeState state;
+      if (isUnlocked) {
+        if (isNextUnlocked) {
+          state = NodeState.completed;
+          completedCount++;
+        } else {
+          state = isBoss ? NodeState.boss : NodeState.active;
+        }
+      } else {
+        state = NodeState.locked;
+      }
+
+      nodes.add(
         LevelNodeModel(
-          id: 'u1_lvl_1',
-          unitNumber: 1,
-          levelNumber: 1,
-          title: 'Level 1-1: Hello & Greetings',
-          subtitle: 'Master basic everyday greetings and farewells',
-          state: NodeState.active,
-          stars: 0,
-          xpReward: 10,
-          objectives: ['Say hello in 3 different contexts', 'Use proper polite responses', 'Shadow native speakers'],
-          xOffset: 0.0,
-        ),
-        LevelNodeModel(
-          id: 'u1_lvl_2',
-          unitNumber: 1,
-          levelNumber: 2,
-          title: 'Level 1-2: Numbers & Ordering',
-          subtitle: 'Order coffee, snacks, and count items like a pro',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 10,
-          objectives: ['Order 2 items at a counter', 'Understand prices and numbers', 'Practice clear vowels'],
-          xOffset: -0.65,
-        ),
-        LevelNodeModel(
-          id: 'u1_lvl_3',
-          unitNumber: 1,
-          levelNumber: 3,
-          title: 'Level 1-3: Food & Drinks',
-          subtitle: 'Essential vocabulary for dining out and asking recommendations',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 15,
+          id: topic.id,
+          unitNumber: unitNumber,
+          levelNumber: i + 1,
+          title: isBoss
+              ? 'Boss: ${topic.npcName} (${topic.npcRole})'
+              : 'Level $unitNumber-${i + 1}: ${topic.title}',
+          subtitle: topic.pedagogicalObjective,
+          state: state,
+          stars: state == NodeState.completed ? 3 : 0,
+          xpReward: isBoss ? 50 : 15,
           objectives: [
-            'Ask "Could I get the check, please?"',
-            'Recognize dietary terms (vegan, gluten)',
-            'Score >80% on pronunciation shadowing'
+            'Grammar: ${topic.targetGrammar}',
+            'Phonetics: ${topic.targetPhonemeFocus}',
+            'Partner: ${topic.npcName}',
           ],
-          xOffset: 0.65,
+          xOffset: xOffsets[i % xOffsets.length],
         ),
-        LevelNodeModel(
-          id: 'u1_lvl_4',
-          unitNumber: 1,
-          levelNumber: 4,
-          title: 'Level 1-4: Directions & Places',
-          subtitle: 'Find your way around airports, stations, and streets',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 10,
-          objectives: ['Ask for nearest subway station', 'Understand "turn left at the corner"'],
-          xOffset: 0.0,
-        ),
-        LevelNodeModel(
-          id: 'u1_lvl_5',
-          unitNumber: 1,
-          levelNumber: 5,
-          title: 'Level 1-5: Daily Routine',
-          subtitle: 'Describe your schedule and casual habits',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 10,
-          objectives: ['Use simple present tense fluently', 'Connect sentences with "then" and "after"'],
-          xOffset: -0.65,
-        ),
-        LevelNodeModel(
-          id: 'u1_boss',
-          unitNumber: 1,
-          levelNumber: 6,
-          title: 'Boss Battle: Airport Customs Officer',
-          subtitle: 'Face a realistic AI voice conversation and pass inspection',
-          state: NodeState.boss,
-          stars: 0,
-          xpReward: 50,
-          objectives: [
-            'Answer 4 continuous spoken questions',
-            'State purpose of trip clearly',
-            'Maintain fluent pacing under pressure'
-          ],
-          xOffset: 0.0,
-        ),
-      ],
-    },
-    2: {
-      'title': 'Manhattan Cafe & Social Banter',
-      'description': 'Natural small talk, ordering complex drinks, and casual idiom mastery.',
-      'progress': 0.0,
-      'nodes': const [
-        LevelNodeModel(
-          id: 'u2_lvl_1',
-          unitNumber: 2,
-          levelNumber: 1,
-          title: 'Level 2-1: Espresso & Milk Craft',
-          subtitle: 'Order bespoke coffee, oat milk, temperature, and syrups',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 15,
-          objectives: ['Order flat white with oat milk', 'Ask for drink to go', 'Handle tip suggestions'],
-          xOffset: 0.0,
-        ),
-        LevelNodeModel(
-          id: 'u2_lvl_2',
-          unitNumber: 2,
-          levelNumber: 2,
-          title: 'Level 2-2: Table for Two',
-          subtitle: 'Host seating, waiting lists, and reservation inquiries',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 15,
-          objectives: ['Ask for an outdoor patio table', 'Inquire about wait time'],
-          xOffset: -0.65,
-        ),
-        LevelNodeModel(
-          id: 'u2_lvl_3',
-          unitNumber: 2,
-          levelNumber: 3,
-          title: 'Level 2-3: Dietary Restrictions',
-          subtitle: 'Communicate allergies and special preparation requests',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 15,
-          objectives: ['Explain peanut allergy clearly', 'Confirm dairy-free substitutes'],
-          xOffset: 0.65,
-        ),
-        LevelNodeModel(
-          id: 'u2_boss',
-          unitNumber: 2,
-          levelNumber: 4,
-          title: 'Boss Battle: Barista Mateo Rush Hour',
-          subtitle: 'Rapid spoken dialogue during morning NYC coffee rush',
-          state: NodeState.boss,
-          stars: 0,
-          xpReward: 50,
-          objectives: ['Order 2 custom drinks quickly', 'Pay with contactless Apple Pay', 'Engage in light weather banter'],
-          xOffset: 0.0,
-        ),
-      ],
-    },
-    3: {
-      'title': 'Global Travel & Navigation',
-      'description': 'Flight connections, baggage claims, taxis, and underground transit.',
-      'progress': 0.0,
-      'nodes': const [
-        LevelNodeModel(
-          id: 'u3_lvl_1',
-          unitNumber: 3,
-          levelNumber: 1,
-          title: 'Level 3-1: Terminal Transit',
-          subtitle: 'Navigating gate changes and boarding passes',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 15,
-          objectives: ['Understand gate change announcements', 'Ask for terminal shuttle'],
-          xOffset: 0.0,
-        ),
-        LevelNodeModel(
-          id: 'u3_boss',
-          unitNumber: 3,
-          levelNumber: 2,
-          title: 'Boss Battle: Hotel Concierge Desk',
-          subtitle: 'Request late check-out and restaurant recommendations',
-          state: NodeState.boss,
-          stars: 0,
-          xpReward: 50,
-          objectives: ['Negotiate 1:00 PM late check-out', 'Ask for hidden local bistro recommendation'],
-          xOffset: 0.0,
-        ),
-      ],
-    },
-    4: {
-      'title': 'High-Stakes Career & Meetings',
-      'description': 'Presenting project milestones, negotiating terms, and technical interviews.',
-      'progress': 0.0,
-      'nodes': const [
-        LevelNodeModel(
-          id: 'u4_lvl_1',
-          unitNumber: 4,
-          levelNumber: 1,
-          title: 'Level 4-1: Executive Introductions',
-          subtitle: 'Pitching your professional background and core competencies',
-          state: NodeState.locked,
-          stars: 0,
-          xpReward: 20,
-          objectives: ['Deliver 60-second elevator pitch', 'Articulate architectural trade-offs'],
-          xOffset: 0.0,
-        ),
-        LevelNodeModel(
-          id: 'u4_boss',
-          unitNumber: 4,
-          levelNumber: 2,
-          title: 'Boss Battle: VP of Product Interview',
-          subtitle: 'High-intensity behavioral & leadership spoken interview',
-          state: NodeState.boss,
-          stars: 0,
-          xpReward: 100,
-          objectives: ['Answer behavioral STAR question', 'Defend technical decision under critique'],
-          xOffset: 0.0,
-        ),
-      ],
-    },
-  };
+      );
+    }
+
+    final progress = nodes.isEmpty ? 0.0 : (completedCount / nodes.length).clamp(0.0, 1.0);
+
+    return {
+      'title': '${firstTopic.cefrLevel} • ${firstTopic.category}: ${firstTopic.title}',
+      'description': firstTopic.pedagogicalObjective,
+      'progress': progress,
+      'nodes': nodes,
+    };
+  }
 
   void _handleNodeTap(LevelNodeModel node) {
     if (node.state == NodeState.locked) {
@@ -259,7 +122,9 @@ class _PathScreenState extends State<PathScreen> {
           MaterialPageRoute(
             builder: (_) => const ConversationScreen(),
           ),
-        );
+        ).then((_) {
+          _onLevelCompleted(node.id);
+        });
       }
       return;
     }
@@ -270,16 +135,33 @@ class _PathScreenState extends State<PathScreen> {
       } else {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => LessonScreen(lessonTitle: node.title),
+            builder: (_) => LessonScreen(
+              lessonTitle: node.title,
+              customExercises: AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(node.id),
+              onCompleted: () {
+                _onLevelCompleted(node.id);
+                Navigator.of(context).pop();
+              },
+            ),
           ),
         );
       }
     });
   }
 
+  void _onLevelCompleted(String completedTopicId) {
+    LocalStorageService().unlockTopic(completedTopicId);
+    final allTopics = ConversationTopicsCatalog.allTopics;
+    final curIndex = allTopics.indexWhere((t) => t.id == completedTopicId);
+    if (curIndex != -1 && curIndex < allTopics.length - 1) {
+      LocalStorageService().unlockTopic(allTopics[curIndex + 1].id);
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    final activeUnit = _unitData[_selectedUnit]!;
+    final activeUnit = _getUnitData(_selectedUnit);
     final List<LevelNodeModel> nodes = activeUnit['nodes'];
 
     return Scaffold(
@@ -315,14 +197,15 @@ class _PathScreenState extends State<PathScreen> {
                   ),
 
                   // Interspersed Milestone Decorations
-                  if (i == 1 && _selectedUnit == 1) ...[
+                  if (i == 1) ...[
                     // Interactive Canvas Reward Chest
                     MilestoneRewardChest(
                       gemsReward: 25,
                       onClaimed: () {
+                        LocalStorageService().addXp(25);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('Bonus Chest Claimed! +25 Gems earned.'),
+                            content: const Text('Bonus Chest Claimed! +25 XP earned.'),
                             backgroundColor: const Color(0xFF0F172A),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -330,11 +213,11 @@ class _PathScreenState extends State<PathScreen> {
                         );
                       },
                     ),
-                  ] else if (i == 3 && _selectedUnit == 1) ...[
+                  ] else if (i == 3) ...[
                     // Canvas Checkpoint Gate
-                    const MilestoneCheckpointGate(
+                    MilestoneCheckpointGate(
                       title: 'Intermediate Conversational Barrier',
-                      isPassed: false,
+                      isPassed: nodes[i].state == NodeState.completed,
                     ),
                   ] else if (i < nodes.length - 1)
                     Padding(
@@ -374,11 +257,12 @@ class _PathScreenState extends State<PathScreen> {
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         scrollDirection: Axis.horizontal,
-        itemCount: 4,
+        itemCount: _totalUnits,
         separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final unitNum = index + 1;
           final isSelected = _selectedUnit == unitNum;
+          final sampleTopic = ConversationTopicsCatalog.allTopics[index * 6];
 
           return BouncyTap(
             onTap: () {
@@ -398,7 +282,7 @@ class _PathScreenState extends State<PathScreen> {
               ),
               child: Center(
                 child: Text(
-                  'UNIT $unitNum',
+                  'UNIT $unitNum • ${sampleTopic.cefrLevel}',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,

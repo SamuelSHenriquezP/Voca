@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
+import '../../../core/widgets/bouncy_tap.dart';
 import '../../../core/widgets/waveform_widget.dart';
 import '../models/exercise.dart';
 
@@ -75,16 +77,22 @@ class _ShadowingDrillState extends State<ShadowingDrill> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: VocaColors.purpleTint,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.volume_up_rounded,
-                      color: VocaColors.primaryPurple,
-                      size: 24,
+                  BouncyTap(
+                    onTap: () {
+                      VocaHaptics.light();
+                      AudioTtsService().speak(widget.exercise.targetSpeechText);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: VocaColors.purpleTint,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.volume_up_rounded,
+                        color: VocaColors.primaryPurple,
+                        size: 24,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),

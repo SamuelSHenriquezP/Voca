@@ -6,6 +6,7 @@ import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/sound_effects.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../models/exercise.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../widgets/action_drawer.dart';
 import '../widgets/cloze_fill_drill.dart';
 import '../widgets/exercise_header.dart';
@@ -16,11 +17,13 @@ import '../widgets/syllable_stress_drill.dart';
 
 class LessonScreen extends StatefulWidget {
   final String lessonTitle;
+  final List<ExerciseModel>? customExercises;
   final VoidCallback? onCompleted;
 
   const LessonScreen({
     super.key,
     this.lessonTitle = 'Level 1-3: Food & Drinks',
+    this.customExercises,
     this.onCompleted,
   });
 
@@ -57,7 +60,10 @@ class _LessonScreenState extends State<LessonScreen> {
     super.initState();
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
 
-    _exercises = const [
+    if (widget.customExercises != null && widget.customExercises!.isNotEmpty) {
+      _exercises = widget.customExercises!;
+    } else {
+      _exercises = const [
       ExerciseModel(
         id: 'ex_scramble',
         type: DrillType.sentenceScramble,
@@ -129,6 +135,7 @@ class _LessonScreenState extends State<LessonScreen> {
         expectedAccentTip: 'Soft link between "could we" -> sounds like "kood-wee".',
       ),
     ];
+    }
   }
 
   @override
@@ -214,6 +221,7 @@ class _LessonScreenState extends State<LessonScreen> {
       });
     } else {
       // Completed all drills!
+      LocalStorageService().addXp(25);
       SoundEffects.playCelebration();
       _confettiController.play();
       _showCompletionDialog();
