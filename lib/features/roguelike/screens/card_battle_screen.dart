@@ -59,6 +59,16 @@ class _CardBattleScreenState extends State<CardBattleScreen>
   List<LinguisticCard>? _rewardOptions;
   LinguisticCard? _selectedRewardCard;
 
+  // Pacing Timer (3 to 4 minutes max per level)
+  int _remainingSeconds = 210; // 3 min 30 sec
+  Timer? _encounterTimer;
+
+  String get _formattedTime {
+    final m = _remainingSeconds ~/ 60;
+    final s = _remainingSeconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -68,13 +78,47 @@ class _CardBattleScreenState extends State<CardBattleScreen>
     _playerMaxHp = widget.playerMaxHp;
     _runDeck.addAll(widget.deck);
 
+    _startTimer();
     _initCombat();
   }
 
   @override
   void dispose() {
+    _encounterTimer?.cancel();
     _confettiController.dispose();
     super.dispose();
+  }
+
+  void _startTimer() {
+    _encounterTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_isVictory || _isDefeat) {
+        timer.cancel();
+        return;
+      }
+      if (_remainingSeconds > 0) {
+        if (mounted) {
+          setState(() => _remainingSeconds--);
+        }
+      } else {
+        timer.cancel();
+        _handleTimeExpired();
+      }
+    });
+  }
+
+  void _handleTimeExpired() {
+    if (_isVictory || _isDefeat) return;
+    VocaHaptics.error();
+    _showFloatingBanner('TIME EXPIRED! GUARDIAN ENRAGED', const Color(0xFFDC2626));
+    setState(() {
+      _playerHp = (_playerHp - 6).clamp(0, _playerMaxHp);
+      if (_playerHp <= 0) {
+        _isDefeat = true;
+      } else {
+        _remainingSeconds = 60; // 60s sudden death overtime
+        _startTimer();
+      }
+    });
   }
 
   void _initCombat() {
@@ -379,6 +423,41 @@ class _CardBattleScreenState extends State<CardBattleScreen>
               ],
             ),
           ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: _remainingSeconds < 45
+                  ? const Color(0xFFEF4444).withOpacity(0.2)
+                  : Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: _remainingSeconds < 45
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFF38BDF8).withOpacity(0.4),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.timer_outlined,
+                  color: _remainingSeconds < 45
+                      ? const Color(0xFFEF4444)
+                      : const Color(0xFF38BDF8),
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _formattedTime,
+                  style: TextStyle(
+                    color: _remainingSeconds < 45 ? const Color(0xFFEF4444) : Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 12,
+                    fontFamily: 'Courier',
+                  ),
+                ),
+              ],
+            ),
+          ),
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B)),
@@ -429,6 +508,7 @@ class _CardBattleScreenState extends State<CardBattleScreen>
             size: 160,
             isAttacking: !_isPlayerTurn,
             isTakingDamage: _shakeScreen,
+            isDefeated: _monster.isDead,
           ),
 
           const SizedBox(height: 10),
@@ -809,6 +889,7 @@ class _CriticalDrillModalState extends State<_CriticalDrillModal> {
   Timer? _timer;
   double _timeProgress = 1.0;
   int? _selectedIdx;
+  bool _showTrick = false;
 
   @override
   void initState() {
@@ -842,7 +923,10 @@ class _CriticalDrillModalState extends State<_CriticalDrillModal> {
 
   void _chooseOption(int index) {
     _timer?.cancel();
-    setState(() => _selectedIdx = index);
+    setState(() {
+      _selectedIdx = index;
+      _showTrick = true;
+    });
     final isCorrect = index == widget.card.drill.correctIndex;
     if (isCorrect) {
       VocaHaptics.heavy();
@@ -850,7 +934,7 @@ class _CriticalDrillModalState extends State<_CriticalDrillModal> {
       VocaHaptics.light();
     }
 
-    Future.delayed(const Duration(milliseconds: 250), () {
+    Future.delayed(const Duration(milliseconds: 650), () {
       if (mounted) {
         widget.onResolved(isCorrect);
       }
@@ -918,18 +1002,87 @@ class _CriticalDrillModalState extends State<_CriticalDrillModal> {
 
             const SizedBox(height: 12),
 
-            // Question Prompt
-            Text(
-              drill.prompt,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                height: 1.3,
-              ),
+            // Question Prompt with TRICK Button
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    drill.prompt,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                BouncyTap(
+                  onTap: () {
+                    setState(() => _showTrick = !_showTrick);
+                    VocaHaptics.selection();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF059669).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF10B981).withOpacity(0.6)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.lightbulb_rounded, color: Color(0xFF34D399), size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          'TRICK',
+                          style: TextStyle(
+                            color: Color(0xFF34D399),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
 
-            const SizedBox(height: 16),
+            if (_showTrick) ...[
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF064E3B).withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFF059669)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.tips_and_updates_rounded, color: Color(0xFF6EE7B7), size: 15),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        drill.explanation,
+                        style: const TextStyle(
+                          color: Color(0xFFE2E8F0),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 14),
 
             // 3 Options
             ...List.generate(drill.options.length, (idx) {

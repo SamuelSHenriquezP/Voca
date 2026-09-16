@@ -6,6 +6,7 @@ class BossCanvasWidget extends StatefulWidget {
   final double size;
   final bool isAttacking;
   final bool isTakingDamage;
+  final bool isDefeated;
 
   const BossCanvasWidget({
     super.key,
@@ -13,6 +14,7 @@ class BossCanvasWidget extends StatefulWidget {
     this.size = 180,
     this.isAttacking = false,
     this.isTakingDamage = false,
+    this.isDefeated = false,
   });
 
   @override
@@ -20,36 +22,99 @@ class BossCanvasWidget extends StatefulWidget {
 }
 
 class _BossCanvasWidgetState extends State<BossCanvasWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _pulseController;
+  late AnimationController _entryController;
+  late AnimationController _lungeController;
 
   @override
   void initState() {
     super.initState();
+    // 1. Idle Breathing & Levitating
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
+
+    // 2. Entrance Spring
+    _entryController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..forward();
+
+    // 3. Attack Lunge
+    _lungeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant BossCanvasWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isAttacking && !oldWidget.isAttacking) {
+      _lungeController.forward(from: 0.0).then((_) {
+        if (mounted) _lungeController.reverse();
+      });
+    }
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
+    _entryController.dispose();
+    _lungeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _pulseController,
+      animation: Listenable.merge([_pulseController, _entryController, _lungeController]),
       builder: (context, child) {
-        return CustomPaint(
-          size: Size(widget.size, widget.size),
-          painter: _getPainter(
-            widget.avatarId,
-            _pulseController.value,
-            widget.isAttacking,
-            widget.isTakingDamage,
+        // Entrance curve
+        final entryScale = CurvedAnimation(
+          parent: _entryController,
+          curve: Curves.easeOutBack,
+        ).value;
+        final entryOpacity = CurvedAnimation(
+          parent: _entryController,
+          curve: Curves.easeIn,
+        ).value;
+
+        // Floating idle hover (sine wave)
+        final idleHoverY = math.sin(_pulseController.value * 2 * math.pi) * 8.0;
+
+        // Attack Lunge (forward thrust)
+        final lungeY = _lungeController.value * 22.0;
+
+        // Damage Shudder (high frequency shake)
+        final damageShakeX = widget.isTakingDamage
+            ? math.sin(_pulseController.value * 30 * math.pi) * 7.0
+            : 0.0;
+
+        // Defeat scale & opacity
+        final defeatScale = widget.isDefeated ? 0.0 : 1.0;
+
+        final totalScale = entryScale * defeatScale * (0.97 + (_pulseController.value * 0.04));
+        final totalY = idleHoverY + lungeY;
+
+        return Opacity(
+          opacity: (entryOpacity * defeatScale).clamp(0.0, 1.0),
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..translate(damageShakeX, totalY)
+              ..scale(totalScale, totalScale),
+            child: CustomPaint(
+              size: Size(widget.size, widget.size),
+              painter: _getPainter(
+                widget.avatarId,
+                _pulseController.value,
+                widget.isAttacking,
+                widget.isTakingDamage,
+              ),
+            ),
           ),
         );
       },
