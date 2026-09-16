@@ -7,10 +7,12 @@ import '../../../core/utils/sound_effects.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../models/exercise.dart';
 import '../widgets/action_drawer.dart';
+import '../widgets/cloze_fill_drill.dart';
 import '../widgets/exercise_header.dart';
 import '../widgets/picture_choice_drill.dart';
 import '../widgets/scramble_drill.dart';
 import '../widgets/shadowing_drill.dart';
+import '../widgets/syllable_stress_drill.dart';
 
 class LessonScreen extends StatefulWidget {
   final String lessonTitle;
@@ -36,10 +38,16 @@ class _LessonScreenState extends State<LessonScreen> {
   // Exercise 1: Scramble
   final List<String> _selectedScrambleWords = [];
 
-  // Exercise 2: Picture Choice
+  // Exercise 2: Cloze Fill
+  String? _selectedClozeAnswer;
+
+  // Exercise 3: Syllable Stress
+  int? _selectedSyllableIndex;
+
+  // Exercise 4: Picture Choice
   String? _selectedPictureOptionId;
 
-  // Exercise 3: Shadowing
+  // Exercise 5: Shadowing
   bool _isShadowingRecorded = false;
 
   late final List<ExerciseModel> _exercises;
@@ -55,8 +63,30 @@ class _LessonScreenState extends State<LessonScreen> {
         type: DrillType.sentenceScramble,
         prompt: 'Arrange the words to say:',
         subtitle: '"Could I please have a cup of coffee?"',
+        trickTip: 'Native Trick: "Could I have" is 10x more polite and natural in real conversation than "I want".',
         targetSentenceWords: ['Could', 'I', 'please', 'have', 'a', 'cup', 'of', 'coffee?'],
         bankWords: ['have', 'coffee?', 'Could', 'tea', 'cup', 'I', 'please', 'of', 'a', 'water'],
+      ),
+      ExerciseModel(
+        id: 'ex_cloze',
+        type: DrillType.clozeFill,
+        prompt: 'Fill in the missing preposition:',
+        subtitle: 'Select the natural spoken collocation',
+        trickTip: 'Native Trick: "Look forward TO" always pairs with "to" + noun/gerund, never "for" or "at"!',
+        clozePrefix: "I'm really looking forward",
+        clozeSuffix: "your presentation tomorrow.",
+        clozeOptions: ['to', 'for', 'at', 'with'],
+        correctClozeAnswer: 'to',
+      ),
+      ExerciseModel(
+        id: 'ex_stress',
+        type: DrillType.syllableStress,
+        prompt: 'Tap the stressed syllable:',
+        subtitle: 'Where does the primary pitch accent land?',
+        trickTip: 'Native Trick: The second vowel drops completely: /ˈkʌmf.tɚ.bəl/. It has 3 spoken syllables, not 4!',
+        ipaPhonetic: '/ˈkʌmf.tɚ.bəl/',
+        syllables: ['COM', 'FOR', 'TA', 'BLE'],
+        correctSyllableIndex: 0,
       ),
       ExerciseModel(
         id: 'ex_choice',
@@ -112,6 +142,10 @@ class _LessonScreenState extends State<LessonScreen> {
     switch (currentEx.type) {
       case DrillType.sentenceScramble:
         return _selectedScrambleWords.isNotEmpty;
+      case DrillType.clozeFill:
+        return _selectedClozeAnswer != null;
+      case DrillType.syllableStress:
+        return _selectedSyllableIndex != null;
       case DrillType.pictureChoice:
         return _selectedPictureOptionId != null;
       case DrillType.shadowing:
@@ -129,6 +163,12 @@ class _LessonScreenState extends State<LessonScreen> {
         final target = currentEx.targetSentenceWords.join(' ');
         isCorrect = assembled == target;
         break;
+      case DrillType.clozeFill:
+        isCorrect = _selectedClozeAnswer == currentEx.correctClozeAnswer;
+        break;
+      case DrillType.syllableStress:
+        isCorrect = _selectedSyllableIndex == currentEx.correctSyllableIndex;
+        break;
       case DrillType.pictureChoice:
         final selectedOpt = currentEx.pictureOptions.firstWhere(
           (o) => o.id == _selectedPictureOptionId,
@@ -137,7 +177,6 @@ class _LessonScreenState extends State<LessonScreen> {
         isCorrect = selectedOpt.isCorrect;
         break;
       case DrillType.shadowing:
-        // Voice shadowing is simulated as successful once user records
         isCorrect = _isShadowingRecorded;
         break;
     }
@@ -168,6 +207,8 @@ class _LessonScreenState extends State<LessonScreen> {
         _currentIndex++;
         _drawerState = DrawerState.standard;
         _selectedScrambleWords.clear();
+        _selectedClozeAnswer = null;
+        _selectedSyllableIndex = null;
         _selectedPictureOptionId = null;
         _isShadowingRecorded = false;
       });
@@ -240,6 +281,24 @@ class _LessonScreenState extends State<LessonScreen> {
     );
   }
 
+  String _getCorrectAnswer(ExerciseModel currentEx) {
+    switch (currentEx.type) {
+      case DrillType.sentenceScramble:
+        return currentEx.targetSentenceWords.join(' ');
+      case DrillType.clozeFill:
+        return currentEx.correctClozeAnswer;
+      case DrillType.syllableStress:
+        return (currentEx.syllables.isNotEmpty &&
+                currentEx.correctSyllableIndex < currentEx.syllables.length)
+            ? currentEx.syllables[currentEx.correctSyllableIndex]
+            : '';
+      case DrillType.pictureChoice:
+        return 'The Bill / Check';
+      case DrillType.shadowing:
+        return currentEx.targetSpeechText;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentEx = _exercises[_currentIndex];
@@ -256,6 +315,24 @@ class _LessonScreenState extends State<LessonScreen> {
           },
           onWordRemoved: (index) {
             setState(() => _selectedScrambleWords.removeAt(index));
+          },
+        );
+        break;
+      case DrillType.clozeFill:
+        drillBody = ClozeFillDrill(
+          exercise: currentEx,
+          selectedAnswer: _selectedClozeAnswer,
+          onAnswerSelected: (ans) {
+            setState(() => _selectedClozeAnswer = ans);
+          },
+        );
+        break;
+      case DrillType.syllableStress:
+        drillBody = SyllableStressDrill(
+          exercise: currentEx,
+          selectedIndex: _selectedSyllableIndex,
+          onIndexSelected: (idx) {
+            setState(() => _selectedSyllableIndex = idx);
           },
         );
         break;
@@ -304,10 +381,10 @@ class _LessonScreenState extends State<LessonScreen> {
             onCheck: _onCheckAnswer,
             onContinue: _onContinue,
             onGotIt: _onGotIt,
-            correctAnswer: currentEx.type == DrillType.sentenceScramble
-                ? currentEx.targetSentenceWords.join(' ')
-                : 'The Bill / Check',
-            tip: 'Focus on native rhythm and clear vowel intonation.',
+            correctAnswer: _getCorrectAnswer(currentEx),
+            tip: currentEx.trickTip.isNotEmpty
+                ? currentEx.trickTip
+                : 'Focus on native rhythm and clear vowel intonation.',
           ),
         ],
       ),
