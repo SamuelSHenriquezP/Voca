@@ -44,6 +44,26 @@ class ScenarioSelectorSheet extends StatelessWidget {
 
   static List<ScenarioItem> get scenarios => const [
         ScenarioItem(
+          id: 'alex_free_chat',
+          title: 'Free Conversation with Alex',
+          personaName: 'Alex',
+          personaRole: 'Native English Companion',
+          description: 'Spontaneous, adaptive, judgment-free talk about anything you want.',
+          difficulty: 'Adaptive',
+          accentColor: Color(0xFF6366F1),
+          iconWidget: Icon(
+            Icons.chat_bubble_outline_rounded,
+            color: Colors.white,
+            size: 24,
+          ),
+          openingMessage:
+              "Hey there! I'm Alex. So great to meet you! How has your day been treating you so far?",
+          suggestedPhrase:
+              '"Hey Alex! My day has been pretty good, just practicing my spoken English."',
+          hintContext:
+              'Speak freely! Alex adapts dynamically to your pace, keeps answers brief, and provides gentle feedback.',
+        ),
+        ScenarioItem(
           id: 'jfk_customs',
           title: 'Airport Customs Inspection',
           personaName: 'Officer Miller',
