@@ -7,6 +7,7 @@ import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../../lesson/screens/lesson_screen.dart';
 import '../models/level_node.dart';
+import '../widgets/curved_path_connector.dart';
 import '../widgets/level_modal.dart';
 import '../widgets/milestone_decorations.dart';
 import '../widgets/path_node.dart';
@@ -511,20 +512,11 @@ class _PathScreenState extends State<PathScreen> {
                       isPassed: nodes[i].state == NodeState.completed,
                     ),
                   ] else if (i < nodes.length - 1)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Center(
-                        child: Container(
-                          width: 2,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: nodes[i].state == NodeState.completed
-                                ? const Color(0xFF4F46E5)
-                                : const Color(0xFFE2E8F0),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
+                    CurvedPathConnector(
+                      startOffset: nodes[i].xOffset,
+                      endOffset: nodes[i + 1].xOffset,
+                      isCompleted: nodes[i].state == NodeState.completed,
+                      isActive: nodes[i + 1].state == NodeState.active || nodes[i].state == NodeState.active,
                     ),
                 ],
                 const SizedBox(height: 40),

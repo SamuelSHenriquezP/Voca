@@ -108,39 +108,47 @@ class _AdventureCartoonAvatarState extends State<AdventureCartoonAvatar>
           final bounceY = widget.expression == 'victory'
               ? -math.sin(t * math.pi * 2).abs() * (s * 0.08)
               : 0.0;
+          // Organic character blinking (quick 80ms blink near breath apex)
+          final isBlinking = widget.isAnimated && (t > 0.88 && t < 0.96);
+          final swayAngle = widget.isAnimated ? math.sin(t * math.pi) * 0.028 : 0.0;
 
-          return Transform.translate(
-            offset: Offset(0, bounceY),
-            child: Transform.scale(
-              scaleX: scaleX,
-              scaleY: scaleY,
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: s,
-                height: s,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _getBackdropColor(),
-                  border: Border.all(
-                    color: const Color(0xFF0F172A),
-                    width: s > 60 ? 3.0 : 2.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      offset: const Offset(0, 4),
-                      blurRadius: 6,
+          return Transform.rotate(
+            angle: swayAngle,
+            alignment: Alignment.bottomCenter,
+            child: Transform.translate(
+              offset: Offset(0, bounceY),
+              child: Transform.scale(
+                scaleX: scaleX,
+                scaleY: scaleY,
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: s,
+                  height: s,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _getBackdropColor(),
+                    border: Border.all(
+                      color: const Color(0xFF0F172A),
+                      width: s > 60 ? 3.0 : 2.0,
                     ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: CustomPaint(
-                    size: Size(s, s),
-                    painter: _AdventureTimePainter(
-                      archetype: widget.archetype,
-                      customColor: widget.customColor,
-                      expression: widget.expression,
-                      animT: t,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        offset: const Offset(0, 4),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: CustomPaint(
+                      size: Size(s, s),
+                      painter: _AdventureTimePainter(
+                        archetype: widget.archetype,
+                        customColor: widget.customColor,
+                        expression: widget.expression,
+                        animT: t,
+                        isBlinking: isBlinking,
+                      ),
                     ),
                   ),
                 ),
@@ -173,12 +181,14 @@ class _AdventureTimePainter extends CustomPainter {
   final Color? customColor;
   final String expression;
   final double animT;
+  final bool isBlinking;
 
   _AdventureTimePainter({
     required this.archetype,
     this.customColor,
     required this.expression,
     required this.animT,
+    this.isBlinking = false,
   });
 
   @override
@@ -321,36 +331,47 @@ class _AdventureTimePainter extends CustomPainter {
     canvas.drawPath(rightEar, fill);
     canvas.drawPath(rightEar, line);
 
-    // Big Jake White Eyes with thick stroke
-    fill.color = Colors.white;
-    final eyeRadius = w * 0.12;
-    canvas.drawCircle(Offset(w * 0.38, h * 0.44), eyeRadius, fill);
-    canvas.drawCircle(Offset(w * 0.38, h * 0.44), eyeRadius, line);
-
-    canvas.drawCircle(Offset(w * 0.62, h * 0.44), eyeRadius, fill);
-    canvas.drawCircle(Offset(w * 0.62, h * 0.44), eyeRadius, line);
-
-    // Black Pupils
-    fill.color = const Color(0xFF0F172A);
-    final pupilOffset = expression == 'wink'
-        ? Offset(w * 0.39, h * 0.44)
-        : Offset(w * 0.38, h * 0.44);
-    canvas.drawCircle(pupilOffset, eyeRadius * 0.52, fill);
-    if (expression != 'wink') {
-      canvas.drawCircle(Offset(w * 0.62, h * 0.44), eyeRadius * 0.52, fill);
+    // Big Jake White Eyes or Blinking Arcs
+    if (isBlinking && expression != 'wink') {
+      final blinkLeft = Path()
+        ..moveTo(w * 0.28, h * 0.44)
+        ..quadraticBezierTo(w * 0.38, h * 0.37, w * 0.48, h * 0.44);
+      final blinkRight = Path()
+        ..moveTo(w * 0.52, h * 0.44)
+        ..quadraticBezierTo(w * 0.62, h * 0.37, w * 0.72, h * 0.44);
+      canvas.drawPath(blinkLeft, line);
+      canvas.drawPath(blinkRight, line);
     } else {
-      // Winking right eye: happy line
-      final winkArc = Path()
-        ..moveTo(w * 0.56, h * 0.44)
-        ..quadraticBezierTo(w * 0.62, h * 0.39, w * 0.68, h * 0.44);
-      canvas.drawPath(winkArc, line);
-    }
+      fill.color = Colors.white;
+      final eyeRadius = w * 0.12;
+      canvas.drawCircle(Offset(w * 0.38, h * 0.44), eyeRadius, fill);
+      canvas.drawCircle(Offset(w * 0.38, h * 0.44), eyeRadius, line);
 
-    // Pupil glints
-    fill.color = Colors.white;
-    canvas.drawCircle(Offset(w * 0.36, h * 0.42), eyeRadius * 0.16, fill);
-    if (expression != 'wink') {
-      canvas.drawCircle(Offset(w * 0.60, h * 0.42), eyeRadius * 0.16, fill);
+      canvas.drawCircle(Offset(w * 0.62, h * 0.44), eyeRadius, fill);
+      canvas.drawCircle(Offset(w * 0.62, h * 0.44), eyeRadius, line);
+
+      // Black Pupils
+      fill.color = const Color(0xFF0F172A);
+      final pupilOffset = expression == 'wink'
+          ? Offset(w * 0.39, h * 0.44)
+          : Offset(w * 0.38, h * 0.44);
+      canvas.drawCircle(pupilOffset, eyeRadius * 0.52, fill);
+      if (expression != 'wink') {
+        canvas.drawCircle(Offset(w * 0.62, h * 0.44), eyeRadius * 0.52, fill);
+      } else {
+        // Winking right eye: happy line
+        final winkArc = Path()
+          ..moveTo(w * 0.56, h * 0.44)
+          ..quadraticBezierTo(w * 0.62, h * 0.39, w * 0.68, h * 0.44);
+        canvas.drawPath(winkArc, line);
+      }
+
+      // Pupil glints
+      fill.color = Colors.white;
+      canvas.drawCircle(Offset(w * 0.36, h * 0.42), eyeRadius * 0.16, fill);
+      if (expression != 'wink') {
+        canvas.drawCircle(Offset(w * 0.60, h * 0.42), eyeRadius * 0.16, fill);
+      }
     }
 
     // Jake's Iconic Overlapping Droopy Jowls / Snout
@@ -580,7 +601,17 @@ class _AdventureTimePainter extends CustomPainter {
 
     fill.color = const Color(0xFF0F172A);
 
-    if (expression == 'happy' || expression == 'victory') {
+    // Blinking eye animation or normal eyes
+    if (isBlinking && expression != 'wink') {
+      final blinkLeft = Path()
+        ..moveTo(leftX - (eyeR * 1.3), eyeY)
+        ..quadraticBezierTo(leftX, eyeY - (eyeR * 0.9), leftX + (eyeR * 1.3), eyeY);
+      final blinkRight = Path()
+        ..moveTo(rightX - (eyeR * 1.3), eyeY)
+        ..quadraticBezierTo(rightX, eyeY - (eyeR * 0.9), rightX + (eyeR * 1.3), eyeY);
+      canvas.drawPath(blinkLeft, line);
+      canvas.drawPath(blinkRight, line);
+    } else {
       // Classic Adventure Time dot eyes
       canvas.drawCircle(Offset(leftX, eyeY), eyeR, fill);
       canvas.drawCircle(Offset(rightX, eyeY), eyeR, fill);
@@ -589,7 +620,9 @@ class _AdventureTimePainter extends CustomPainter {
       fill.color = Colors.white;
       canvas.drawCircle(Offset(leftX - (eyeR * 0.35), eyeY - (eyeR * 0.35)), eyeR * 0.32, fill);
       canvas.drawCircle(Offset(rightX - (eyeR * 0.35), eyeY - (eyeR * 0.35)), eyeR * 0.32, fill);
+    }
 
+    if (expression == 'happy' || expression == 'victory') {
       // Wide Open Cartoon Mouth with cute pink tongue (#FB7185)
       final mouthY = center.dy + (h * 0.06);
       final mouthPath = Path()
@@ -620,10 +653,6 @@ class _AdventureTimePainter extends CustomPainter {
         canvas.drawPath(fang, fill);
       }
     } else if (expression == 'sweat') {
-      // Worried / Sweat drop
-      canvas.drawCircle(Offset(leftX, eyeY), eyeR * 0.9, fill);
-      canvas.drawCircle(Offset(rightX, eyeY), eyeR * 0.9, fill);
-
       // Squiggly mouth
       final mouthPath = Path()
         ..moveTo(center.dx - (w * 0.08), center.dy + (h * 0.07))
@@ -642,9 +671,6 @@ class _AdventureTimePainter extends CustomPainter {
       canvas.drawPath(drop, line);
     } else {
       // Classic confident grin
-      canvas.drawCircle(Offset(leftX, eyeY), eyeR, fill);
-      canvas.drawCircle(Offset(rightX, eyeY), eyeR, fill);
-
       final smilePath = Path()
         ..moveTo(center.dx - (w * 0.09), center.dy + (h * 0.06))
         ..quadraticBezierTo(center.dx, center.dy + (h * 0.12), center.dx + (w * 0.09), center.dy + (h * 0.06));
@@ -657,7 +683,8 @@ class _AdventureTimePainter extends CustomPainter {
     return oldDelegate.archetype != archetype ||
         oldDelegate.customColor != customColor ||
         oldDelegate.expression != expression ||
-        oldDelegate.animT != animT;
+        oldDelegate.animT != animT ||
+        oldDelegate.isBlinking != isBlinking;
   }
 }
 

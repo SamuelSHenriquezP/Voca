@@ -56,7 +56,7 @@ class MilestoneCheckpointGate extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          isPassed ? 'STAGE CLEARED' : 'CHECKPOINT GATE',
+                          isPassed ? 'PASO LIBRE' : 'PUNTO DE CONTROL',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
@@ -219,7 +219,7 @@ class _MilestoneRewardChestState extends State<MilestoneRewardChest>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _isClaimed ? 'REWARD CLAIMED' : 'BONUS CACHE',
+                      _isClaimed ? 'RECOMPENSA RECLAMADA' : 'COFRE DE AVENTURA',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
@@ -228,7 +228,7 @@ class _MilestoneRewardChestState extends State<MilestoneRewardChest>
                       ),
                     ),
                     Text(
-                      _isClaimed ? '+${widget.gemsReward} Gems Added' : 'Tap to unlock +${widget.gemsReward} Gems',
+                      _isClaimed ? '+${widget.gemsReward} XP añadidos a tu perfil' : 'Toca para abrir y ganar +${widget.gemsReward} XP',
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -273,8 +273,21 @@ class _ChestVectorPainter extends CustomPainter {
     canvas.drawRRect(baseRect, fillPaint);
     canvas.drawRRect(baseRect, paint);
 
-    // Lid
+    // Lid & Magical Sparkles
     if (isOpen) {
+      // Golden magic light bursting from inside
+      final glowPaint = Paint()
+        ..shader = RadialGradient(
+          colors: [const Color(0xFFFBBF24).withOpacity(0.5), Colors.transparent],
+        ).createShader(Rect.fromCircle(center: Offset(size.width * 0.5, size.height * 0.35), radius: size.width * 0.35));
+      canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.35), size.width * 0.35, glowPaint);
+
+      // Star sparkles
+      final starPaint = Paint()..color = const Color(0xFFF59E0B)..style = PaintingStyle.fill;
+      _drawLittleStar(canvas, Offset(size.width * 0.35, size.height * 0.20), 2.8, starPaint);
+      _drawLittleStar(canvas, Offset(size.width * 0.65, size.height * 0.15), 2.4, starPaint);
+      _drawLittleStar(canvas, Offset(size.width * 0.50, size.height * 0.08), 3.2, starPaint);
+
       // Tilted open lid
       final lidPath = Path()
         ..moveTo(size.width * 0.15, size.height * 0.45)
@@ -294,6 +307,16 @@ class _ChestVectorPainter extends CustomPainter {
 
     // Keyhole/Latch
     canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.60), 2.0, paint);
+  }
+
+  void _drawLittleStar(Canvas canvas, Offset c, double r, Paint paint) {
+    final path = Path()
+      ..moveTo(c.dx, c.dy - r)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx + r, c.dy)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx, c.dy + r)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx - r, c.dy)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx, c.dy - r);
+    canvas.drawPath(path, paint);
   }
 
   @override
