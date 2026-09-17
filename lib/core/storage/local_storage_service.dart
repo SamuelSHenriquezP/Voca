@@ -338,6 +338,25 @@ class LocalStorageService {
     }
   }
 
+  // =========================================================================
+  // API KEY & CLOUD AI PROVIDER STORAGE
+  // =========================================================================
+  String? getApiKey(String provider) {
+    return _prefs?.getString('voca_api_key_${provider.toLowerCase().replaceAll(' ', '_')}');
+  }
+
+  Future<void> saveApiKey(String provider, String key) async {
+    await _prefs?.setString('voca_api_key_${provider.toLowerCase().replaceAll(' ', '_')}', key.trim());
+  }
+
+  String getSelectedAiProvider() {
+    return _prefs?.getString('voca_selected_ai_provider') ?? 'gemini';
+  }
+
+  Future<void> setSelectedAiProvider(String provider) async {
+    await _prefs?.setString('voca_selected_ai_provider', provider.toLowerCase().replaceAll(' ', '_'));
+  }
+
   static const List<Map<String, dynamic>> _defaultVaultWords = [
     {
       'id': 'v1',

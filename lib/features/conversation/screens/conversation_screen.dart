@@ -274,20 +274,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
-  void _processUserTurn([String? customText]) {
+  Future<void> _processUserTurn([String? customText]) async {
     final turns = _activeTurns;
     final turn = _currentTurn;
     final textToProcess = (customText != null && customText.trim().isNotEmpty)
         ? customText.trim()
         : (_dynamicSuggestedPhrase ?? turn.suggestedUserResponse);
-
-    final result = ContextualConversationEngine.processUserInput(
-      scenarioId: _activeScenario.id,
-      personaName: _activeScenario.personaName,
-      userText: textToProcess,
-      history: _messages,
-      topicTitle: _activeScenario.title,
-    );
 
     SoundEffects.playSuccess();
     VocaHaptics.medium();
@@ -299,23 +291,32 @@ class _ConversationScreenState extends State<ConversationScreen> {
           text: textToProcess,
           isUser: true,
           time: '14:04',
-          accuracyScore: result.accuracyScore,
-          coachGrammarTip: result.grammarTip,
-          coachPronunciationTip: result.pronunciationTip,
         ),
       );
+      _statusText = '${_activeScenario.personaName} thinking...';
+      _scrollToBottom();
+    });
 
+    final result = await ContextualConversationEngine.processUserInputAsync(
+      scenarioId: _activeScenario.id,
+      personaName: _activeScenario.personaName,
+      userText: textToProcess,
+      history: _messages,
+      topicTitle: _activeScenario.title,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
       _currentGrammarTip = result.grammarTip;
       _currentPronunciationTip = result.pronunciationTip;
       _currentFluencyScore = result.accuracyScore;
       _dynamicSuggestedPhrase = result.suggestedFollowUp;
       _dynamicHint = result.hint;
-      _statusText = '${_activeScenario.personaName} thinking...';
-      _scrollToBottom();
     });
 
     // NPC response after natural conversational pause
-    Future.delayed(const Duration(milliseconds: 900), () {
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (!mounted) return;
 
       setState(() {

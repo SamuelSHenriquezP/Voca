@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'voca_colors.dart';
+import 'voca_typography.dart';
 
 class VocaTheme {
   VocaTheme._();
@@ -17,7 +18,18 @@ class VocaTheme {
         surface: VocaColors.cardBackground,
         error: VocaColors.rubyRed,
       ),
-      textTheme: GoogleFonts.nunitoTextTheme(),
+      textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
+        displayLarge: VocaTypography.display,
+        displayMedium: VocaTypography.displayMedium,
+        headlineLarge: VocaTypography.heading1,
+        headlineMedium: VocaTypography.heading2,
+        headlineSmall: VocaTypography.heading3,
+        bodyLarge: VocaTypography.bodyLarge,
+        bodyMedium: VocaTypography.bodyMedium,
+        bodySmall: VocaTypography.bodySmall,
+        labelLarge: VocaTypography.buttonText,
+        labelSmall: VocaTypography.caption,
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
+import '../../../core/network/network_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/widgets/bouncy_tap.dart';
@@ -19,6 +20,26 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   int _selectedTab = 0;
   final List<String> _tabs = ['Overview', 'Leaderboard', 'Achievements'];
+  NetworkStatus? _networkStatus;
+  bool _isCheckingNetwork = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshNetwork();
+  }
+
+  Future<void> _refreshNetwork() async {
+    if (_isCheckingNetwork) return;
+    setState(() => _isCheckingNetwork = true);
+    final status = await NetworkService().checkInternetAccess();
+    if (mounted) {
+      setState(() {
+        _networkStatus = status;
+        _isCheckingNetwork = false;
+      });
+    }
+  }
 
   List<Map<String, dynamic>> get _rankings {
     final userXp = LocalStorageService().getXp();
@@ -214,6 +235,103 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
 
               const SizedBox(height: 24),
+
+              // Internet & Cloud Connectivity Card
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: (_networkStatus?.isOnline ?? true)
+                          ? const Color(0xFFBBF7D0)
+                          : const Color(0xFFFECACA),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: (_networkStatus?.isOnline ?? true)
+                              ? const Color(0xFFDCFCE7)
+                              : const Color(0xFFFEE2E2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          (_networkStatus?.isOnline ?? true)
+                              ? Icons.wifi_rounded
+                              : Icons.wifi_off_rounded,
+                          color: (_networkStatus?.isOnline ?? true)
+                              ? VocaColors.emeraldGreen
+                              : VocaColors.rubyRed,
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  (_networkStatus?.isOnline ?? true)
+                                      ? 'Internet Conectado'
+                                      : 'Modo Offline',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: (_networkStatus?.isOnline ?? true)
+                                        ? VocaColors.emeraldGreen
+                                        : VocaColors.rubyRed,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _networkStatus != null
+                                  ? '${_networkStatus!.statusMessage} • Acceso completo'
+                                  : 'Comprobando acceso a Internet...',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFF64748B),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _isCheckingNetwork ? null : _refreshNetwork,
+                        icon: _isCheckingNetwork
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.refresh_rounded, size: 18, color: VocaColors.primaryPurple),
+                        tooltip: 'Probar conexión',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 14),
 
               // Settings & BYOK
               Padding(

@@ -1,4 +1,6 @@
 import 'dart:math' as math;
+import '../../../core/storage/local_storage_service.dart';
+import '../../../core/network/network_service.dart';
 import '../models/chat_message.dart';
 
 class AiReplyResult {
@@ -21,6 +23,59 @@ class AiReplyResult {
 
 class ContextualConversationEngine {
   ContextualConversationEngine._();
+
+  /// Asynchronously processes user input. If an API key is stored and internet is available,
+  /// queries the cloud AI (Gemini or OpenAI). Otherwise falls back smoothly to local engine.
+  static Future<AiReplyResult> processUserInputAsync({
+    required String scenarioId,
+    required String personaName,
+    required String userText,
+    required List<ChatMessage> history,
+    String? topicTitle,
+  }) async {
+    final localResult = processUserInput(
+      scenarioId: scenarioId,
+      personaName: personaName,
+      userText: userText,
+      history: history,
+      topicTitle: topicTitle,
+    );
+
+    final provider = LocalStorageService().getSelectedAiProvider();
+    final apiKey = LocalStorageService().getApiKey(provider);
+
+    if (apiKey != null && apiKey.isNotEmpty) {
+      final systemPrompt = 'You are $personaName participating in a real-life English conversation practice scenario ("${topicTitle ?? scenarioId}"). Speak naturally, concise (1-2 sentences), friendly, and conversational in English. Do not use asterisks or stage directions.';
+
+      String? cloudReply;
+      if (provider == 'gemini') {
+        cloudReply = await NetworkService().callGemini(
+          apiKey: apiKey,
+          prompt: userText,
+          systemInstruction: systemPrompt,
+        );
+      } else if (provider == 'openai') {
+        cloudReply = await NetworkService().callOpenAi(
+          apiKey: apiKey,
+          prompt: userText,
+          systemInstruction: systemPrompt,
+        );
+      }
+
+      if (cloudReply != null && cloudReply.trim().isNotEmpty) {
+        return AiReplyResult(
+          replyText: cloudReply.trim(),
+          grammarTip: localResult.grammarTip,
+          pronunciationTip: localResult.pronunciationTip,
+          accuracyScore: localResult.accuracyScore,
+          suggestedFollowUp: localResult.suggestedFollowUp,
+          hint: localResult.hint,
+        );
+      }
+    }
+
+    return localResult;
+  }
 
   /// Analyzes the user's input in the current scenario context and produces
   /// an authentic, character-consistent spoken reply with pedagogical feedback.
