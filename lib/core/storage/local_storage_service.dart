@@ -160,6 +160,29 @@ class LocalStorageService {
     }
   }
 
+  Future<void> unlockUnitTopics({
+    required List<String> unitTopicIds,
+    String? nextUnitFirstTopicId,
+  }) async {
+    bool changed = false;
+    for (final id in unitTopicIds) {
+      if (!_cachedUnlockedTopics.contains(id)) {
+        _cachedUnlockedTopics.add(id);
+        changed = true;
+      }
+    }
+    if (nextUnitFirstTopicId != null && !_cachedUnlockedTopics.contains(nextUnitFirstTopicId)) {
+      _cachedUnlockedTopics.add(nextUnitFirstTopicId);
+      changed = true;
+    }
+    if (changed) {
+      await _prefs?.setStringList(_kUnlockedTopics, _cachedUnlockedTopics);
+      try {
+        await _db.updateProfile(unlockedTopics: _cachedUnlockedTopics.join(','));
+      } catch (_) {}
+    }
+  }
+
   // --- COLLECTED CARDS ---
   List<String> getCollectedCardIds() => List.unmodifiable(_cachedCollectedCards);
 

@@ -8,6 +8,7 @@ class UnitHeader extends StatelessWidget {
   final String description;
   final double progress;
   final VoidCallback? onGuidebookTap;
+  final VoidCallback? onJumpExamTap;
 
   const UnitHeader({
     super.key,
@@ -16,6 +17,7 @@ class UnitHeader extends StatelessWidget {
     required this.description,
     this.progress = 0.50,
     this.onGuidebookTap,
+    this.onJumpExamTap,
   });
 
   @override
@@ -125,6 +127,70 @@ class UnitHeader extends StatelessWidget {
               ),
             ],
           ),
+
+          // Jump Exam Banner (if unit not yet fully mastered)
+          if (progress < 1.0 && onJumpExamTap != null) ...[
+            const SizedBox(height: 14),
+            BouncyTap(
+              onTap: onJumpExamTap,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFEF3C7), Color(0xFFFDE68A)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFF59E0B).withOpacity(0.2),
+                      offset: const Offset(0, 3),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF59E0B),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 16),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'EXAMEN PARA SALTAR UNIDAD',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF92400E),
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                          SizedBox(height: 1),
+                          Text(
+                            '8 desafíos rigurosos de gramática, audio y ciencia.',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF78350F),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 13, color: Color(0xFF92400E)),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

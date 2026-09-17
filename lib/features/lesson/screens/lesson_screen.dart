@@ -10,7 +10,9 @@ import '../models/tactical_card.dart';
 import '../widgets/action_drawer.dart';
 import '../widgets/cloze_fill_drill.dart';
 import '../widgets/exercise_header.dart';
+import '../widgets/listening_drill.dart';
 import '../widgets/picture_choice_drill.dart';
+import '../widgets/science_context_drill.dart';
 import '../widgets/scramble_drill.dart';
 import '../widgets/shadowing_drill.dart';
 import '../widgets/syllable_stress_drill.dart';
@@ -64,6 +66,14 @@ class _LessonScreenState extends State<LessonScreen> {
 
   // Exercise 5: Shadowing
   bool _isShadowingRecorded = false;
+
+  // Exercise 6: Listening Comprehension
+  String? _selectedListeningAnswer;
+  final Set<String> _disabledListeningOptions = {};
+
+  // Exercise 7: Science & Real-World Facts
+  String? _selectedScienceAnswer;
+  final Set<String> _disabledScienceOptions = {};
 
   late final List<ExerciseModel> _exercises;
 
@@ -169,6 +179,10 @@ class _LessonScreenState extends State<LessonScreen> {
         return _selectedPictureOptionId != null;
       case DrillType.shadowing:
         return _isShadowingRecorded;
+      case DrillType.listeningComprehension:
+        return _selectedListeningAnswer != null;
+      case DrillType.scienceFactContext:
+        return _selectedScienceAnswer != null;
     }
   }
 
@@ -197,6 +211,12 @@ class _LessonScreenState extends State<LessonScreen> {
         break;
       case DrillType.shadowing:
         isCorrect = _isShadowingRecorded;
+        break;
+      case DrillType.listeningComprehension:
+        isCorrect = _selectedListeningAnswer == currentEx.correctListeningAnswer;
+        break;
+      case DrillType.scienceFactContext:
+        isCorrect = _selectedScienceAnswer == currentEx.correctScienceAnswer;
         break;
     }
 
@@ -348,6 +368,44 @@ class _LessonScreenState extends State<LessonScreen> {
         applied = true;
         _showPerkMessage('💡 ¡Pronunciación validada con éxito!');
         break;
+
+      case DrillType.listeningComprehension:
+        final wrongOpts = currentEx.listeningOptions
+            .where((opt) => opt != currentEx.correctListeningAnswer && !_disabledListeningOptions.contains(opt))
+            .take(2)
+            .toList();
+        if (wrongOpts.isNotEmpty) {
+          setState(() {
+            _disabledListeningOptions.addAll(wrongOpts);
+            if (_selectedListeningAnswer != null && wrongOpts.contains(_selectedListeningAnswer)) {
+              _selectedListeningAnswer = null;
+            }
+          });
+          applied = true;
+          _showPerkMessage('💡 ¡Pista 50/50! Opciones de audio incorrectas descartadas.');
+        } else {
+          _showPerkMessage('Ya no quedan opciones por descartar.');
+        }
+        break;
+
+      case DrillType.scienceFactContext:
+        final wrongOpts = currentEx.scienceOptions
+            .where((opt) => opt != currentEx.correctScienceAnswer && !_disabledScienceOptions.contains(opt))
+            .take(2)
+            .toList();
+        if (wrongOpts.isNotEmpty) {
+          setState(() {
+            _disabledScienceOptions.addAll(wrongOpts);
+            if (_selectedScienceAnswer != null && wrongOpts.contains(_selectedScienceAnswer)) {
+              _selectedScienceAnswer = null;
+            }
+          });
+          applied = true;
+          _showPerkMessage('💡 ¡Pista 50/50! Opciones de ciencia incorrectas descartadas.');
+        } else {
+          _showPerkMessage('Ya no quedan opciones por descartar.');
+        }
+        break;
     }
 
     if (applied) {
@@ -391,6 +449,10 @@ class _LessonScreenState extends State<LessonScreen> {
         _selectedSyllableIndex = null;
         _selectedPictureOptionId = null;
         _isShadowingRecorded = false;
+        _selectedListeningAnswer = null;
+        _disabledListeningOptions.clear();
+        _selectedScienceAnswer = null;
+        _disabledScienceOptions.clear();
         _disabledClozeOptions.clear();
         _disabledPictureOptionIds.clear();
       });
@@ -458,6 +520,10 @@ class _LessonScreenState extends State<LessonScreen> {
         return correctOpt.label;
       case DrillType.shadowing:
         return currentEx.targetSpeechText;
+      case DrillType.listeningComprehension:
+        return currentEx.correctListeningAnswer;
+      case DrillType.scienceFactContext:
+        return currentEx.correctScienceAnswer;
     }
   }
 
@@ -514,6 +580,26 @@ class _LessonScreenState extends State<LessonScreen> {
           exercise: currentEx,
           onRecordingComplete: (isRec) {
             setState(() => _isShadowingRecorded = isRec);
+          },
+        );
+        break;
+      case DrillType.listeningComprehension:
+        drillBody = ListeningDrill(
+          exercise: currentEx,
+          selectedAnswer: _selectedListeningAnswer,
+          disabledOptions: _disabledListeningOptions,
+          onAnswerSelected: (ans) {
+            setState(() => _selectedListeningAnswer = ans);
+          },
+        );
+        break;
+      case DrillType.scienceFactContext:
+        drillBody = ScienceContextDrill(
+          exercise: currentEx,
+          selectedAnswer: _selectedScienceAnswer,
+          disabledOptions: _disabledScienceOptions,
+          onAnswerSelected: (ans) {
+            setState(() => _selectedScienceAnswer = ans);
           },
         );
         break;

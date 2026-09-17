@@ -4,6 +4,8 @@ enum DrillType {
   shadowing,
   clozeFill,
   syllableStress,
+  listeningComprehension,
+  scienceFactContext,
 }
 
 class PictureChoiceOption {
@@ -52,6 +54,19 @@ class ExerciseModel {
   final int correctSyllableIndex;
   final String ipaPhonetic;
 
+  // For Listening Comprehension
+  final String audioScript;
+  final String comprehensionQuestion;
+  final List<String> listeningOptions;
+  final String correctListeningAnswer;
+
+  // For Science & Real-World Facts
+  final String factBadge;
+  final String factSnippet;
+  final String factQuestion;
+  final List<String> scienceOptions;
+  final String correctScienceAnswer;
+
   const ExerciseModel({
     required this.id,
     required this.type,
@@ -71,5 +86,14 @@ class ExerciseModel {
     this.syllables = const [],
     this.correctSyllableIndex = 0,
     this.ipaPhonetic = '',
+    this.audioScript = '',
+    this.comprehensionQuestion = '',
+    this.listeningOptions = const [],
+    this.correctListeningAnswer = '',
+    this.factBadge = '',
+    this.factSnippet = '',
+    this.factQuestion = '',
+    this.scienceOptions = const [],
+    this.correctScienceAnswer = '',
   });
 }

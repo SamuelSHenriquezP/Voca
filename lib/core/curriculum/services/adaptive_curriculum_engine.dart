@@ -86,20 +86,27 @@ class AdaptiveCurriculumEngine {
       ),
     );
 
-    // 3. Syllable Stress Rhythm Drill (Target phoneme & stress)
-    final stressData = _buildStressForTopic(topic);
-    exercises.add(
-      ExerciseModel(
-        id: '${topic.id}_stress',
-        type: DrillType.syllableStress,
-        prompt: 'Toca la sílaba tónica (acento principal):',
-        subtitle: 'Enfoque fonético: ${topic.targetPhonemeFocus}',
-        trickTip: stressData['trick'] as String,
-        ipaPhonetic: stressData['ipa'] as String,
-        syllables: List<String>.from(stressData['syllables'] as List),
-        correctSyllableIndex: stressData['index'] as int,
-      ),
-    );
+    // 3. Dynamic rotating activity (Syllable Stress, Listening Comprehension, or Science Fact)
+    final rotationMod = topic.id.hashCode.abs() % 3;
+    if (rotationMod == 0) {
+      exercises.add(_buildListeningForTopic(topic));
+    } else if (rotationMod == 1) {
+      exercises.add(_buildScienceForTopic(topic));
+    } else {
+      final stressData = _buildStressForTopic(topic);
+      exercises.add(
+        ExerciseModel(
+          id: '${topic.id}_stress',
+          type: DrillType.syllableStress,
+          prompt: 'Toca la sílaba tónica (acento principal):',
+          subtitle: 'Enfoque fonético: ${topic.targetPhonemeFocus}',
+          trickTip: stressData['trick'] as String,
+          ipaPhonetic: stressData['ipa'] as String,
+          syllables: List<String>.from(stressData['syllables'] as List),
+          correctSyllableIndex: stressData['index'] as int,
+        ),
+      );
+    }
 
     // 4. Picture & Meaning Choice Drill (Authentic pragmatic response)
     final choiceData = _buildChoiceForTopic(topic);
@@ -665,5 +672,308 @@ class AdaptiveCurriculumEngine {
       'tokens': ['[I would ree-lee]', '[uh-PREE-shee-ayt]', '[yur GY-dens]', '[with this to-day]'],
       'tip': 'Acentúa claramente las palabras de contenido: "REALLY", "APPRECIATE", "GUIDANCE".',
     };
+  }
+
+  // =========================================================================
+  // 6. LISTENING COMPREHENSION BUILDER
+  // =========================================================================
+  static ExerciseModel _buildListeningForTopic(ConversationTopicMeta topic) {
+    final scenarios = [
+      {
+        'script': 'Attention passengers on flight two zero four to Chicago O\'Hare. Your departure gate has been relocated from B12 to C7 due to scheduled runway maintenance. Boarding commences in twenty minutes.',
+        'question': '¿Hacia qué puerta deben dirigirse los pasajeros del vuelo 204?',
+        'options': ['Puerta C7', 'Puerta B12', 'Puerta A14', 'Puerta D20'],
+        'answer': 'Puerta C7',
+        'trick': 'Truco Auditivo: "Has been relocated" indica el cambio de puerta asignada.',
+      },
+      {
+        'script': 'Good afternoon! For your beverage today, I can prepare that iced latte with either organic oat milk or almond milk, and we have sugar-free hazelnut syrup.',
+        'question': '¿Qué leches vegetales ofreció el barista en el audio?',
+        'options': ['Avena orgánica o almendra', 'Soja o coco', 'Solo leche de vaca entera', 'Leche deslactosada'],
+        'answer': 'Avena orgánica o almendra',
+        'trick': 'Truco Auditivo: "Either... or..." expresa las dos opciones disponibles.',
+      },
+      {
+        'script': 'According to the astrophysics briefing, the James Webb Space Telescope observes primarily in infrared because ancient light has redshifted across billions of years.',
+        'question': '¿Por qué el telescopio espacial observa en luz infrarroja?',
+        'options': [
+          'Porque la luz antigua se ha desplazado al rojo',
+          'Para ahorrar energía en el espacio profundo',
+          'Porque el espacio exterior refleja luz ultravioleta',
+          'Para captar únicamente la radiación lunar',
+        ],
+        'answer': 'Porque la luz antigua se ha desplazado al rojo',
+        'trick': 'Truco Auditivo: "Redshifted" (corrimiento al rojo) es el fenómeno óptico clave.',
+      },
+      {
+        'script': 'Doctor Martinez recommends taking two tablets strictly thirty minutes after your evening meal to prevent any gastric irritation.',
+        'question': '¿Cuándo debe tomarse la medicación según el doctor?',
+        'options': [
+          '30 minutos después de la cena',
+          'En ayunas por la mañana',
+          'Inmediatamente antes de dormir con agua',
+          'A cualquier hora del día',
+        ],
+        'answer': '30 minutos después de la cena',
+        'trick': 'Truco Auditivo: "Strictly thirty minutes after your evening meal" indica el momento exacto.',
+      },
+      {
+        'script': 'While the executive board appreciated the aggressive schedule, they voted to postpone the software launch until the second quarter to safeguard cybersecurity.',
+        'question': '¿Qué decisión tomó la junta directiva respecto al lanzamiento?',
+        'options': [
+          'Postergarlo hasta el segundo trimestre',
+          'Cancelar el proyecto de forma definitiva',
+          'Lanzarlo esta misma semana sin cambios',
+          'Vender la patente a un competidor',
+        ],
+        'answer': 'Postergarlo hasta el segundo trimestre',
+        'trick': 'Truco Auditivo: "Voted to postpone... until the second quarter" expresa la decisión ejecutiva.',
+      },
+    ];
+
+    final index = topic.id.hashCode.abs() % scenarios.length;
+    final data = scenarios[index];
+
+    return ExerciseModel(
+      id: '${topic.id}_listening',
+      type: DrillType.listeningComprehension,
+      prompt: 'Escucha con atención y responde:',
+      subtitle: 'Comprensión auditiva real con pronunciación nativa',
+      trickTip: data['trick'] as String,
+      audioScript: data['script'] as String,
+      comprehensionQuestion: data['question'] as String,
+      listeningOptions: List<String>.from(data['options'] as List),
+      correctListeningAnswer: data['answer'] as String,
+    );
+  }
+
+  // =========================================================================
+  // 7. SCIENCE & REAL-WORLD CURIOSITY BUILDER
+  // =========================================================================
+  static ExerciseModel _buildScienceForTopic(ConversationTopicMeta topic) {
+    final scienceFacts = [
+      {
+        'badge': '🧠 Neurociencia & Aprendizaje',
+        'prompt': 'Lee el descubrimiento neurocientífico y analiza:',
+        'subtitle': 'Vocabulario científico auténtico en contexto',
+        'snippet': 'Neuroplasticity proves that adult brains continuously forge new neural pathways through deliberate spaced repetition and bilingual cognitive challenges.',
+        'question': 'Según el texto científico, ¿cómo desarrolla el cerebro nuevas vías neuronales?',
+        'options': [
+          'Mediante repetición espaciada y desafíos bilingües',
+          'Únicamente descansando ocho horas al día',
+          'A través de mutaciones genéticas pasivas',
+          'Solo durante los primeros cinco años de vida',
+        ],
+        'answer': 'Mediante repetición espaciada y desafíos bilingües',
+        'trick': 'Vocabulario Científico: "To forge" significa forjar o construir conexiones sólidas.',
+      },
+      {
+        'badge': '🪐 Astrofísica & Cosmología',
+        'prompt': 'Analiza el informe astronómico sobre el cosmos:',
+        'subtitle': 'Fenómenos del universo en inglés real',
+        'snippet': 'Gravitational lensing occurs when a massive cluster of galaxies bends the spacetime fabric, acting like a colossal cosmic magnifying glass.',
+        'question': '¿Qué provoca el efecto de "lente gravitacional" según el texto?',
+        'options': [
+          'La masa de las galaxias curva el tejido del espaciotiempo',
+          'El viento solar en los polos magnéticos planetarios',
+          'Los cristales de hielo en la atmósfera superior',
+          'La colisión de dos agujeros negros supermasivos',
+        ],
+        'answer': 'La masa de las galaxias curva el tejido del espaciotiempo',
+        'trick': 'Vocabulario Científico: "Bends the spacetime fabric" = curva el tejido espacio-temporal.',
+      },
+      {
+        'badge': '🌊 Biología Marina & Bioquímica',
+        'prompt': 'Descubre la adaptación de las criaturas abisales:',
+        'subtitle': 'Ciencia biológica de vanguardia',
+        'snippet': 'Deep-sea organisms produce bioluminescence via an enzymatic oxidation reaction between luciferin and oxygen, creating cold light without wasting thermal energy.',
+        'question': '¿Cuál es la característica principal de la bioluminiscencia descrita?',
+        'options': [
+          'Genera luz fría sin desperdiciar energía térmica',
+          'Emite calor extremo para ahuyentar a los depredadores',
+          'Requiere luz solar directa para poder activarse',
+          'Depende exclusivamente de descargas eléctricas constantes',
+        ],
+        'answer': 'Genera luz fría sin desperdiciar energía térmica',
+        'trick': 'Vocabulario Científico: "Cold light without wasting thermal energy" es la notable eficiencia de la bioluminiscencia.',
+      },
+      {
+        'badge': '⚡ Computación Cuántica',
+        'prompt': 'Explora la física computacional cuántica:',
+        'subtitle': 'Tecnología y computación moderna',
+        'snippet': 'Unlike classical binary bits that exist strictly as zero or one, quantum qubits harness superposition, enabling them to calculate vast probabilities simultaneously.',
+        'question': '¿Qué ventaja otorgan los qubits cuánticos gracias a la superposición?',
+        'options': [
+          'Calcular múltiples probabilidades de manera simultánea',
+          'Consumir menos almacenamiento en discos duros tradicionales',
+          'Funcionar sin necesidad de algoritmos de software',
+          'Garantizar que no existan errores lógicos en el hardware',
+        ],
+        'answer': 'Calcular múltiples probabilidades de manera simultánea',
+        'trick': 'Vocabulario Científico: "Harness superposition" = aprovechar la superposición cuántica.',
+      },
+    ];
+
+    final index = topic.id.hashCode.abs() % scienceFacts.length;
+    final item = scienceFacts[index];
+
+    return ExerciseModel(
+      id: '${topic.id}_science',
+      type: DrillType.scienceFactContext,
+      prompt: item['prompt'] as String,
+      subtitle: item['subtitle'] as String,
+      trickTip: item['trick'] as String,
+      factBadge: item['badge'] as String,
+      factSnippet: item['snippet'] as String,
+      factQuestion: item['question'] as String,
+      scienceOptions: List<String>.from(item['options'] as List),
+      correctScienceAnswer: item['answer'] as String,
+    );
+  }
+
+  // =========================================================================
+  // 8. UNIT JUMP EXAM GENERATOR (DIFFICULT PLACEMENT CHALLENGE)
+  // =========================================================================
+  /// Generates a demanding 8-exercise Unit Jump Exam to skip the entire unit.
+  /// Tests real grammar, listening comprehension, science analysis, and dialogue pragmatics.
+  static List<ExerciseModel> generateJumpExamForUnit(int unitNumber) {
+    final allTopics = ConversationTopicsCatalog.allTopics;
+    final startIndex = (unitNumber - 1) * 6;
+    final endIndex = (startIndex + 6 <= allTopics.length) ? startIndex + 6 : allTopics.length;
+    final unitTopics = allTopics.sublist(startIndex, endIndex);
+
+    final t1 = unitTopics.first;
+    final t2 = unitTopics.length > 1 ? unitTopics[1] : t1;
+    final t3 = unitTopics.length > 2 ? unitTopics[2] : t1;
+    final t4 = unitTopics.length > 3 ? unitTopics[3] : t2;
+    final t5 = unitTopics.length > 4 ? unitTopics[4] : t3;
+    final tBoss = unitTopics.last;
+
+    final List<ExerciseModel> exam = [];
+
+    // 1. Strict Scramble Drill with extra distractors
+    final sc1 = _buildScrambleForTopic(t1);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_scramble_1',
+        type: DrillType.sentenceScramble,
+        prompt: '⚡ EXAMEN DE SALTO [1/8]: Reconstruye con sintaxis perfecta:',
+        subtitle: '"${sc1['meaning']}" (Sin margen de error)',
+        trickTip: sc1['trick'] as String,
+        targetSentenceWords: List<String>.from(sc1['target'] as List),
+        bankWords: List<String>.from(sc1['bank'] as List),
+      ),
+    );
+
+    // 2. Strict Cloze Fill Drill
+    final cl1 = _buildClozeForTopic(t2, LearnerWeakness.prepositions);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_cloze_1',
+        type: DrillType.clozeFill,
+        prompt: '⚡ EXAMEN DE SALTO [2/8]: Precisión gramatical estricta:',
+        subtitle: 'Tema evaluado: ${t2.title} (${t2.targetGrammar})',
+        trickTip: cl1['trick'] as String,
+        clozePrefix: cl1['prefix'] as String,
+        clozeSuffix: cl1['suffix'] as String,
+        clozeOptions: List<String>.from(cl1['options'] as List),
+        correctClozeAnswer: cl1['answer'] as String,
+      ),
+    );
+
+    // 3. Audio Listening Comprehension
+    final list1 = _buildListeningForTopic(t3);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_listening_1',
+        type: DrillType.listeningComprehension,
+        prompt: '⚡ EXAMEN DE SALTO [3/8]: Comprensión auditiva crítica:',
+        subtitle: 'Escucha el audio nativo y detecta la respuesta exacta',
+        trickTip: list1.trickTip,
+        audioScript: list1.audioScript,
+        comprehensionQuestion: list1.comprehensionQuestion,
+        listeningOptions: list1.listeningOptions,
+        correctListeningAnswer: list1.correctListeningAnswer,
+      ),
+    );
+
+    // 4. Science & Curiosity Reading Challenge
+    final sci1 = _buildScienceForTopic(t4);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_science_1',
+        type: DrillType.scienceFactContext,
+        prompt: '⚡ EXAMEN DE SALTO [4/8]: Lectura e inferencia científica:',
+        subtitle: sci1.subtitle,
+        trickTip: sci1.trickTip,
+        factBadge: sci1.factBadge,
+        factSnippet: sci1.factSnippet,
+        factQuestion: sci1.factQuestion,
+        scienceOptions: sci1.scienceOptions,
+        correctScienceAnswer: sci1.correctScienceAnswer,
+      ),
+    );
+
+    // 5. Advanced Syllable Stress
+    final str1 = _buildStressForTopic(t5);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_stress_1',
+        type: DrillType.syllableStress,
+        prompt: '⚡ EXAMEN DE SALTO [5/8]: Identifica el acento prosódico:',
+        subtitle: 'Enfoque fonético: ${t5.targetPhonemeFocus}',
+        trickTip: str1['trick'] as String,
+        ipaPhonetic: str1['ipa'] as String,
+        syllables: List<String>.from(str1['syllables'] as List),
+        correctSyllableIndex: str1['index'] as int,
+      ),
+    );
+
+    // 6. Advanced Second Listening Comprehension
+    final list2 = _buildListeningForTopic(tBoss);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_listening_2',
+        type: DrillType.listeningComprehension,
+        prompt: '⚡ EXAMEN DE SALTO [6/8]: Prueba auditiva avanzada:',
+        subtitle: 'Análisis de intención y colocación del hablante',
+        trickTip: list2.trickTip,
+        audioScript: list2.audioScript,
+        comprehensionQuestion: list2.comprehensionQuestion,
+        listeningOptions: list2.listeningOptions,
+        correctListeningAnswer: list2.correctListeningAnswer,
+      ),
+    );
+
+    // 7. Second Science Context Challenge
+    final sci2 = _buildScienceForTopic(tBoss);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_science_2',
+        type: DrillType.scienceFactContext,
+        prompt: '⚡ EXAMEN DE SALTO [7/8]: Análisis contextual complejo:',
+        subtitle: 'Terminología y deducción lógica en inglés',
+        trickTip: sci2.trickTip,
+        factBadge: sci2.factBadge,
+        factSnippet: sci2.factSnippet,
+        factQuestion: sci2.factQuestion,
+        scienceOptions: sci2.scienceOptions,
+        correctScienceAnswer: sci2.correctScienceAnswer,
+      ),
+    );
+
+    // 8. Pragmatic Choice Boss Dialogue
+    final cho1 = _buildChoiceForTopic(tBoss);
+    exam.add(
+      ExerciseModel(
+        id: 'exam_u${unitNumber}_choice_1',
+        type: DrillType.pictureChoice,
+        prompt: '⚡ EXAMEN DE SALTO [8/8]: Resolución conversacional final:',
+        subtitle: 'Conversación de maestría con ${tBoss.npcName} (${tBoss.npcRole})',
+        pictureOptions: List<PictureChoiceOption>.from(cho1['options'] as List),
+      ),
+    );
+
+    return exam;
   }
 }

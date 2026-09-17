@@ -190,6 +190,114 @@ class _PathScreenState extends State<PathScreen> {
     );
   }
 
+  void _startUnitJumpExam(int unitNumber) {
+    VocaHaptics.selection();
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        title: const Row(
+          children: [
+            Icon(Icons.bolt_rounded, color: Color(0xFFD97706), size: 28),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Examen de Salto de Unidad',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Este examen pondrá a prueba tu dominio total de la Unidad $unitNumber.',
+              style: const TextStyle(fontSize: 13, color: Color(0xFF334155), fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF3C7),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFFCD34D)),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('• 8 ejercicios avanzados con límite estricto de vidas.', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
+                  SizedBox(height: 4),
+                  Text('• Incluye audios nativos reales y lecturas científicas.', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF92400E))),
+                  SizedBox(height: 4),
+                  Text('• Si lo superas, desbloquearás todos los niveles de la unidad + 100 XP.', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF78350F))),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: const Text('Cancelar', style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w700)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD97706),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            ),
+            onPressed: () {
+              Navigator.of(dialogCtx).pop();
+              final examExercises = AdaptiveCurriculumEngine.generateJumpExamForUnit(unitNumber);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => LessonScreen(
+                    lessonTitle: '⚡ Examen de Salto: Unidad $unitNumber',
+                    customExercises: examExercises,
+                    onCompleted: () async {
+                      final allTopics = ConversationTopicsCatalog.allTopics;
+                      final startIndex = (unitNumber - 1) * 6;
+                      final endIndex = (startIndex + 6 <= allTopics.length) ? startIndex + 6 : allTopics.length;
+                      final unitTopicIds = allTopics.sublist(startIndex, endIndex).map((t) => t.id).toList();
+                      final nextFirstId = endIndex < allTopics.length ? allTopics[endIndex].id : null;
+
+                      final storage = LocalStorageService();
+                      await storage.unlockUnitTopics(
+                        unitTopicIds: unitTopicIds,
+                        nextUnitFirstTopicId: nextFirstId,
+                      );
+                      await storage.addXp(100);
+                      await storage.saveCollectedCard('card_jump_master');
+                      storage.addDoubleXp(1);
+                      storage.addShield(1);
+
+                      if (mounted) {
+                        setState(() {});
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('⚡ ¡Unidad $unitNumber superada por examen! +100 XP y niveles desbloqueados.'),
+                            backgroundColor: const Color(0xFF10B981),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
+            child: const Text('Comenzar Examen', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeUnit = _getUnitData(_selectedUnit);
@@ -234,6 +342,7 @@ class _PathScreenState extends State<PathScreen> {
                   title: activeUnit['title'],
                   description: activeUnit['description'],
                   progress: activeUnit['progress'],
+                  onJumpExamTap: () => _startUnitJumpExam(_selectedUnit),
                 ),
 
                 // Adventure Time Hero Session Banner
