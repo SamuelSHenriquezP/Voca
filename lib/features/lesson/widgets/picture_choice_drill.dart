@@ -216,10 +216,27 @@ class PictureChoiceDrill extends StatelessWidget {
           painter: ClocheVectorPainter(accentColor: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B)),
         );
       case 'opt_fork':
-      default:
         return CustomPaint(
           size: const Size(60, 60),
           painter: CutleryVectorPainter(accentColor: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B)),
+        );
+      default:
+        return Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFEEF2FF) : const Color(0xFFF8FAFC),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+              width: 1.5,
+            ),
+          ),
+          child: Icon(
+            isSelected ? Icons.check_circle_rounded : Icons.chat_bubble_outline_rounded,
+            size: 24,
+            color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+          ),
         );
     }
   }

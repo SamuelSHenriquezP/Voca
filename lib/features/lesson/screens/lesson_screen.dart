@@ -23,7 +23,7 @@ class LessonScreen extends StatefulWidget {
 
   const LessonScreen({
     super.key,
-    this.lessonTitle = 'Level 1-3: Food & Drinks',
+    this.lessonTitle = 'Nivel 1-1: Saludos y Presentaciones',
     this.customExercises,
     this.onCompleted,
   });
@@ -71,77 +71,77 @@ class _LessonScreenState extends State<LessonScreen> {
       _exercises = widget.customExercises!;
     } else {
       _exercises = const [
-      ExerciseModel(
-        id: 'ex_scramble',
-        type: DrillType.sentenceScramble,
-        prompt: 'Arrange the words to say:',
-        subtitle: '"Could I please have a cup of coffee?"',
-        trickTip: 'Native Trick: "Could I have" is 10x more polite and natural in real conversation than "I want".',
-        targetSentenceWords: ['Could', 'I', 'please', 'have', 'a', 'cup', 'of', 'coffee?'],
-        bankWords: ['have', 'coffee?', 'Could', 'tea', 'cup', 'I', 'please', 'of', 'a', 'water'],
-      ),
-      ExerciseModel(
-        id: 'ex_cloze',
-        type: DrillType.clozeFill,
-        prompt: 'Fill in the missing preposition:',
-        subtitle: 'Select the natural spoken collocation',
-        trickTip: 'Native Trick: "Look forward TO" always pairs with "to" + noun/gerund, never "for" or "at"!',
-        clozePrefix: "I'm really looking forward",
-        clozeSuffix: "your presentation tomorrow.",
-        clozeOptions: ['to', 'for', 'at', 'with'],
-        correctClozeAnswer: 'to',
-      ),
-      ExerciseModel(
-        id: 'ex_stress',
-        type: DrillType.syllableStress,
-        prompt: 'Tap the stressed syllable:',
-        subtitle: 'Where does the primary pitch accent land?',
-        trickTip: 'Native Trick: The second vowel drops completely: /ˈkʌmf.tɚ.bəl/. It has 3 spoken syllables, not 4!',
-        ipaPhonetic: '/ˈkʌmf.tɚ.bəl/',
-        syllables: ['COM', 'FOR', 'TA', 'BLE'],
-        correctSyllableIndex: 0,
-      ),
-      ExerciseModel(
-        id: 'ex_choice',
-        type: DrillType.pictureChoice,
-        prompt: 'Which of these means "The Check / Bill"?',
-        subtitle: 'Tap the matching card with proper pronunciation',
-        pictureOptions: [
-          PictureChoiceOption(
-            id: 'opt_menu',
-            label: 'The Menu',
-            audioPhonetic: '/ðə ˈmɛn.juː/',
-            isCorrect: false,
-          ),
-          PictureChoiceOption(
-            id: 'opt_bill',
-            label: 'The Bill / Check',
-            audioPhonetic: '/ðə tʃɛk/',
-            isCorrect: true,
-          ),
-          PictureChoiceOption(
-            id: 'opt_waiter',
-            label: 'The Waiter',
-            audioPhonetic: '/ðə ˈweɪ.tər/',
-            isCorrect: false,
-          ),
-          PictureChoiceOption(
-            id: 'opt_fork',
-            label: 'The Cutlery',
-            audioPhonetic: '/ˈkʌt.lər.i/',
-            isCorrect: false,
-          ),
-        ],
-      ),
-      ExerciseModel(
-        id: 'ex_shadow',
-        type: DrillType.shadowing,
-        prompt: 'Speak this sentence out loud:',
-        targetSpeechText: '"Excuse me, could we get the check, please?"',
-        phoneticTokens: ['[ik-SKYOOS mee]', '[kood wee get]', '[thuh chek]', '[pleez]'],
-        expectedAccentTip: 'Soft link between "could we" -> sounds like "kood-wee".',
-      ),
-    ];
+        ExerciseModel(
+          id: 'ex_scramble',
+          type: DrillType.sentenceScramble,
+          prompt: 'Arrange the words to say:',
+          subtitle: '"Hello, nice to meet you, my name is Alex."',
+          trickTip: 'Consejo: En inglés natural, decir "Nice to meet you" es el saludo amigable por excelencia.',
+          targetSentenceWords: ['Hello,', 'nice', 'to', 'meet', 'you,', 'my', 'name', 'is', 'Alex.'],
+          bankWords: ['nice', 'Alex.', 'is', 'Hello,', 'goodbye', 'to', 'meet', 'my', 'coffee', 'you,', 'name'],
+        ),
+        ExerciseModel(
+          id: 'ex_cloze',
+          type: DrillType.clozeFill,
+          prompt: 'Completa con la forma correcta del verbo "to be":',
+          subtitle: 'Presente simple para presentaciones',
+          trickTip: 'Regla: Con "My name" (tercera persona singular "it"), siempre usamos "is".',
+          clozePrefix: 'Hi! My name',
+          clozeSuffix: 'Emma. What is your name?',
+          clozeOptions: ['is', 'are', 'am', 'be'],
+          correctClozeAnswer: 'is',
+        ),
+        ExerciseModel(
+          id: 'ex_stress',
+          type: DrillType.syllableStress,
+          prompt: 'Toca la sílaba con mayor acento:',
+          subtitle: '¿Dónde recae el énfasis de la palabra?',
+          trickTip: 'El acento en "WELCOME" recae con fuerza en la primera sílaba: /ˈwɛl.kəm/.',
+          ipaPhonetic: '/ˈwɛl.kəm/',
+          syllables: ['WEL', 'COME'],
+          correctSyllableIndex: 0,
+        ),
+        ExerciseModel(
+          id: 'ex_choice',
+          type: DrillType.pictureChoice,
+          prompt: '¿Cómo respondes cordialmente a "Nice to meet you"?',
+          subtitle: 'Selecciona la respuesta conversacional adecuada',
+          pictureOptions: [
+            PictureChoiceOption(
+              id: 'opt_meet_too',
+              label: 'Nice to meet you too!',
+              audioPhonetic: '/naɪs tuː miːt juː tuː/',
+              isCorrect: true,
+            ),
+            PictureChoiceOption(
+              id: 'opt_bye',
+              label: 'Goodbye, see you!',
+              audioPhonetic: '/ɡʊdˈbaɪ siː juː/',
+              isCorrect: false,
+            ),
+            PictureChoiceOption(
+              id: 'opt_no',
+              label: 'No, thank you.',
+              audioPhonetic: '/noʊ θæŋk juː/',
+              isCorrect: false,
+            ),
+            PictureChoiceOption(
+              id: 'opt_what',
+              label: 'What is this?',
+              audioPhonetic: '/wʌt ɪz ðɪs/',
+              isCorrect: false,
+            ),
+          ],
+        ),
+        ExerciseModel(
+          id: 'ex_shadow',
+          type: DrillType.shadowing,
+          prompt: 'Pronuncia esta frase en voz alta:',
+          targetSpeechText: '"Hello! It is wonderful to meet you. My name is Alex."',
+          phoneticTokens: ['[heh-LOH]', '[it iz]', '[WUHN-der-ful]', '[to meet yoo]', '[my naym iz AL-eks]'],
+          expectedAccentTip: 'Enlaza con suavidad "It is" -> suena fluido como "it-iz".',
+        ),
+      ];
     }
   }
 
@@ -427,7 +427,8 @@ class _LessonScreenState extends State<LessonScreen> {
             ? currentEx.syllables[currentEx.correctSyllableIndex]
             : '';
       case DrillType.pictureChoice:
-        return 'The Bill / Check';
+        final correct = currentEx.pictureOptions.where((o) => o.isCorrect);
+        return correct.isNotEmpty ? correct.first.label : '';
       case DrillType.shadowing:
         return currentEx.targetSpeechText;
     }

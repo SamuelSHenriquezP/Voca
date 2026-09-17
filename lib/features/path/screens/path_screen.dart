@@ -208,7 +208,7 @@ class _PathScreenState extends State<PathScreen> {
                         LocalStorageService().addXp(25);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('Bonus Chest Claimed! +25 XP earned.'),
+                            content: const Text('¡Cofre desbloqueado! +25 XP ganados.'),
                             backgroundColor: const Color(0xFF0F172A),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -219,7 +219,7 @@ class _PathScreenState extends State<PathScreen> {
                   ] else if (i == 3) ...[
                     // Canvas Checkpoint Gate
                     MilestoneCheckpointGate(
-                      title: 'Intermediate Conversational Barrier',
+                      title: 'Punto de Control Conversacional',
                       isPassed: nodes[i].state == NodeState.completed,
                     ),
                   ] else if (i < nodes.length - 1)
@@ -285,7 +285,7 @@ class _PathScreenState extends State<PathScreen> {
               ),
               child: Center(
                 child: Text(
-                  'UNIT $unitNum • ${sampleTopic.cefrLevel}',
+                  'UNIDAD $unitNum • ${sampleTopic.cefrLevel}',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,

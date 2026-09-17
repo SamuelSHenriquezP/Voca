@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/voca_colors.dart';
 import '../../core/widgets/bouncy_tap.dart';
-import '../arcade/screens/arcade_screen.dart';
 import '../conversation/screens/conversation_screen.dart';
 import '../path/screens/path_screen.dart';
 import '../profile/screens/profile_screen.dart';
@@ -25,7 +24,6 @@ class _MainNavScreenState extends State<MainNavScreen> {
   Widget build(BuildContext context) {
     final screens = [
       const PathScreen(),
-      const ArcadeScreen(),
       const ConversationScreen(),
       const VaultScreen(),
       const ProfileScreen(),
@@ -37,7 +35,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
         children: screens,
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         decoration: BoxDecoration(
           color: Colors.white,
           border: const Border(
@@ -64,24 +62,18 @@ class _MainNavScreenState extends State<MainNavScreen> {
               ),
               _buildNavItem(
                 index: 1,
-                icon: Icons.school_rounded,
-                label: 'PRÁCTICA',
-                activeColor: const Color(0xFF059669),
-              ),
-              _buildNavItem(
-                index: 2,
                 icon: Icons.record_voice_over_rounded,
                 label: 'CONVERSAR',
                 activeColor: const Color(0xFFE11D48),
               ),
               _buildNavItem(
-                index: 3,
+                index: 2,
                 icon: Icons.style_rounded,
                 label: 'PALABRAS',
                 activeColor: const Color(0xFF0284C7),
               ),
               _buildNavItem(
-                index: 4,
+                index: 3,
                 icon: Icons.person_rounded,
                 label: 'PERFIL',
                 activeColor: const Color(0xFFD97706),
