@@ -226,3 +226,4 @@ class _CurvedPathPainter extends CustomPainter {
         oldDelegate.progress != progress;
   }
 }
+
