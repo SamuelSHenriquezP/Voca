@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/haptic_feedback_utils.dart';
 import '../utils/sound_effects.dart';
+import '../../features/lesson/models/tactical_card.dart';
 import 'cartoon_character_avatar.dart';
 import 'voca_button.dart';
 
@@ -62,11 +63,18 @@ class _CelebrationDialogState extends State<CelebrationDialog>
   late AnimationController _animController;
   late Animation<double> _xpAnimation;
 
+  late final List<TacticalCard> _draftCards;
+  TacticalCard? _selectedCard;
+
   @override
   void initState() {
     super.initState();
     _confettiController = ConfettiController(duration: const Duration(seconds: 2));
     _confettiController.play();
+
+    final pool = List<TacticalCard>.from(TacticalCard.all)..shuffle();
+    _draftCards = pool.take(3).toList();
+    _selectedCard = _draftCards.first;
 
     SoundEffects.playCelebration();
     VocaHaptics.success();
@@ -262,15 +270,110 @@ class _CelebrationDialogState extends State<CelebrationDialog>
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
+
+                  // Roguelike Reward Card Selection Draft
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.auto_awesome_rounded, size: 15, color: Color(0xFF4F46E5)),
+                            SizedBox(width: 6),
+                            Text(
+                              'ELIGE TU CARTA DE APOYO',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF4F46E5),
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: _draftCards.map((card) {
+                            final isSelected = _selectedCard?.type == card.type;
+                            return Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  VocaHaptics.selection();
+                                  setState(() => _selectedCard = card);
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? card.lightBg : Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected ? card.primaryColor : const Color(0xFFCBD5E1),
+                                      width: isSelected ? 2.0 : 1.0,
+                                    ),
+                                    boxShadow: [
+                                      if (isSelected)
+                                        BoxShadow(
+                                          color: card.primaryColor.withOpacity(0.18),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Icon(card.icon, size: 20, color: card.primaryColor),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        card.shortName,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: isSelected ? card.primaryColor : const Color(0xFF1E293B),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '+1 CARTA',
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w800,
+                                          color: card.primaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
 
                   // Clean Flat Action Button
                   VocaButton(
-                    text: 'CONTINUAR',
+                    text: _selectedCard != null ? 'RECLAMAR Y CONTINUAR' : 'CONTINUAR',
                     variant: VocaButtonVariant.success,
                     height: 52,
                     isFullWidth: true,
                     onPressed: () {
+                      if (_selectedCard != null) {
+                        TacticalCard.add(_selectedCard!.type, 1);
+                      }
                       Navigator.of(context).pop();
                       widget.onContinue();
                     },

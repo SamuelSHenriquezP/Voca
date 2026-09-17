@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -341,470 +340,539 @@ class _CharmingCharacterPainter extends CustomPainter {
   }
 
   // =========================================================================
-  // 1. ALEX - THE ADORABLE PURPLE & CYAN STUDY COMPANION
+  // 1. ALEX RIVERA - REALISTIC LANGUAGE COACH
   // =========================================================================
   void _paintAlex(Canvas canvas, double w, double h) {
-    // Soft cute body shoulders
-    final hoodiePaint = Paint()..color = const Color(0xFF6366F1);
-    final hoodiePath = Path()
-      ..moveTo(w * 0.15, h * 1.0)
-      ..quadraticBezierTo(w * 0.28, h * 0.74, w * 0.5, h * 0.74)
-      ..quadraticBezierTo(w * 0.72, h * 0.74, w * 0.85, h * 1.0)
+    // Shoulders - Minimalist Lavender/Navy Sweater
+    final sweaterPaint = Paint()..color = const Color(0xFF4F46E5);
+    final bodyPath = Path()
+      ..moveTo(w * 0.12, h * 1.0)
+      ..quadraticBezierTo(w * 0.25, h * 0.72, w * 0.5, h * 0.72)
+      ..quadraticBezierTo(w * 0.75, h * 0.72, w * 0.88, h * 1.0)
       ..close();
-    canvas.drawPath(hoodiePath, hoodiePaint);
+    canvas.drawPath(bodyPath, sweaterPaint);
 
-    // White tee collar
+    // White Shirt Collar peek
     final shirtPaint = Paint()..color = Colors.white;
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.82), width: w * 0.28, height: h * 0.14),
-      shirtPaint,
+    final collarPath = Path()
+      ..moveTo(w * 0.40, h * 0.72)
+      ..lineTo(w * 0.5, h * 0.82)
+      ..lineTo(w * 0.60, h * 0.72)
+      ..close();
+    canvas.drawPath(collarPath, shirtPaint);
+
+    // Neck & Shadow
+    final skinShadowPaint = Paint()..color = const Color(0xFFE2B79D);
+    final skinPaint = Paint()..color = const Color(0xFFFAD4C0);
+    canvas.drawRect(
+      Rect.fromCenter(center: Offset(w * 0.5, h * 0.68), width: w * 0.20, height: h * 0.14),
+      skinShadowPaint,
     );
 
-    // Head - Cute rounded anime proportions
-    final skinPaint = Paint()..color = const Color(0xFFFFDFC4); // Natural warm peach skin
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.52), width: w * 0.58, height: h * 0.52),
-      skinPaint,
-    );
+    // Face Shape - Natural Human Oval
+    final headRect = Rect.fromCenter(center: Offset(w * 0.5, h * 0.50), width: w * 0.46, height: h * 0.46);
+    canvas.drawOval(headRect, skinPaint);
 
-    // Stylish modern messy hair / bangs
-    final hairPaint = Paint()..color = const Color(0xFF312E81); // Deep stylish indigo hair
+    // Ears
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.26, h * 0.51), width: w * 0.08, height: h * 0.12), skinPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.74, h * 0.51), width: w * 0.08, height: h * 0.12), skinPaint);
+
+    // Modern White Wireless Earbud (Coach aesthetic)
+    final earbudPaint = Paint()..color = Colors.white;
+    canvas.drawCircle(Offset(w * 0.73, h * 0.51), w * 0.025, earbudPaint);
+
+    // Natural Modern Dark Haircut (Side-parted, stylish)
+    final hairPaint = Paint()..color = const Color(0xFF1E293B);
     final hairPath = Path()
-      ..moveTo(w * 0.22, h * 0.44)
-      ..quadraticBezierTo(w * 0.24, h * 0.22, w * 0.5, h * 0.22)
-      ..quadraticBezierTo(w * 0.76, h * 0.22, w * 0.78, h * 0.44)
-      ..quadraticBezierTo(w * 0.68, h * 0.36, w * 0.56, h * 0.40)
-      ..quadraticBezierTo(w * 0.48, h * 0.32, w * 0.38, h * 0.42)
-      ..quadraticBezierTo(w * 0.28, h * 0.38, w * 0.22, h * 0.44)
+      ..moveTo(w * 0.25, h * 0.44)
+      ..quadraticBezierTo(w * 0.24, h * 0.20, w * 0.48, h * 0.18)
+      ..quadraticBezierTo(w * 0.76, h * 0.20, w * 0.75, h * 0.44)
+      ..quadraticBezierTo(w * 0.68, h * 0.32, w * 0.52, h * 0.34)
+      ..quadraticBezierTo(w * 0.38, h * 0.28, w * 0.25, h * 0.44)
       ..close();
     canvas.drawPath(hairPath, hairPaint);
 
-    // Cyan Studio Headphones Band
-    final hpBandPaint = Paint()
-      ..color = const Color(0xFF06B6D4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = w * 0.08
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.44), width: w * 0.64, height: h * 0.54),
-      math.pi * 1.1,
-      math.pi * 0.8,
-      false,
-      hpBandPaint,
-    );
+    // Natural Eyebrows
+    _drawRealisticEyebrow(canvas, Offset(w * 0.33, h * 0.44), Offset(w * 0.41, h * 0.42), Offset(w * 0.46, h * 0.44), const Color(0xFF1E293B), 2.0);
+    _drawRealisticEyebrow(canvas, Offset(w * 0.54, h * 0.44), Offset(w * 0.59, h * 0.42), Offset(w * 0.67, h * 0.44), const Color(0xFF1E293B), 2.0);
 
-    // Headphone Ear Cushions
-    final cushionPaint = Paint()..color = const Color(0xFF0891B2);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.18, h * 0.52), width: w * 0.12, height: h * 0.22),
-        Radius.circular(w * 0.06),
-      ),
-      cushionPaint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.82, h * 0.52), width: w * 0.12, height: h * 0.22),
-        Radius.circular(w * 0.06),
-      ),
-      cushionPaint,
-    );
+    // Realistic Eyes
+    _drawRealisticEye(canvas, Offset(w * 0.39, h * 0.48), w * 0.08, h * 0.045, const Color(0xFF3B2F2F));
+    _drawRealisticEye(canvas, Offset(w * 0.61, h * 0.48), w * 0.08, h * 0.045, const Color(0xFF3B2F2F));
 
-    // Cute Cheerful Eyes with twin sparkle lights
-    _drawSparkleEye(canvas, Offset(w * 0.39, h * 0.51), w * 0.052);
-    _drawSparkleEye(canvas, Offset(w * 0.61, h * 0.51), w * 0.052);
+    // Nose Line
+    _drawRealisticNose(canvas, Offset(w * 0.50, h * 0.48), Offset(w * 0.50, h * 0.56), const Color(0xFFD49B7E));
 
-    // Rosy Blush
-    _drawBlush(canvas, Offset(w * 0.30, h * 0.58), w * 0.09, h * 0.045);
-    _drawBlush(canvas, Offset(w * 0.70, h * 0.58), w * 0.09, h * 0.045);
-
-    // Animated Happy Mouth
-    _drawSmilingMouth(canvas, Offset(w * 0.5, h * 0.63), w * 0.14, speakingT);
+    // Realistic Natural Smile
+    _drawRealisticMouth(canvas, Offset(w * 0.50, h * 0.62), w * 0.14, speakingT);
   }
 
   // =========================================================================
-  // 2. OFFICER MILLER - CRISP NAVY UNIFORM & AVIATOR CONFIDENCE
+  // 2. OFFICER MILLER - REALISTIC JFK CUSTOMS OFFICER
   // =========================================================================
   void _paintOfficerMiller(Canvas canvas, double w, double h) {
-    // Navy Uniform Jacket
+    // Regulation Navy Uniform Jacket
     final jacketPaint = Paint()..color = const Color(0xFF1E3A8A);
     final jacketPath = Path()
-      ..moveTo(w * 0.12, h * 1.0)
-      ..quadraticBezierTo(w * 0.26, h * 0.72, w * 0.5, h * 0.72)
-      ..quadraticBezierTo(w * 0.74, h * 0.72, w * 0.88, h * 1.0)
+      ..moveTo(w * 0.10, h * 1.0)
+      ..quadraticBezierTo(w * 0.24, h * 0.70, w * 0.5, h * 0.70)
+      ..quadraticBezierTo(w * 0.76, h * 0.70, w * 0.90, h * 1.0)
       ..close();
     canvas.drawPath(jacketPath, jacketPaint);
 
-    // Gold epaulettes
+    // Gold Insignia Epaulettes on shoulders
     final goldPaint = Paint()..color = const Color(0xFFF59E0B);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.22, h * 0.82), width: w * 0.16, height: h * 0.05),
-        const Radius.circular(3),
-      ),
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(w * 0.20, h * 0.79), width: w * 0.14, height: h * 0.04), const Radius.circular(2)),
       goldPaint,
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.78, h * 0.82), width: w * 0.16, height: h * 0.05),
-        const Radius.circular(3),
-      ),
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(w * 0.80, h * 0.79), width: w * 0.14, height: h * 0.04), const Radius.circular(2)),
       goldPaint,
     );
 
-    // White Shirt & Gold Necktie
+    // Crisp White Shirt & Navy Regulation Tie
     final shirtPaint = Paint()..color = Colors.white;
-    final tiePaint = Paint()..color = const Color(0xFFD97706);
+    final tiePaint = Paint()..color = const Color(0xFF0F172A);
     final collarPath = Path()
-      ..moveTo(w * 0.42, h * 0.74)
-      ..lineTo(w * 0.5, h * 0.86)
-      ..lineTo(w * 0.58, h * 0.74)
+      ..moveTo(w * 0.41, h * 0.70)
+      ..lineTo(w * 0.5, h * 0.84)
+      ..lineTo(w * 0.59, h * 0.70)
       ..close();
     canvas.drawPath(collarPath, shirtPaint);
 
     final tiePath = Path()
-      ..moveTo(w * 0.47, h * 0.84)
-      ..lineTo(w * 0.53, h * 0.84)
+      ..moveTo(w * 0.47, h * 0.81)
+      ..lineTo(w * 0.53, h * 0.81)
       ..lineTo(w * 0.55, h * 1.0)
       ..lineTo(w * 0.45, h * 1.0)
       ..close();
     canvas.drawPath(tiePath, tiePaint);
 
-    // Friendly Face
-    final skinPaint = Paint()..color = const Color(0xFFFBD2B5);
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.55), width: w * 0.56, height: h * 0.48),
-      skinPaint,
-    );
+    // Gold Tie Clip
+    canvas.drawLine(Offset(w * 0.47, h * 0.89), Offset(w * 0.53, h * 0.89), goldPaint..strokeWidth = 2.0);
 
-    // Navy Officer Peaked Cap
+    // Gold Customs Shield Badge on chest
+    final badgePath = Path()
+      ..moveTo(w * 0.28, h * 0.84)
+      ..lineTo(w * 0.34, h * 0.84)
+      ..lineTo(w * 0.34, h * 0.90)
+      ..lineTo(w * 0.31, h * 0.93)
+      ..lineTo(w * 0.28, h * 0.90)
+      ..close();
+    canvas.drawPath(badgePath, goldPaint..style = PaintingStyle.fill);
+
+    // Neck
+    final skinShadowPaint = Paint()..color = const Color(0xFFDCAC8F);
+    final skinPaint = Paint()..color = const Color(0xFFF5CEB3);
+    canvas.drawRect(Rect.fromCenter(center: Offset(w * 0.5, h * 0.67), width: w * 0.22, height: h * 0.12), skinShadowPaint);
+
+    // Structured Mature Face
+    final headRect = Rect.fromCenter(center: Offset(w * 0.5, h * 0.51), width: w * 0.47, height: h * 0.45);
+    canvas.drawOval(headRect, skinPaint);
+
+    // Ears
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.26, h * 0.52), width: w * 0.08, height: h * 0.12), skinPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.74, h * 0.52), width: w * 0.08, height: h * 0.12), skinPaint);
+
+    // Peaked Service Officer Cap
     final capPaint = Paint()..color = const Color(0xFF1E293B);
-    final capVisorPaint = Paint()..color = const Color(0xFF0F172A);
     final capPath = Path()
-      ..moveTo(w * 0.18, h * 0.38)
-      ..quadraticBezierTo(w * 0.22, h * 0.14, w * 0.5, h * 0.14)
-      ..quadraticBezierTo(w * 0.78, h * 0.14, w * 0.82, h * 0.38)
+      ..moveTo(w * 0.20, h * 0.38)
+      ..quadraticBezierTo(w * 0.22, h * 0.14, w * 0.50, h * 0.14)
+      ..quadraticBezierTo(w * 0.78, h * 0.14, w * 0.80, h * 0.38)
       ..close();
     canvas.drawPath(capPath, capPaint);
 
-    // Cap Visor
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.38), width: w * 0.70, height: h * 0.10),
-      capVisorPaint,
+    // Gold Cap Chin Strap & Star Badge
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(w * 0.5, h * 0.36), width: w * 0.60, height: h * 0.025), const Radius.circular(1)),
+      goldPaint,
     );
+    canvas.drawCircle(Offset(w * 0.5, h * 0.26), w * 0.04, goldPaint);
 
-    // Golden Star Badge on Cap
-    canvas.drawCircle(Offset(w * 0.5, h * 0.26), w * 0.05, goldPaint);
+    // Polished Black Cap Visor
+    final visorPaint = Paint()..color = const Color(0xFF0F172A);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.5, h * 0.39), width: w * 0.68, height: h * 0.09), visorPaint);
 
-    // Cool Aviator Glasses
-    final aviatorPaint = Paint()..color = const Color(0xFF0F172A);
-    final aviatorFramePaint = Paint()
-      ..color = const Color(0xFFF59E0B)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
+    // Professional Observant Eyebrows
+    _drawRealisticEyebrow(canvas, Offset(w * 0.32, h * 0.46), Offset(w * 0.41, h * 0.44), Offset(w * 0.47, h * 0.46), const Color(0xFF0F172A), 2.2);
+    _drawRealisticEyebrow(canvas, Offset(w * 0.53, h * 0.46), Offset(w * 0.59, h * 0.44), Offset(w * 0.68, h * 0.46), const Color(0xFF0F172A), 2.2);
 
-    // Left lens
-    final leftLens = RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(w * 0.38, h * 0.48), width: w * 0.18, height: h * 0.14),
-      Radius.circular(w * 0.05),
-    );
-    // Right lens
-    final rightLens = RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(w * 0.62, h * 0.48), width: w * 0.18, height: h * 0.14),
-      Radius.circular(w * 0.05),
-    );
+    // Realistic Attentive Eyes
+    _drawRealisticEye(canvas, Offset(w * 0.39, h * 0.49), w * 0.08, h * 0.042, const Color(0xFF2C3E50));
+    _drawRealisticEye(canvas, Offset(w * 0.61, h * 0.49), w * 0.08, h * 0.042, const Color(0xFF2C3E50));
 
-    canvas.drawRRect(leftLens, aviatorPaint);
-    canvas.drawRRect(rightLens, aviatorPaint);
-    canvas.drawRRect(leftLens, aviatorFramePaint);
-    canvas.drawRRect(rightLens, aviatorFramePaint);
+    // Strong Defined Nose
+    _drawRealisticNose(canvas, Offset(w * 0.50, h * 0.48), Offset(w * 0.50, h * 0.57), const Color(0xFFC7957B));
 
-    // Bridge
-    canvas.drawLine(Offset(w * 0.47, h * 0.45), Offset(w * 0.53, h * 0.45), aviatorFramePaint);
-
-    // Lens Sheen Reflection
-    final sheenPaint = Paint()
-      ..color = Colors.white.withOpacity(0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-    canvas.drawLine(Offset(w * 0.32, h * 0.44), Offset(w * 0.42, h * 0.52), sheenPaint);
-    canvas.drawLine(Offset(w * 0.56, h * 0.44), Offset(w * 0.66, h * 0.52), sheenPaint);
-
-    // Confident, Friendly Smile
-    _drawSmilingMouth(canvas, Offset(w * 0.5, h * 0.65), w * 0.16, speakingT);
+    // Composed Professional Smile
+    _drawRealisticMouth(canvas, Offset(w * 0.50, h * 0.63), w * 0.15, speakingT);
   }
 
   // =========================================================================
-  // 3. BARISTA MATEO - WARM COFFEE BEANIE & ARTISAN GLASSES
+  // 3. BARISTA MATEO - REALISTIC ARTISAN SPECIALTY BARISTA
   // =========================================================================
   void _paintBaristaMateo(Canvas canvas, double w, double h) {
-    // Dark Green Artisan Apron
-    final apronPaint = Paint()..color = const Color(0xFF065F46);
-    final apronPath = Path()
-      ..moveTo(w * 0.16, h * 1.0)
-      ..quadraticBezierTo(w * 0.28, h * 0.74, w * 0.5, h * 0.74)
-      ..quadraticBezierTo(w * 0.72, h * 0.74, w * 0.84, h * 1.0)
-      ..close();
-    canvas.drawPath(apronPath, apronPaint);
-
-    // Apron Straps
-    final strapPaint = Paint()
-      ..color = const Color(0xFF78350F)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.5;
-    canvas.drawLine(Offset(w * 0.35, h * 0.76), Offset(w * 0.22, h * 1.0), strapPaint);
-    canvas.drawLine(Offset(w * 0.65, h * 0.76), Offset(w * 0.78, h * 1.0), strapPaint);
-
-    // Warm Face
-    final skinPaint = Paint()..color = const Color(0xFFFED7AA);
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.54), width: w * 0.58, height: h * 0.50),
-      skinPaint,
-    );
-
-    // Knit Coffee Beanie (Warm amber/brown)
-    final beaniePaint = Paint()..color = const Color(0xFF92400E);
-    final beaniePath = Path()
-      ..moveTo(w * 0.18, h * 0.44)
-      ..quadraticBezierTo(w * 0.22, h * 0.14, w * 0.5, h * 0.14)
-      ..quadraticBezierTo(w * 0.78, h * 0.14, w * 0.82, h * 0.44)
-      ..close();
-    canvas.drawPath(beaniePath, beaniePaint);
-
-    // Beanie Fold
-    final foldPaint = Paint()..color = const Color(0xFFB45309);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.5, h * 0.40), width: w * 0.66, height: h * 0.10),
-        const Radius.circular(6),
-      ),
-      foldPaint,
-    );
-
-    // Tortoiseshell Round Glasses
-    final glassesPaint = Paint()
-      ..color = const Color(0xFF78350F)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.8;
-    canvas.drawCircle(Offset(w * 0.38, h * 0.50), w * 0.08, glassesPaint);
-    canvas.drawCircle(Offset(w * 0.62, h * 0.50), w * 0.08, glassesPaint);
-    canvas.drawLine(Offset(w * 0.46, h * 0.50), Offset(w * 0.54, h * 0.50), glassesPaint);
-
-    // Friendly Eyes
-    _drawSparkleEye(canvas, Offset(w * 0.38, h * 0.50), w * 0.045);
-    _drawSparkleEye(canvas, Offset(w * 0.62, h * 0.50), w * 0.045);
-
-    // Rosy Cheeks
-    _drawBlush(canvas, Offset(w * 0.28, h * 0.57), w * 0.08, h * 0.04);
-    _drawBlush(canvas, Offset(w * 0.72, h * 0.57), w * 0.08, h * 0.04);
-
-    // Warm Barista Smile
-    _drawSmilingMouth(canvas, Offset(w * 0.5, h * 0.64), w * 0.15, speakingT);
-  }
-
-  // =========================================================================
-  // 4. DIRECTOR MARCUS - MODERN TECH EXECUTIVE & RECTANGULAR FRAMES
-  // =========================================================================
-  void _paintDirectorMarcus(Canvas canvas, double w, double h) {
-    // Charcoal Smart-Casual Blazer
-    final blazerPaint = Paint()..color = const Color(0xFF0F766E);
-    final blazerPath = Path()
-      ..moveTo(w * 0.14, h * 1.0)
-      ..quadraticBezierTo(w * 0.26, h * 0.74, w * 0.5, h * 0.74)
-      ..quadraticBezierTo(w * 0.74, h * 0.74, w * 0.86, h * 1.0)
-      ..close();
-    canvas.drawPath(blazerPath, blazerPaint);
-
-    // Crisp White Shirt Lapel
-    final shirtPaint = Paint()..color = Colors.white;
+    // Forest Green Artisan Canvas Apron over White Roll-Sleeve Shirt
+    final shirtPaint = Paint()..color = const Color(0xFFF1F5F9);
     final shirtPath = Path()
-      ..moveTo(w * 0.40, h * 0.74)
-      ..lineTo(w * 0.5, h * 0.90)
-      ..lineTo(w * 0.60, h * 0.74)
+      ..moveTo(w * 0.12, h * 1.0)
+      ..quadraticBezierTo(w * 0.25, h * 0.72, w * 0.5, h * 0.72)
+      ..quadraticBezierTo(w * 0.75, h * 0.72, w * 0.88, h * 1.0)
       ..close();
     canvas.drawPath(shirtPath, shirtPaint);
 
-    // Sharp Confident Face
-    final skinPaint = Paint()..color = const Color(0xFFFDE68A).withRed(250).withGreen(225).withBlue(195);
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.52), width: w * 0.56, height: h * 0.50),
-      skinPaint,
-    );
+    final apronPaint = Paint()..color = const Color(0xFF065F46); // Forest green apron
+    final apronPath = Path()
+      ..moveTo(w * 0.24, h * 1.0)
+      ..lineTo(w * 0.30, h * 0.76)
+      ..lineTo(w * 0.70, h * 0.76)
+      ..lineTo(w * 0.76, h * 1.0)
+      ..close();
+    canvas.drawPath(apronPath, apronPaint);
 
-    // Neat Modern Haircut
-    final hairPaint = Paint()..color = const Color(0xFF1E293B);
+    // Leather crossed straps with brass rivets
+    final strapPaint = Paint()
+      ..color = const Color(0xFF78350F)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.8;
+    canvas.drawLine(Offset(w * 0.32, h * 0.76), Offset(w * 0.22, h * 1.0), strapPaint);
+    canvas.drawLine(Offset(w * 0.68, h * 0.76), Offset(w * 0.78, h * 1.0), strapPaint);
+
+    // Brass Rivets
+    final rivetPaint = Paint()..color = const Color(0xFFD97706);
+    canvas.drawCircle(Offset(w * 0.32, h * 0.78), w * 0.018, rivetPaint);
+    canvas.drawCircle(Offset(w * 0.68, h * 0.78), w * 0.018, rivetPaint);
+
+    // Neck
+    final skinShadowPaint = Paint()..color = const Color(0xFFE0B496);
+    final skinPaint = Paint()..color = const Color(0xFFF8D5B8);
+    canvas.drawRect(Rect.fromCenter(center: Offset(w * 0.5, h * 0.68), width: w * 0.20, height: h * 0.12), skinShadowPaint);
+
+    // Warm Mediterranean Face
+    final headRect = Rect.fromCenter(center: Offset(w * 0.5, h * 0.51), width: w * 0.46, height: h * 0.46);
+    canvas.drawOval(headRect, skinPaint);
+
+    // Ears
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.26, h * 0.52), width: w * 0.08, height: h * 0.12), skinPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.74, h * 0.52), width: w * 0.08, height: h * 0.12), skinPaint);
+
+    // Short Textured Dark Wavy Hair
+    final hairPaint = Paint()..color = const Color(0xFF3E2723);
     final hairPath = Path()
-      ..moveTo(w * 0.20, h * 0.44)
-      ..quadraticBezierTo(w * 0.22, h * 0.20, w * 0.5, h * 0.18)
-      ..quadraticBezierTo(w * 0.78, h * 0.20, w * 0.80, h * 0.44)
-      ..quadraticBezierTo(w * 0.68, h * 0.32, w * 0.50, h * 0.32)
-      ..quadraticBezierTo(w * 0.32, h * 0.32, w * 0.20, h * 0.44)
+      ..moveTo(w * 0.24, h * 0.46)
+      ..quadraticBezierTo(w * 0.23, h * 0.22, w * 0.50, h * 0.19)
+      ..quadraticBezierTo(w * 0.77, h * 0.22, w * 0.76, h * 0.46)
+      ..quadraticBezierTo(w * 0.69, h * 0.33, w * 0.53, h * 0.31)
+      ..quadraticBezierTo(w * 0.36, h * 0.30, w * 0.24, h * 0.46)
       ..close();
     canvas.drawPath(hairPath, hairPaint);
 
-    // Modern Rectangular Glasses
-    final framePaint = Paint()
-      ..color = const Color(0xFF0F172A)
+    // Warm Eyebrows
+    _drawRealisticEyebrow(canvas, Offset(w * 0.32, h * 0.44), Offset(w * 0.40, h * 0.42), Offset(w * 0.46, h * 0.44), const Color(0xFF3E2723), 2.0);
+    _drawRealisticEyebrow(canvas, Offset(w * 0.54, h * 0.44), Offset(w * 0.60, h * 0.42), Offset(w * 0.68, h * 0.44), const Color(0xFF3E2723), 2.0);
+
+    // Chic Round Tortoiseshell Glasses
+    final glassesPaint = Paint()
+      ..color = const Color(0xFF78350F)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.4;
+      ..strokeWidth = 2.2;
+    canvas.drawCircle(Offset(w * 0.38, h * 0.49), w * 0.075, glassesPaint);
+    canvas.drawCircle(Offset(w * 0.62, h * 0.49), w * 0.075, glassesPaint);
+    canvas.drawLine(Offset(w * 0.455, h * 0.49), Offset(w * 0.545, h * 0.49), glassesPaint);
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.38, h * 0.50), width: w * 0.17, height: h * 0.11),
-        const Radius.circular(4),
-      ),
-      framePaint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(w * 0.62, h * 0.50), width: w * 0.17, height: h * 0.11),
-        const Radius.circular(4),
-      ),
-      framePaint,
-    );
-    canvas.drawLine(Offset(w * 0.47, h * 0.50), Offset(w * 0.53, h * 0.50), framePaint);
+    // Realistic Friendly Warm Eyes behind glasses
+    _drawRealisticEye(canvas, Offset(w * 0.38, h * 0.49), w * 0.072, h * 0.040, const Color(0xFF451A03));
+    _drawRealisticEye(canvas, Offset(w * 0.62, h * 0.49), w * 0.072, h * 0.040, const Color(0xFF451A03));
 
-    // Focused Eyes
-    _drawSparkleEye(canvas, Offset(w * 0.38, h * 0.50), w * 0.046);
-    _drawSparkleEye(canvas, Offset(w * 0.62, h * 0.50), w * 0.046);
+    // Nose
+    _drawRealisticNose(canvas, Offset(w * 0.50, h * 0.48), Offset(w * 0.50, h * 0.56), const Color(0xFFCA9377));
 
-    // Tech Founder Confident Smile
-    _drawSmilingMouth(canvas, Offset(w * 0.5, h * 0.64), w * 0.14, speakingT);
+    // Subtle neat groomed stubble shadow
+    final stubblePaint = Paint()..color = const Color(0xFF78350F).withOpacity(0.08);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.5, h * 0.64), width: w * 0.26, height: h * 0.12), stubblePaint);
+
+    // Genuine Warm Barista Smile
+    _drawRealisticMouth(canvas, Offset(w * 0.50, h * 0.63), w * 0.14, speakingT);
   }
 
   // =========================================================================
-  // 5. CONCIERGE PIERRE - REFINED BURGUNDY VEST & GOLDEN KEYS
+  // 4. DIRECTOR MARCUS - REALISTIC TECH EXECUTIVE
+  // =========================================================================
+  void _paintDirectorMarcus(Canvas canvas, double w, double h) {
+    // Tailored Charcoal-Teal Executive Blazer
+    final blazerPaint = Paint()..color = const Color(0xFF0F766E);
+    final blazerPath = Path()
+      ..moveTo(w * 0.11, h * 1.0)
+      ..quadraticBezierTo(w * 0.24, h * 0.71, w * 0.5, h * 0.71)
+      ..quadraticBezierTo(w * 0.76, h * 0.71, w * 0.89, h * 1.0)
+      ..close();
+    canvas.drawPath(blazerPath, blazerPaint);
+
+    // Crisp Open-Collar Executive White Shirt
+    final shirtPaint = Paint()..color = Colors.white;
+    final shirtPath = Path()
+      ..moveTo(w * 0.40, h * 0.71)
+      ..lineTo(w * 0.50, h * 0.88)
+      ..lineTo(w * 0.60, h * 0.71)
+      ..close();
+    canvas.drawPath(shirtPath, shirtPaint);
+
+    // Lapel Notches
+    final lapelPaint = Paint()
+      ..color = const Color(0xFF115E59)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    canvas.drawLine(Offset(w * 0.32, h * 0.71), Offset(w * 0.42, h * 0.86), lapelPaint);
+    canvas.drawLine(Offset(w * 0.68, h * 0.71), Offset(w * 0.58, h * 0.86), lapelPaint);
+
+    // Neck
+    final skinShadowPaint = Paint()..color = const Color(0xFFD6B299);
+    final skinPaint = Paint()..color = const Color(0xFFEED3BE);
+    canvas.drawRect(Rect.fromCenter(center: Offset(w * 0.5, h * 0.68), width: w * 0.21, height: h * 0.12), skinShadowPaint);
+
+    // Distinguished Face
+    final headRect = Rect.fromCenter(center: Offset(w * 0.5, h * 0.50), width: w * 0.46, height: h * 0.46);
+    canvas.drawOval(headRect, skinPaint);
+
+    // Ears
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.26, h * 0.51), width: w * 0.08, height: h * 0.12), skinPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.74, h * 0.51), width: w * 0.08, height: h * 0.12), skinPaint);
+
+    // Modern Neat Executive Taper Fade
+    final hairPaint = Paint()..color = const Color(0xFF1E293B);
+    final hairPath = Path()
+      ..moveTo(w * 0.24, h * 0.44)
+      ..quadraticBezierTo(w * 0.23, h * 0.22, w * 0.50, h * 0.19)
+      ..quadraticBezierTo(w * 0.77, h * 0.22, w * 0.76, h * 0.44)
+      ..quadraticBezierTo(w * 0.66, h * 0.32, w * 0.50, h * 0.31)
+      ..quadraticBezierTo(w * 0.34, h * 0.32, w * 0.24, h * 0.44)
+      ..close();
+    canvas.drawPath(hairPath, hairPaint);
+
+    // Modern Rectangular Titanium Glasses
+    final glassesPaint = Paint()
+      ..color = const Color(0xFF334155)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(w * 0.38, h * 0.48), width: w * 0.15, height: h * 0.08), const Radius.circular(3)),
+      glassesPaint,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(w * 0.62, h * 0.48), width: w * 0.15, height: h * 0.08), const Radius.circular(3)),
+      glassesPaint,
+    );
+    canvas.drawLine(Offset(w * 0.455, h * 0.48), Offset(w * 0.545, h * 0.48), glassesPaint);
+
+    // Focused Eyebrows
+    _drawRealisticEyebrow(canvas, Offset(w * 0.32, h * 0.43), Offset(w * 0.40, h * 0.41), Offset(w * 0.46, h * 0.43), const Color(0xFF1E293B), 2.2);
+    _drawRealisticEyebrow(canvas, Offset(w * 0.54, h * 0.43), Offset(w * 0.60, h * 0.41), Offset(w * 0.68, h * 0.43), const Color(0xFF1E293B), 2.2);
+
+    // Focused Intellectual Eyes
+    _drawRealisticEye(canvas, Offset(w * 0.38, h * 0.48), w * 0.075, h * 0.040, const Color(0xFF2D3748));
+    _drawRealisticEye(canvas, Offset(w * 0.62, h * 0.48), w * 0.075, h * 0.040, const Color(0xFF2D3748));
+
+    // Nose
+    _drawRealisticNose(canvas, Offset(w * 0.50, h * 0.47), Offset(w * 0.50, h * 0.56), const Color(0xFFBA8E74));
+
+    // Confident Executive Smile
+    _drawRealisticMouth(canvas, Offset(w * 0.50, h * 0.62), w * 0.14, speakingT);
+  }
+
+  // =========================================================================
+  // 5. CONCIERGE PIERRE - REALISTIC LUXURY HOTEL CONCIERGE
   // =========================================================================
   void _paintConciergePierre(Canvas canvas, double w, double h) {
-    // Tailored Burgundy Hotel Vest
+    // Tailored Burgundy Concierge Vest
     final vestPaint = Paint()..color = const Color(0xFF881337);
     final vestPath = Path()
-      ..moveTo(w * 0.14, h * 1.0)
-      ..quadraticBezierTo(w * 0.26, h * 0.74, w * 0.5, h * 0.74)
-      ..quadraticBezierTo(w * 0.74, h * 0.74, w * 0.86, h * 1.0)
+      ..moveTo(w * 0.12, h * 1.0)
+      ..quadraticBezierTo(w * 0.25, h * 0.72, w * 0.5, h * 0.72)
+      ..quadraticBezierTo(w * 0.75, h * 0.72, w * 0.88, h * 1.0)
       ..close();
     canvas.drawPath(vestPath, vestPaint);
 
-    // White Shirt & Gold Bow Tie
+    // Crisp High-Collar Formal Shirt
     final shirtPaint = Paint()..color = Colors.white;
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.80), width: w * 0.24, height: h * 0.12),
-      shirtPaint,
-    );
+    final shirtPath = Path()
+      ..moveTo(w * 0.41, h * 0.72)
+      ..lineTo(w * 0.5, h * 0.84)
+      ..lineTo(w * 0.59, h * 0.72)
+      ..close();
+    canvas.drawPath(shirtPath, shirtPaint);
 
-    // Elegant Bow Tie
-    final bowPaint = Paint()..color = const Color(0xFFF59E0B);
+    // Elegant Silk Bow Tie
+    final bowPaint = Paint()..color = const Color(0xFF1E293B);
     final leftWing = Path()
-      ..moveTo(w * 0.5, h * 0.78)
-      ..lineTo(w * 0.40, h * 0.74)
-      ..lineTo(w * 0.40, h * 0.82)
+      ..moveTo(w * 0.5, h * 0.77)
+      ..lineTo(w * 0.42, h * 0.73)
+      ..lineTo(w * 0.42, h * 0.81)
       ..close();
     final rightWing = Path()
-      ..moveTo(w * 0.5, h * 0.78)
-      ..lineTo(w * 0.60, h * 0.74)
-      ..lineTo(w * 0.60, h * 0.82)
+      ..moveTo(w * 0.5, h * 0.77)
+      ..lineTo(w * 0.58, h * 0.73)
+      ..lineTo(w * 0.58, h * 0.81)
       ..close();
     canvas.drawPath(leftWing, bowPaint);
     canvas.drawPath(rightWing, bowPaint);
-    canvas.drawCircle(Offset(w * 0.5, h * 0.78), w * 0.035, bowPaint);
+    canvas.drawCircle(Offset(w * 0.5, h * 0.77), w * 0.028, bowPaint);
 
-    // Refined Face
-    final skinPaint = Paint()..color = const Color(0xFFFFDFC4);
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.52), width: w * 0.56, height: h * 0.50),
-      skinPaint,
-    );
+    // Golden "Les Clefs d'Or" Crossed Keys Pin on Left Lapel
+    final goldPin = Paint()
+      ..color = const Color(0xFFF59E0B)
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke;
+    canvas.drawLine(Offset(w * 0.28, h * 0.79), Offset(w * 0.34, h * 0.85), goldPin);
+    canvas.drawLine(Offset(w * 0.34, h * 0.79), Offset(w * 0.28, h * 0.85), goldPin);
+    canvas.drawCircle(Offset(w * 0.31, h * 0.82), w * 0.015, Paint()..color = const Color(0xFFF59E0B));
 
-    // Elegant Slicked Back Hair
+    // Neck
+    final skinShadowPaint = Paint()..color = const Color(0xFFDEB499);
+    final skinPaint = Paint()..color = const Color(0xFFF5D0B5);
+    canvas.drawRect(Rect.fromCenter(center: Offset(w * 0.5, h * 0.68), width: w * 0.20, height: h * 0.12), skinShadowPaint);
+
+    // Refined Parisian Face
+    final headRect = Rect.fromCenter(center: Offset(w * 0.5, h * 0.50), width: w * 0.46, height: h * 0.46);
+    canvas.drawOval(headRect, skinPaint);
+
+    // Ears
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.26, h * 0.51), width: w * 0.08, height: h * 0.12), skinPaint);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.74, h * 0.51), width: w * 0.08, height: h * 0.12), skinPaint);
+
+    // Side-Parted Slate / Silver-Tinged Hair
     final hairPaint = Paint()..color = const Color(0xFF475569);
     final hairPath = Path()
-      ..moveTo(w * 0.20, h * 0.42)
-      ..quadraticBezierTo(w * 0.22, h * 0.20, w * 0.5, h * 0.18)
-      ..quadraticBezierTo(w * 0.78, h * 0.20, w * 0.80, h * 0.42)
-      ..quadraticBezierTo(w * 0.70, h * 0.32, w * 0.50, h * 0.30)
-      ..quadraticBezierTo(w * 0.30, h * 0.32, w * 0.20, h * 0.42)
+      ..moveTo(w * 0.24, h * 0.44)
+      ..quadraticBezierTo(w * 0.23, h * 0.21, w * 0.50, h * 0.19)
+      ..quadraticBezierTo(w * 0.77, h * 0.21, w * 0.76, h * 0.44)
+      ..quadraticBezierTo(w * 0.67, h * 0.31, w * 0.50, h * 0.30)
+      ..quadraticBezierTo(w * 0.33, h * 0.31, w * 0.24, h * 0.44)
       ..close();
     canvas.drawPath(hairPath, hairPaint);
 
-    // Hospitable Eyes
-    _drawSparkleEye(canvas, Offset(w * 0.39, h * 0.49), w * 0.048);
-    _drawSparkleEye(canvas, Offset(w * 0.61, h * 0.49), w * 0.048);
+    // Refined Eyebrows
+    _drawRealisticEyebrow(canvas, Offset(w * 0.33, h * 0.44), Offset(w * 0.41, h * 0.42), Offset(w * 0.46, h * 0.44), const Color(0xFF334155), 2.0);
+    _drawRealisticEyebrow(canvas, Offset(w * 0.54, h * 0.44), Offset(w * 0.59, h * 0.42), Offset(w * 0.67, h * 0.44), const Color(0xFF334155), 2.0);
 
-    // Neat Parisian Curved Mustache
+    // Attentive Courteous Eyes
+    _drawRealisticEye(canvas, Offset(w * 0.39, h * 0.48), w * 0.078, h * 0.042, const Color(0xFF334155));
+    _drawRealisticEye(canvas, Offset(w * 0.61, h * 0.48), w * 0.078, h * 0.042, const Color(0xFF334155));
+
+    // Refined Aristocratic Nose
+    _drawRealisticNose(canvas, Offset(w * 0.50, h * 0.47), Offset(w * 0.50, h * 0.56), const Color(0xFFC9957B));
+
+    // Finely Groomed Parisian Curved Mustache
     final stachePaint = Paint()
       ..color = const Color(0xFF334155)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0
+      ..strokeWidth = 2.2
       ..strokeCap = StrokeCap.round;
     final stachePath = Path()
-      ..moveTo(w * 0.34, h * 0.59)
-      ..quadraticBezierTo(w * 0.44, h * 0.62, w * 0.5, h * 0.59)
-      ..quadraticBezierTo(w * 0.56, h * 0.62, w * 0.66, h * 0.59);
+      ..moveTo(w * 0.38, h * 0.59)
+      ..quadraticBezierTo(w * 0.45, h * 0.61, w * 0.50, h * 0.59)
+      ..quadraticBezierTo(w * 0.55, h * 0.61, w * 0.62, h * 0.59);
     canvas.drawPath(stachePath, stachePaint);
 
-    // Polite French Smile
-    _drawSmilingMouth(canvas, Offset(w * 0.5, h * 0.65), w * 0.13, speakingT);
+    // Polite Diplomatic Smile
+    _drawRealisticMouth(canvas, Offset(w * 0.50, h * 0.63), w * 0.13, speakingT);
   }
 
   // =========================================================================
-  // SHARED ANIME / CARTOON RENDERING HELPERS
+  // REALISTIC HUMAN DETAIL HELPERS (NO ANIME / NO LED / NO 3D)
   // =========================================================================
-  void _drawSparkleEye(Canvas canvas, Offset center, double radius) {
-    // Dark Pupil
+  void _drawRealisticEye(Canvas canvas, Offset center, double width, double height, Color irisColor) {
+    // Sclera (Eye white)
+    final scleraPaint = Paint()..color = const Color(0xFFFAFAFA);
+    final eyeRect = Rect.fromCenter(center: center, width: width, height: height);
+    canvas.drawOval(eyeRect, scleraPaint);
+
+    // Iris
+    final irisRadius = height * 0.44;
+    final irisPaint = Paint()..color = irisColor;
+    canvas.drawCircle(center, irisRadius, irisPaint);
+
+    // Pupil
     final pupilPaint = Paint()..color = const Color(0xFF0F172A);
-    canvas.drawCircle(center, radius, pupilPaint);
+    canvas.drawCircle(center, irisRadius * 0.50, pupilPaint);
 
-    // Large Sparkle
-    final sparklePaint = Paint()..color = Colors.white;
-    canvas.drawCircle(
-      Offset(center.dx - radius * 0.35, center.dy - radius * 0.35),
-      radius * 0.42,
-      sparklePaint,
-    );
+    // Crisp Specular Light Dot
+    final specPaint = Paint()..color = Colors.white;
+    canvas.drawCircle(Offset(center.dx - irisRadius * 0.32, center.dy - irisRadius * 0.32), irisRadius * 0.28, specPaint);
 
-    // Small Secondary Sparkle
-    canvas.drawCircle(
-      Offset(center.dx + radius * 0.38, center.dy + radius * 0.38),
-      radius * 0.22,
-      sparklePaint,
-    );
-  }
-
-  void _drawBlush(Canvas canvas, Offset center, double width, double height) {
-    final blushPaint = Paint()..color = const Color(0xFFFB7185).withOpacity(0.50);
-    canvas.drawOval(
-      Rect.fromCenter(center: center, width: width, height: height),
-      blushPaint,
-    );
-  }
-
-  void _drawSmilingMouth(Canvas canvas, Offset center, double width, double speakingT) {
-    final mouthPaint = Paint()
-      ..color = const Color(0xFF991B1B)
-      ..style = PaintingStyle.fill;
-
-    final openH = (width * 0.4) + (speakingT * width * 0.35);
-
-    // Cheerful crescent open smile
-    final mouthPath = Path()
+    // Natural Eyelid Line
+    final lidPaint = Paint()
+      ..color = const Color(0xFF334155)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    final lidPath = Path()
       ..moveTo(center.dx - width * 0.5, center.dy)
-      ..quadraticBezierTo(center.dx, center.dy + openH, center.dx + width * 0.5, center.dy)
-      ..close();
-    canvas.drawPath(mouthPath, mouthPaint);
+      ..quadraticBezierTo(center.dx, center.dy - height * 0.65, center.dx + width * 0.5, center.dy);
+    canvas.drawPath(lidPath, lidPaint);
+  }
 
-    // Cute upper teeth shine
-    final teethPaint = Paint()..color = Colors.white;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: Offset(center.dx, center.dy + (openH * 0.22)),
-          width: width * 0.55,
-          height: openH * 0.32,
-        ),
-        const Radius.circular(2),
-      ),
-      teethPaint,
-    );
+  void _drawRealisticEyebrow(Canvas canvas, Offset start, Offset mid, Offset end, Color color, double thickness) {
+    final browPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = thickness
+      ..strokeCap = StrokeCap.round;
+    final browPath = Path()
+      ..moveTo(start.dx, start.dy)
+      ..quadraticBezierTo(mid.dx, mid.dy, end.dx, end.dy);
+    canvas.drawPath(browPath, browPaint);
+  }
+
+  void _drawRealisticNose(Canvas canvas, Offset bridge, Offset tip, Color color) {
+    final nosePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
+    final nosePath = Path()
+      ..moveTo(bridge.dx, bridge.dy)
+      ..lineTo(tip.dx, tip.dy)
+      ..lineTo(tip.dx + 4.0, tip.dy);
+    canvas.drawPath(nosePath, nosePaint);
+  }
+
+  void _drawRealisticMouth(Canvas canvas, Offset center, double width, double speakingT) {
+    final lipColor = const Color(0xFFB91C1C).withOpacity(0.70);
+    final openH = 2.0 + (speakingT * 5.0);
+
+    if (openH > 3.0) {
+      // Gentle opening while speaking
+      final mouthPaint = Paint()..color = const Color(0xFF450A0A);
+      final mouthPath = Path()
+        ..moveTo(center.dx - width * 0.5, center.dy)
+        ..quadraticBezierTo(center.dx, center.dy + openH, center.dx + width * 0.5, center.dy)
+        ..close();
+      canvas.drawPath(mouthPath, mouthPaint);
+
+      // White teeth line
+      final teethPaint = Paint()
+        ..color = Colors.white
+        ..strokeWidth = 1.5
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(
+        Offset(center.dx - width * 0.25, center.dy + 1.2),
+        Offset(center.dx + width * 0.25, center.dy + 1.2),
+        teethPaint,
+      );
+    } else {
+      // Natural serene smile line
+      final smilePaint = Paint()
+        ..color = lipColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+        ..strokeCap = StrokeCap.round;
+      final smilePath = Path()
+        ..moveTo(center.dx - width * 0.5, center.dy)
+        ..quadraticBezierTo(center.dx, center.dy + 3.0, center.dx + width * 0.5, center.dy);
+      canvas.drawPath(smilePath, smilePaint);
+    }
   }
 
   @override
@@ -812,3 +880,4 @@ class _CharmingCharacterPainter extends CustomPainter {
     return oldDelegate.speakingT != speakingT || oldDelegate.type != type;
   }
 }
+

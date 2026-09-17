@@ -357,6 +357,55 @@ class LocalStorageService {
     await _prefs?.setString('voca_selected_ai_provider', provider.toLowerCase().replaceAll(' ', '_'));
   }
 
+  // =========================================================================
+  // TACTICAL LEARNING CARDS (ROGUELIKE PERKS IN NORMAL LESSONS)
+  // =========================================================================
+  int getShields() => _prefs?.getInt('voca_card_shield') ?? 2;
+  int getClues() => _prefs?.getInt('voca_card_clue') ?? 2;
+  int getSkips() => _prefs?.getInt('voca_card_skip') ?? 1;
+  int getDoubleXpCount() => _prefs?.getInt('voca_card_double_xp') ?? 1;
+
+  void addShield(int count) => _prefs?.setInt('voca_card_shield', getShields() + count);
+  void addClue(int count) => _prefs?.setInt('voca_card_clue', getClues() + count);
+  void addSkip(int count) => _prefs?.setInt('voca_card_skip', getSkips() + count);
+  void addDoubleXp(int count) => _prefs?.setInt('voca_card_double_xp', getDoubleXpCount() + count);
+
+  bool useShield() {
+    final cur = getShields();
+    if (cur > 0) {
+      _prefs?.setInt('voca_card_shield', cur - 1);
+      return true;
+    }
+    return false;
+  }
+
+  bool useClue() {
+    final cur = getClues();
+    if (cur > 0) {
+      _prefs?.setInt('voca_card_clue', cur - 1);
+      return true;
+    }
+    return false;
+  }
+
+  bool useSkip() {
+    final cur = getSkips();
+    if (cur > 0) {
+      _prefs?.setInt('voca_card_skip', cur - 1);
+      return true;
+    }
+    return false;
+  }
+
+  bool useDoubleXp() {
+    final cur = getDoubleXpCount();
+    if (cur > 0) {
+      _prefs?.setInt('voca_card_double_xp', cur - 1);
+      return true;
+    }
+    return false;
+  }
+
   static const List<Map<String, dynamic>> _defaultVaultWords = [
     {
       'id': 'v1',

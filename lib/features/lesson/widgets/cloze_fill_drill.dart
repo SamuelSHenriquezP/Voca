@@ -9,12 +9,14 @@ class ClozeFillDrill extends StatefulWidget {
   final ExerciseModel exercise;
   final String? selectedAnswer;
   final ValueChanged<String> onAnswerSelected;
+  final Set<String>? disabledOptions;
 
   const ClozeFillDrill({
     super.key,
     required this.exercise,
     required this.selectedAnswer,
     required this.onAnswerSelected,
+    this.disabledOptions,
   });
 
   @override
@@ -186,6 +188,29 @@ class _ClozeFillDrillState extends State<ClozeFillDrill> {
               runSpacing: 12,
               children: ex.clozeOptions.map((opt) {
                 final isSelected = widget.selectedAnswer == opt;
+                final isDisabled = widget.disabledOptions?.contains(opt) ?? false;
+                if (isDisabled) {
+                  return Opacity(
+                    opacity: 0.25,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                      ),
+                      child: Text(
+                        opt,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF94A3B8),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ),
+                  );
+                }
 
                 return BouncyTap(
                   onTap: () {

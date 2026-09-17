@@ -10,12 +10,14 @@ class PictureChoiceDrill extends StatelessWidget {
   final ExerciseModel exercise;
   final String? selectedOptionId;
   final Function(PictureChoiceOption option) onOptionSelected;
+  final Set<String>? disabledOptionIds;
 
   const PictureChoiceDrill({
     super.key,
     required this.exercise,
     required this.selectedOptionId,
     required this.onOptionSelected,
+    this.disabledOptionIds,
   });
 
   @override
@@ -102,6 +104,31 @@ class PictureChoiceDrill extends StatelessWidget {
           itemBuilder: (context, index) {
             final option = exercise.pictureOptions[index];
             final isSelected = selectedOptionId == option.id;
+            final isDisabled = disabledOptionIds?.contains(option.id) ?? false;
+
+            if (isDisabled) {
+              return Opacity(
+                opacity: 0.25,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: Text(
+                      option.label,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF94A3B8),
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
 
             return BouncyTap(
               onTap: () {
