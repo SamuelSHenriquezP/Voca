@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../../../core/widgets/cartoon_character_avatar.dart';
 import 'npc_avatar_card.dart';
 
 class ScenarioItem {
@@ -248,15 +249,11 @@ class ScenarioSelectorSheet extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Vector Icon Badge
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: sc.accentColor,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Center(child: sc.iconWidget),
+            // Cartoon Character Avatar
+            CartoonCharacterAvatar.fromId(
+              sc.id,
+              size: 50,
+              showRipple: false,
             ),
             const SizedBox(width: 14),
 

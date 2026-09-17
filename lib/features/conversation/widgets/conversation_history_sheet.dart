@@ -3,6 +3,7 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../../../core/widgets/cartoon_character_avatar.dart';
 
 class ConversationHistorySheet extends StatefulWidget {
   const ConversationHistorySheet({super.key});
@@ -207,16 +208,10 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
             ),
             child: Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4F46E5).withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.record_voice_over_rounded, color: Color(0xFF4F46E5), size: 22),
-                  ),
+                CartoonCharacterAvatar.fromId(
+                  session['scenario_id']?.toString() ?? persona,
+                  size: 44,
+                  showRipple: false,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

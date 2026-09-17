@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/widgets/cartoon_character_avatar.dart';
 
 class NpcAvatarCard extends StatelessWidget {
   final String name;
@@ -29,75 +30,12 @@ class NpcAvatarCard extends StatelessWidget {
 
     return Column(
       children: [
-        // Concentric Ripple Rings & Vector Persona Avatar
-        SizedBox(
-          width: 130,
-          height: 130,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Outer Ripple Ring
-              if (isSpeaking)
-                Container(
-                  width: 126,
-                  height: 126,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF6366F1).withOpacity(0.25),
-                      width: 1.5,
-                    ),
-                  ),
-                )
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .scale(
-                      begin: const Offset(0.9, 0.9),
-                      end: const Offset(1.15, 1.15),
-                      duration: const Duration(milliseconds: 1000),
-                    ),
-
-              // Middle Ripple Ring
-              if (isSpeaking)
-                Container(
-                  width: 106,
-                  height: 106,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF6366F1).withOpacity(0.08),
-                  ),
-                )
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .scale(
-                      begin: const Offset(0.95, 0.95),
-                      end: const Offset(1.08, 1.08),
-                      duration: const Duration(milliseconds: 800),
-                    ),
-
-              // Core Vector Avatar Container
-              Container(
-                width: 86,
-                height: 86,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF0F172A),
-                  border: Border.all(color: const Color(0xFF334155), width: 2.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: CustomPaint(
-                    size: Size(48, 48),
-                    painter: OfficerVectorPainter(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        // Expressive Animated Cartoon Avatar
+        CartoonCharacterAvatar.fromId(
+          name,
+          size: 96,
+          isSpeaking: isSpeaking,
+          showRipple: true,
         ),
         const SizedBox(height: 12),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/widgets/bouncy_tap.dart';
@@ -44,9 +45,9 @@ class _PathNodeState extends State<PathNode> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: const Color(0xFF6366F1).withOpacity(0.35),
                         offset: const Offset(0, 3),
-                        blurRadius: 8,
+                        blurRadius: 10,
                       ),
                     ],
                   ),
@@ -60,7 +61,9 @@ class _PathNodeState extends State<PathNode> {
                           shape: BoxShape.circle,
                           color: Color(0xFF10B981), // Live pulse dot
                         ),
-                      ),
+                      )
+                          .animate(onPlay: (c) => c.repeat(reverse: true))
+                          .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.3, 1.3)),
                       const SizedBox(width: 6),
                       Text(
                         'START',
@@ -73,7 +76,9 @@ class _PathNodeState extends State<PathNode> {
                       ),
                     ],
                   ),
-                ),
+                )
+                    .animate(onPlay: (c) => c.repeat())
+                    .shimmer(duration: const Duration(milliseconds: 1800), color: Colors.white.withOpacity(0.35)),
                 const SizedBox(width: 8),
                 const MascotAvatar(size: 44, emotion: 'focus'),
               ],
@@ -140,19 +145,32 @@ class _PathNodeState extends State<PathNode> {
         child: Stack(
           alignment: Alignment.topCenter,
           children: [
-            // Active Aura
+            // Active Pulsing Glow Aura
             if (isActive)
               Container(
-                width: size + 8,
-                height: size + 8,
+                width: size + 16,
+                height: size + 16,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFF6366F1).withOpacity(0.35),
+                      const Color(0xFF4F46E5).withOpacity(0.0),
+                    ],
+                  ),
                   border: Border.all(
-                    color: const Color(0xFF4F46E5).withOpacity(0.2),
+                    color: const Color(0xFF6366F1).withOpacity(0.6),
                     width: 2,
                   ),
                 ),
-              ),
+              )
+                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                  .scale(
+                    begin: const Offset(0.92, 0.92),
+                    end: const Offset(1.18, 1.18),
+                    duration: const Duration(milliseconds: 1100),
+                    curve: Curves.easeInOutSine,
+                  ),
 
             // Subtle 3D Lip
             Positioned(
@@ -204,7 +222,8 @@ class _PathNodeState extends State<PathNode> {
   }
 
   Widget _buildBossNode() {
-    const double size = 72.0;
+    const double size = 74.0;
+    final isUnlocked = widget.node.state != NodeState.locked;
 
     return BouncyTap(
       onTap: widget.onTap,
@@ -212,28 +231,41 @@ class _PathNodeState extends State<PathNode> {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isUnlocked
+                ? const [Color(0xFF1E293B), Color(0xFF0F172A)]
+                : const [Color(0xFF18181B), Color(0xFF09090B)],
+          ),
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0xFF334155), width: 1.5),
+          border: Border.all(
+            color: isUnlocked ? const Color(0xFFF59E0B) : const Color(0xFF334155),
+            width: isUnlocked ? 2.0 : 1.2,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isUnlocked ? const Color(0xFFF59E0B).withOpacity(0.3) : Colors.black.withOpacity(0.1),
               offset: const Offset(0, 6),
               blurRadius: 16,
             ),
           ],
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.mic_none_rounded, color: Colors.white, size: 26),
-            SizedBox(height: 3),
+            Icon(
+              Icons.military_tech_rounded,
+              color: isUnlocked ? const Color(0xFFFBBF24) : const Color(0xFF64748B),
+              size: 28,
+            ),
+            const SizedBox(height: 2),
             Text(
               'BOSS',
               style: TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
+                color: isUnlocked ? const Color(0xFFFDE68A) : const Color(0xFF94A3B8),
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
                 letterSpacing: 1.2,
               ),
             ),

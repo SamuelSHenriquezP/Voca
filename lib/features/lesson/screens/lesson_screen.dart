@@ -2,9 +2,8 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
-import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/sound_effects.dart';
-import '../../../core/widgets/voca_button.dart';
+import '../../../core/widgets/celebration_dialog.dart';
 import '../models/exercise.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../widgets/action_drawer.dart';
@@ -235,57 +234,21 @@ class _LessonScreenState extends State<LessonScreen> {
   }
 
   void _showCompletionDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFEEF2FF),
-                border: Border.all(color: const Color(0xFFC7D2FE), width: 1.5),
-              ),
-              child: const Center(
-                child: Icon(Icons.workspace_premium_rounded, color: Color(0xFF4F46E5), size: 34),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Lesson Completed!',
-              style: VocaTypography.heading1.copyWith(fontSize: 24),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'You earned +15 XP and maintained your 14-day streak!',
-              style: VocaTypography.bodyMedium.copyWith(color: VocaColors.textMuted),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            VocaButton(
-              text: 'CLAIM REWARDS',
-              variant: VocaButtonVariant.gold,
-              isFullWidth: true,
-              height: 52,
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                if (widget.onCompleted != null) {
-                  widget.onCompleted!();
-                } else {
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
-        ),
-      ),
+    CelebrationDialog.show(
+      context,
+      title: 'LESSON COMPLETED!',
+      subtitle: 'Speech rhythm & vocabulary reinforced',
+      xpEarned: 25,
+      accuracyPercent: 96,
+      streakDays: LocalStorageService().getStreak(),
+      characterId: 'alex',
+      onContinue: () {
+        if (widget.onCompleted != null) {
+          widget.onCompleted!();
+        } else {
+          Navigator.of(context).pop();
+        }
+      },
     );
   }
 

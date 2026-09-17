@@ -5,7 +5,7 @@ import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/utils/sound_effects.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/voca_button.dart';
+import '../../../core/widgets/celebration_dialog.dart';
 import '../models/chat_message.dart';
 import '../services/contextual_conversation_engine.dart';
 import '../widgets/coach_tip_card.dart';
@@ -386,48 +386,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
       accuracyScore: _currentFluencyScore.toDouble(),
     );
 
-    SoundEffects.playCelebration();
-    VocaHaptics.success();
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFFEEF2FF),
-              ),
-              child: const Icon(Icons.verified_rounded, size: 36, color: Color(0xFF4F46E5)),
-            ),
-            const SizedBox(height: 14),
-            Text('Dialogue Mastered!', style: VocaTypography.heading1.copyWith(fontSize: 22)),
-            const SizedBox(height: 6),
-            Text(
-              'You successfully completed all 3 spoken exchanges with ${_activeScenario.personaName}!\n+35 XP earned.',
-              style: VocaTypography.bodyMedium.copyWith(color: const Color(0xFF64748B)),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            VocaButton(
-              text: 'CONTINUE JOURNEY',
-              variant: VocaButtonVariant.gold,
-              isFullWidth: true,
-              height: 48,
-              onPressed: () {
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
-        ),
-      ),
+    CelebrationDialog.show(
+      context,
+      title: 'DIALOGUE MASTERED!',
+      subtitle: 'Completed spoken exchanges with ${_activeScenario.personaName}',
+      xpEarned: 35,
+      accuracyPercent: _currentFluencyScore,
+      streakDays: LocalStorageService().getStreak(),
+      characterId: _activeScenario.id,
+      onContinue: () {},
     );
   }
 

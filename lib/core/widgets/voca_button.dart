@@ -37,7 +37,7 @@ class VocaButton extends StatefulWidget {
     this.variant = VocaButtonVariant.primary,
     this.height = 48,
     this.width,
-    this.depth = 3.5,
+    this.depth = 4.0,
     this.borderRadius = 14.0,
     this.isFullWidth = false,
     this.isLoading = false,
@@ -209,7 +209,9 @@ class _VocaButtonState extends State<VocaButton> {
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                   border: widget.variant == VocaButtonVariant.neutral
                       ? Border.all(color: const Color(0xFFE4E4E7), width: 1)
-                      : null,
+                      : (widget.variant == VocaButtonVariant.ghost
+                          ? null
+                          : Border.all(color: Colors.white.withOpacity(0.18), width: 1)),
                 ),
                 child: content,
               ),
