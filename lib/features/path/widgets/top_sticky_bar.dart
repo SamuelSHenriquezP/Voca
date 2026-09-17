@@ -13,6 +13,7 @@ class TopStickyBar extends StatelessWidget {
   final VoidCallback? onStreakTap;
   final VoidCallback? onHeartsTap;
   final VoidCallback? onGemsTap;
+  final VoidCallback? onProfileTap;
 
   const TopStickyBar({
     super.key,
@@ -24,6 +25,7 @@ class TopStickyBar extends StatelessWidget {
     this.onStreakTap,
     this.onHeartsTap,
     this.onGemsTap,
+    this.onProfileTap,
   });
 
   @override
@@ -166,6 +168,25 @@ class TopStickyBar extends StatelessWidget {
                 ),
               ),
             ),
+
+            // Optional Profile / Settings button
+            if (onProfileTap != null)
+              BouncyTap(
+                onTap: onProfileTap,
+                child: Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                  ),
+                  child: const Icon(
+                    Icons.person_outline_rounded,
+                    size: 16,
+                    color: Color(0xFF475569),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

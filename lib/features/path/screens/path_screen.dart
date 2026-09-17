@@ -12,6 +12,7 @@ import '../widgets/milestone_decorations.dart';
 import '../widgets/path_node.dart';
 import '../widgets/top_sticky_bar.dart';
 import '../widgets/unit_header.dart';
+import '../../profile/screens/profile_screen.dart';
 
 class PathScreen extends StatefulWidget {
   final VoidCallback? onOpenLesson;
@@ -158,10 +159,47 @@ class _PathScreenState extends State<PathScreen> {
     setState(() {});
   }
 
+  LevelNodeModel? _findCurrentActiveNode(List<LevelNodeModel> nodes) {
+    for (final node in nodes) {
+      if (node.state == NodeState.active || node.state == NodeState.boss) {
+        return node;
+      }
+    }
+    for (final node in nodes) {
+      if (node.state == NodeState.completed) {
+        return node;
+      }
+    }
+    return nodes.isNotEmpty ? nodes.first : null;
+  }
+
+  void _startDirectLesson(LevelNodeModel node) {
+    VocaHaptics.medium();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LessonScreen(
+          lessonTitle: node.title,
+          customExercises: AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(node.id),
+          onCompleted: () {
+            _onLevelCompleted(node.id);
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeUnit = _getUnitData(_selectedUnit);
     final List<LevelNodeModel> nodes = activeUnit['nodes'];
+    final activeNode = _findCurrentActiveNode(nodes);
+    final isBoss = activeNode?.state == NodeState.boss;
+    final advanceLabel = activeNode != null
+        ? (isBoss
+            ? 'DESAFÍO FINAL • UNIDAD $_selectedUnit'
+            : 'AVANZAR • NIVEL $_selectedUnit-${activeNode.levelNumber}')
+        : 'AVANZAR';
 
     return Scaffold(
       backgroundColor: VocaColors.backgroundNeutral,
@@ -172,6 +210,12 @@ class _PathScreenState extends State<PathScreen> {
             streakDays: LocalStorageService().getStreak(),
             gems: LocalStorageService().getXp() ~/ 10,
             hearts: LocalStorageService().getLives(),
+            onProfileTap: () {
+              VocaHaptics.selection();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            },
           ),
 
           // Unit Switcher Selector Strip
@@ -180,7 +224,7 @@ class _PathScreenState extends State<PathScreen> {
           // Scrollable Learning Path
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.only(bottom: 90),
+              padding: const EdgeInsets.only(bottom: 24),
               children: [
                 // Active Unit Header Banner
                 UnitHeader(
@@ -244,6 +288,69 @@ class _PathScreenState extends State<PathScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(
+            top: BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              offset: const Offset(0, -4),
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: BouncyTap(
+            onTap: () {
+              if (activeNode != null) {
+                _startDirectLesson(activeNode);
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              height: 54,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isBoss
+                      ? const [Color(0xFFE11D48), Color(0xFFBE123C)]
+                      : const [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isBoss ? const Color(0xFFE11D48) : const Color(0xFF4F46E5)).withOpacity(0.35),
+                    offset: const Offset(0, 4),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 28),
+                  const SizedBox(width: 8),
+                  Text(
+                    advanceLabel,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
