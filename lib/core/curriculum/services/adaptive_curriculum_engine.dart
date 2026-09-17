@@ -1,5 +1,6 @@
 import '../data/conversation_topics_catalog.dart';
 import '../../../../features/lesson/models/exercise.dart';
+import '../../../../features/path/models/level_node.dart';
 import '../../storage/local_storage_service.dart';
 
 enum LearnerWeakness {
@@ -38,8 +39,11 @@ class AdaptiveCurriculumEngine {
   }
 
   /// Generates a pedagogically rigorous 5-exercise lesson
-  /// tailored directly to the specified topic, target grammar, vocabulary, and phonetics.
-  static List<ExerciseModel> generateAdaptiveLessonForTopic(String topicId) {
+  /// tailored directly to the specified topic, target grammar, vocabulary, and focus type.
+  static List<ExerciseModel> generateAdaptiveLessonForTopic(
+    String topicId, {
+    LevelFocusType focusType = LevelFocusType.syntaxBattle,
+  }) {
     final topic = ConversationTopicsCatalog.getTopicById(topicId) ??
         ConversationTopicsCatalog.allTopics.first;
 
@@ -48,90 +52,239 @@ class AdaptiveCurriculumEngine {
     final perfectStreak = LocalStorageService().getPerfectLessonStreak();
     final isAdaptiveHard = perfectStreak >= 1;
 
-    // 1. Scramble Drill (Target syntax & grammar of the specific topic)
-    final scrambleData = _buildScrambleForTopic(topic);
-    exercises.add(
-      ExerciseModel(
-        id: '${topic.id}_scramble',
-        type: DrillType.sentenceScramble,
-        prompt: isAdaptiveHard
-            ? '🔥 Desafío de Racha: Organiza con precisión:'
-            : 'Organiza la oración para expresar:',
-        subtitle: isAdaptiveHard
-            ? 'Racha perfecta x$perfectStreak: Mayor dificultad • "${scrambleData['meaning']}"'
-            : '"${scrambleData['meaning']}"',
-        trickTip: scrambleData['trick'] as String,
-        targetSentenceWords: List<String>.from(scrambleData['target'] as List),
-        bankWords: List<String>.from(scrambleData['bank'] as List),
-      ),
-    );
+    switch (focusType) {
+      case LevelFocusType.storyReading:
+        // 1. Lore Story Passage with blanks completion
+        exercises.add(_buildStoryPassageForTopic(topic));
+        // 2. Target Cloze grammar slot
+        final cl1 = _buildClozeForTopic(topic, weakness);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_story_cloze',
+          type: DrillType.clozeFill,
+          prompt: 'Completa la frase clave de la historia:',
+          subtitle: 'Gramática de la aventura • ${topic.title}',
+          trickTip: cl1['trick'] as String,
+          clozePrefix: cl1['prefix'] as String,
+          clozeSuffix: cl1['suffix'] as String,
+          clozeOptions: List<String>.from(cl1['options'] as List),
+          correctClozeAnswer: cl1['answer'] as String,
+        ));
+        // 3. Audio listening detail
+        exercises.add(_buildListeningForTopic(topic));
+        // 4. Scramble reconstruction
+        final sc1 = _buildScrambleForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_story_scramble',
+          type: DrillType.sentenceScramble,
+          prompt: 'Reconstruye el diálogo del capítulo:',
+          subtitle: '"${sc1['meaning']}"',
+          trickTip: sc1['trick'] as String,
+          targetSentenceWords: List<String>.from(sc1['target'] as List),
+          bankWords: List<String>.from(sc1['bank'] as List),
+        ));
+        // 5. Spoken shadowing of the story line
+        final sh1 = _buildShadowForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_shadow',
+          type: DrillType.shadowing,
+          prompt: 'Pronuncia el diálogo del relato:',
+          targetSpeechText: '"${sh1['sentence']}"',
+          phoneticTokens: List<String>.from(sh1['tokens'] as List),
+          expectedAccentTip: sh1['tip'] as String,
+        ));
+        break;
 
-    // 2. Cloze Fill Drill (Target grammar slot / preposition / collocation)
-    final clozeData = _buildClozeForTopic(topic, weakness);
-    exercises.add(
-      ExerciseModel(
-        id: '${topic.id}_cloze',
-        type: DrillType.clozeFill,
-        prompt: isAdaptiveHard
-            ? '🔥 Desafío Gramatical: Selecciona la forma exacta:'
-            : 'Completa la frase con la opción correcta:',
-        subtitle: isAdaptiveHard
-            ? '🔥 Alta precisión requerida • ${topic.title} (${topic.targetGrammar})'
-            : 'Tema: ${topic.title} (${topic.targetGrammar})',
-        trickTip: clozeData['trick'] as String,
-        clozePrefix: clozeData['prefix'] as String,
-        clozeSuffix: clozeData['suffix'] as String,
-        clozeOptions: List<String>.from(clozeData['options'] as List),
-        correctClozeAnswer: clozeData['answer'] as String,
-      ),
-    );
+      case LevelFocusType.listeningLab:
+        // 1. Audio Listening Comprehension
+        exercises.add(_buildListeningForTopic(topic));
+        // 2. Syllable Stress
+        final st2 = _buildStressForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_stress',
+          type: DrillType.syllableStress,
+          prompt: '🎧 Laboratorio Auditivo: Toca la sílaba tónica:',
+          subtitle: 'Acento y prosodia: ${topic.targetPhonemeFocus}',
+          trickTip: st2['trick'] as String,
+          ipaPhonetic: st2['ipa'] as String,
+          syllables: List<String>.from(st2['syllables'] as List),
+          correctSyllableIndex: st2['index'] as int,
+        ));
+        // 3. Second Audio Listening scenario
+        exercises.add(_buildListeningForTopic(topic));
+        // 4. Cloze Fill
+        final cl2 = _buildClozeForTopic(topic, weakness);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_cloze',
+          type: DrillType.clozeFill,
+          prompt: '🎧 Reconocimiento auditivo: Completa el hueco:',
+          subtitle: 'Tema: ${topic.title} (${topic.targetGrammar})',
+          trickTip: cl2['trick'] as String,
+          clozePrefix: cl2['prefix'] as String,
+          clozeSuffix: cl2['suffix'] as String,
+          clozeOptions: List<String>.from(cl2['options'] as List),
+          correctClozeAnswer: cl2['answer'] as String,
+        ));
+        // 5. Shadowing with accent tip
+        final sh2 = _buildShadowForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_shadow',
+          type: DrillType.shadowing,
+          prompt: 'Pronuncia imitando la entonación nativa:',
+          targetSpeechText: '"${sh2['sentence']}"',
+          phoneticTokens: List<String>.from(sh2['tokens'] as List),
+          expectedAccentTip: sh2['tip'] as String,
+        ));
+        break;
 
-    // 3. Dynamic rotating activity (Syllable Stress, Listening Comprehension, or Science Fact)
-    final rotationMod = topic.id.hashCode.abs() % 3;
-    if (rotationMod == 0) {
-      exercises.add(_buildListeningForTopic(topic));
-    } else if (rotationMod == 1) {
-      exercises.add(_buildScienceForTopic(topic));
-    } else {
-      final stressData = _buildStressForTopic(topic);
-      exercises.add(
-        ExerciseModel(
+      case LevelFocusType.scienceExplore:
+        // 1. Science & Real-world curiosity reading
+        exercises.add(_buildScienceForTopic(topic));
+        // 2. Science cloze / grammar slot
+        final cl3 = _buildClozeForTopic(topic, weakness);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_cloze',
+          type: DrillType.clozeFill,
+          prompt: '🔬 Exploración Científica: Precisión técnica:',
+          subtitle: 'Tema: ${topic.title} (${topic.targetGrammar})',
+          trickTip: cl3['trick'] as String,
+          clozePrefix: cl3['prefix'] as String,
+          clozeSuffix: cl3['suffix'] as String,
+          clozeOptions: List<String>.from(cl3['options'] as List),
+          correctClozeAnswer: cl3['answer'] as String,
+        ));
+        // 3. Science analysis exercise
+        exercises.add(_buildScienceForTopic(topic));
+        // 4. Scientific syntax scramble
+        final sc3 = _buildScrambleForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_scramble',
+          type: DrillType.sentenceScramble,
+          prompt: '🔬 Sintaxis Científica: Estructura la deducción:',
+          subtitle: '"${sc3['meaning']}"',
+          trickTip: sc3['trick'] as String,
+          targetSentenceWords: List<String>.from(sc3['target'] as List),
+          bankWords: List<String>.from(sc3['bank'] as List),
+        ));
+        // 5. Spoken speech shadowing
+        final sh3 = _buildShadowForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_shadow',
+          type: DrillType.shadowing,
+          prompt: 'Pronuncia el postulado científico en voz alta:',
+          targetSpeechText: '"${sh3['sentence']}"',
+          phoneticTokens: List<String>.from(sh3['tokens'] as List),
+          expectedAccentTip: sh3['tip'] as String,
+        ));
+        break;
+
+      case LevelFocusType.dialogueBoss:
+        // 1. Authentic roleplay choice with NPC
+        final ch4 = _buildChoiceForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_choice',
+          type: DrillType.pictureChoice,
+          prompt: '👑 DESAFÍO FINAL: Respuesta conversacional a ${topic.npcName}:',
+          subtitle: '${topic.npcRole} • ${topic.pedagogicalObjective}',
+          pictureOptions: List<PictureChoiceOption>.from(ch4['options'] as List),
+        ));
+        // 2. Listening Comprehension in Dialogue
+        exercises.add(_buildListeningForTopic(topic));
+        // 3. Cloze grammar slot
+        final cl4 = _buildClozeForTopic(topic, weakness);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_cloze',
+          type: DrillType.clozeFill,
+          prompt: '👑 Precisión con ${topic.npcName}:',
+          subtitle: topic.targetGrammar,
+          trickTip: cl4['trick'] as String,
+          clozePrefix: cl4['prefix'] as String,
+          clozeSuffix: cl4['suffix'] as String,
+          clozeOptions: List<String>.from(cl4['options'] as List),
+          correctClozeAnswer: cl4['answer'] as String,
+        ));
+        // 4. Scramble
+        final sc4 = _buildScrambleForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_scramble',
+          type: DrillType.sentenceScramble,
+          prompt: '👑 Estructura tu respuesta final:',
+          subtitle: '"${sc4['meaning']}"',
+          trickTip: sc4['trick'] as String,
+          targetSentenceWords: List<String>.from(sc4['target'] as List),
+          bankWords: List<String>.from(sc4['bank'] as List),
+        ));
+        // 5. Shadowing with native rhythm
+        final sh4 = _buildShadowForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_shadow',
+          type: DrillType.shadowing,
+          prompt: 'Demuestra fluidez nativa en el cierre del diálogo:',
+          targetSpeechText: '"${sh4['sentence']}"',
+          phoneticTokens: List<String>.from(sh4['tokens'] as List),
+          expectedAccentTip: sh4['tip'] as String,
+        ));
+        break;
+
+      case LevelFocusType.syntaxBattle:
+        // 1. Scramble
+        final sc5 = _buildScrambleForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_scramble',
+          type: DrillType.sentenceScramble,
+          prompt: isAdaptiveHard
+              ? '⚔️ Desafío de Sintaxis (Racha x$perfectStreak):'
+              : '⚔️ Batalla de Sintaxis: Organiza la oración:',
+          subtitle: '"${sc5['meaning']}"',
+          trickTip: sc5['trick'] as String,
+          targetSentenceWords: List<String>.from(sc5['target'] as List),
+          bankWords: List<String>.from(sc5['bank'] as List),
+        ));
+        // 2. Cloze
+        final cl5 = _buildClozeForTopic(topic, weakness);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_cloze',
+          type: DrillType.clozeFill,
+          prompt: isAdaptiveHard ? '⚔️ Forma exacta requerida:' : '⚔️ Completa la estructura sintáctica:',
+          subtitle: 'Tema: ${topic.title} (${topic.targetGrammar})',
+          trickTip: cl5['trick'] as String,
+          clozePrefix: cl5['prefix'] as String,
+          clozeSuffix: cl5['suffix'] as String,
+          clozeOptions: List<String>.from(cl5['options'] as List),
+          correctClozeAnswer: cl5['answer'] as String,
+        ));
+        // 3. Syllable Stress
+        final st5 = _buildStressForTopic(topic);
+        exercises.add(ExerciseModel(
           id: '${topic.id}_stress',
           type: DrillType.syllableStress,
           prompt: 'Toca la sílaba tónica (acento principal):',
           subtitle: 'Enfoque fonético: ${topic.targetPhonemeFocus}',
-          trickTip: stressData['trick'] as String,
-          ipaPhonetic: stressData['ipa'] as String,
-          syllables: List<String>.from(stressData['syllables'] as List),
-          correctSyllableIndex: stressData['index'] as int,
-        ),
-      );
+          trickTip: st5['trick'] as String,
+          ipaPhonetic: st5['ipa'] as String,
+          syllables: List<String>.from(st5['syllables'] as List),
+          correctSyllableIndex: st5['index'] as int,
+        ));
+        // 4. Choice
+        final ch5 = _buildChoiceForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_choice',
+          type: DrillType.pictureChoice,
+          prompt: ch5['prompt'] as String,
+          subtitle: 'Respuesta conversacional con ${topic.npcName} (${topic.npcRole})',
+          pictureOptions: List<PictureChoiceOption>.from(ch5['options'] as List),
+        ));
+        // 5. Shadowing
+        final sh5 = _buildShadowForTopic(topic);
+        exercises.add(ExerciseModel(
+          id: '${topic.id}_shadow',
+          type: DrillType.shadowing,
+          prompt: 'Pronuncia en voz alta con entonación natural:',
+          targetSpeechText: '"${sh5['sentence']}"',
+          phoneticTokens: List<String>.from(sh5['tokens'] as List),
+          expectedAccentTip: sh5['tip'] as String,
+        ));
+        break;
     }
-
-    // 4. Picture & Meaning Choice Drill (Authentic pragmatic response)
-    final choiceData = _buildChoiceForTopic(topic);
-    exercises.add(
-      ExerciseModel(
-        id: '${topic.id}_choice',
-        type: DrillType.pictureChoice,
-        prompt: choiceData['prompt'] as String,
-        subtitle: 'Respuesta conversacional con ${topic.npcName} (${topic.npcRole})',
-        pictureOptions: List<PictureChoiceOption>.from(choiceData['options'] as List),
-      ),
-    );
-
-    // 5. Shadowing Drill (Spoken rhythm & fluency)
-    final shadowData = _buildShadowForTopic(topic);
-    exercises.add(
-      ExerciseModel(
-        id: '${topic.id}_shadow',
-        type: DrillType.shadowing,
-        prompt: 'Pronuncia en voz alta con entonación natural:',
-        targetSpeechText: '"${shadowData['sentence']}"',
-        phoneticTokens: List<String>.from(shadowData['tokens'] as List),
-        expectedAccentTip: shadowData['tip'] as String,
-      ),
-    );
 
     return exercises;
   }
@@ -975,5 +1128,79 @@ class AdaptiveCurriculumEngine {
     );
 
     return exam;
+  }
+
+  // =========================================================================
+  // 9. STORY PASSAGE & ADVENTURE LORE BUILDER
+  // =========================================================================
+  static ExerciseModel _buildStoryPassageForTopic(ConversationTopicMeta topic) {
+    final loreStories = [
+      {
+        'chapter': 'Capítulo 1: El Transmisor Secreto de la Casa del Árbol',
+        'prompt': 'Completa el pasaje narrativo de la historia:',
+        'subtitle': 'Aventura en Ooo • Lectura contextual y vocabulario',
+        'leading': 'Finn and Jake discovered an ancient radio tucked beneath the treehouse floorboards. The copper antenna was glowing brightly, and a mysterious voice from across the multiverse whispered that true linguistic power is gained only by those who',
+        'trailing': 'consistently every single day without fear of making mistakes.',
+        'options': ['practice speaking', 'stop listening', 'sleep quietly', 'run away'],
+        'answer': 'practice speaking',
+        'trick': 'Lectura Contextual: "Practice speaking consistently" se enlaza con "linguistic power".',
+      },
+      {
+        'chapter': 'Capítulo 2: La Fórmula de la Dulce Princesa',
+        'prompt': 'Analiza el informe del laboratorio de Bubblegum:',
+        'subtitle': 'Aventura en Ooo • Ciencia y precisión en inglés',
+        'leading': 'Inside the Candy Kingdom royal observatory, Princess Bubblegum adjusted her goggles and held up a beaker filled with luminescent liquid. She explained to Finn that the experiment would fail unless they',
+        'trailing': 'the ingredients with absolute scientific precision.',
+        'options': ['measure', 'burn', 'forget', 'ignore'],
+        'answer': 'measure',
+        'trick': 'Lectura Contextual: "Measure the ingredients" es la colocación precisa requerida en el laboratorio.',
+      },
+      {
+        'chapter': 'Capítulo 3: El Acorde Ancestral de Marceline',
+        'prompt': 'Sigue el relato de la Cueva de los Ecos:',
+        'subtitle': 'Aventura en Ooo • Comprensión lectora narrativa',
+        'leading': 'Deep in the obsidian cavern, Marceline tuned the four steel strings of her battle-axe bass. As the sound resonated through the tunnels, she smiled and told Jake that every great song begins with someone who has the courage to',
+        'trailing': 'their own authentic voice without hesitation.',
+        'options': ['express', 'hide', 'destroy', 'dislike'],
+        'answer': 'express',
+        'trick': 'Lectura Contextual: "To express one\'s authentic voice" es una frase idiomática indispensable.',
+      },
+      {
+        'chapter': 'Capítulo 4: El Algoritmo Cuántico de BMO',
+        'prompt': 'Descifra la pantalla de BMO:',
+        'subtitle': 'Aventura en Ooo • Tecnología del lore en inglés',
+        'leading': 'BMO beeped cheerily and projected a holographic green map onto the wooden table. The robotic companion declared that the dimensional rift could be safely closed if the heroes could successfully',
+        'trailing': 'the grammatical cipher before the midnight bell tolled.',
+        'options': ['decode', 'erase', 'break', 'lose'],
+        'answer': 'decode',
+        'trick': 'Lectura Contextual: "Decode the cipher" (descifrar el código) es la acción narrativa clave.',
+      },
+      {
+        'chapter': 'Capítulo 5: Los Manuscritos del Rey Helado',
+        'prompt': 'Lee el fragmento hallado en la montaña de hielo:',
+        'subtitle': 'Aventura en Ooo • Crónicas del pasado',
+        'leading': 'Perched atop the frozen battlements, Simon opened a weather-worn diary written before the ancient catastrophe. The yellowed pages revealed that long ago, people from distant continents could easily',
+        'trailing': 'with one another by learning a shared universal language.',
+        'options': ['communicate', 'argue', 'disappear', 'sleep'],
+        'answer': 'communicate',
+        'trick': 'Lectura Contextual: "Communicate with one another" (comunicarse unos con otros).',
+      },
+    ];
+
+    final index = topic.id.hashCode.abs() % loreStories.length;
+    final item = loreStories[index];
+
+    return ExerciseModel(
+      id: '${topic.id}_story',
+      type: DrillType.storyPassage,
+      prompt: item['prompt'] as String,
+      subtitle: item['subtitle'] as String,
+      trickTip: item['trick'] as String,
+      storyChapterTitle: item['chapter'] as String,
+      storyPassageLeading: item['leading'] as String,
+      storyPassageTrailing: item['trailing'] as String,
+      storyOptions: List<String>.from(item['options'] as List),
+      correctStoryAnswer: item['answer'] as String,
+    );
   }
 }

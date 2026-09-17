@@ -67,6 +67,16 @@ class _PathScreenState extends State<PathScreen> {
         state = NodeState.locked;
       }
 
+      final focusTypes = [
+        LevelFocusType.storyReading,   // Nivel 1: Historia Lore & Lectura
+        LevelFocusType.syntaxBattle,   // Nivel 2: Batalla de Sintaxis
+        LevelFocusType.listeningLab,   // Nivel 3: Laboratorio de Audio
+        LevelFocusType.scienceExplore, // Nivel 4: Exploración Científica
+        LevelFocusType.storyReading,   // Nivel 5: Crónica Avanzada de Lore
+        LevelFocusType.dialogueBoss,   // Nivel 6: Jefe Conversacional
+      ];
+      final focusType = isBoss ? LevelFocusType.dialogueBoss : focusTypes[i % focusTypes.length];
+
       nodes.add(
         LevelNodeModel(
           id: topic.id,
@@ -77,12 +87,14 @@ class _PathScreenState extends State<PathScreen> {
               : 'Level $unitNumber-${i + 1}: ${topic.title}',
           subtitle: topic.pedagogicalObjective,
           state: state,
+          focusType: focusType,
           stars: state == NodeState.completed ? 3 : 0,
           xpReward: isBoss ? 50 : 15,
           objectives: [
-            'Grammar: ${topic.targetGrammar}',
-            'Phonetics: ${topic.targetPhonemeFocus}',
-            'Partner: ${topic.npcName}',
+            'Enfoque: ${focusType.name}',
+            'Gramática: ${topic.targetGrammar}',
+            'Fonética: ${topic.targetPhonemeFocus}',
+            'Personaje: ${topic.npcName}',
           ],
           xOffset: xOffsets[i % xOffsets.length],
         ),
@@ -180,7 +192,10 @@ class _PathScreenState extends State<PathScreen> {
       MaterialPageRoute(
         builder: (_) => LessonScreen(
           lessonTitle: node.title,
-          customExercises: AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(node.id),
+          customExercises: AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(
+            node.id,
+            focusType: node.focusType,
+          ),
           onCompleted: () {
             _onLevelCompleted(node.id);
             Navigator.of(context).pop();

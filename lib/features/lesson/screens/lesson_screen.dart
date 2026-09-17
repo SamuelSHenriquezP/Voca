@@ -15,6 +15,7 @@ import '../widgets/picture_choice_drill.dart';
 import '../widgets/science_context_drill.dart';
 import '../widgets/scramble_drill.dart';
 import '../widgets/shadowing_drill.dart';
+import '../widgets/story_passage_drill.dart';
 import '../widgets/syllable_stress_drill.dart';
 import '../../../core/widgets/adventure_cartoon_avatar.dart';
 import '../widgets/tactical_cards_bar.dart';
@@ -74,6 +75,10 @@ class _LessonScreenState extends State<LessonScreen> {
   // Exercise 7: Science & Real-World Facts
   String? _selectedScienceAnswer;
   final Set<String> _disabledScienceOptions = {};
+
+  // Exercise 8: Story Passage & Lore Reading
+  String? _selectedStoryAnswer;
+  final Set<String> _disabledStoryOptions = {};
 
   late final List<ExerciseModel> _exercises;
 
@@ -183,6 +188,8 @@ class _LessonScreenState extends State<LessonScreen> {
         return _selectedListeningAnswer != null;
       case DrillType.scienceFactContext:
         return _selectedScienceAnswer != null;
+      case DrillType.storyPassage:
+        return _selectedStoryAnswer != null;
     }
   }
 
@@ -217,6 +224,9 @@ class _LessonScreenState extends State<LessonScreen> {
         break;
       case DrillType.scienceFactContext:
         isCorrect = _selectedScienceAnswer == currentEx.correctScienceAnswer;
+        break;
+      case DrillType.storyPassage:
+        isCorrect = _selectedStoryAnswer == currentEx.correctStoryAnswer;
         break;
     }
 
@@ -406,6 +416,25 @@ class _LessonScreenState extends State<LessonScreen> {
           _showPerkMessage('Ya no quedan opciones por descartar.');
         }
         break;
+
+      case DrillType.storyPassage:
+        final wrongOpts = currentEx.storyOptions
+            .where((opt) => opt != currentEx.correctStoryAnswer && !_disabledStoryOptions.contains(opt))
+            .take(2)
+            .toList();
+        if (wrongOpts.isNotEmpty) {
+          setState(() {
+            _disabledStoryOptions.addAll(wrongOpts);
+            if (_selectedStoryAnswer != null && wrongOpts.contains(_selectedStoryAnswer)) {
+              _selectedStoryAnswer = null;
+            }
+          });
+          applied = true;
+          _showPerkMessage('💡 ¡Pista 50/50! Opciones de historia incorrectas descartadas.');
+        } else {
+          _showPerkMessage('Ya no quedan opciones por descartar.');
+        }
+        break;
     }
 
     if (applied) {
@@ -453,6 +482,8 @@ class _LessonScreenState extends State<LessonScreen> {
         _disabledListeningOptions.clear();
         _selectedScienceAnswer = null;
         _disabledScienceOptions.clear();
+        _selectedStoryAnswer = null;
+        _disabledStoryOptions.clear();
         _disabledClozeOptions.clear();
         _disabledPictureOptionIds.clear();
       });
@@ -524,6 +555,8 @@ class _LessonScreenState extends State<LessonScreen> {
         return currentEx.correctListeningAnswer;
       case DrillType.scienceFactContext:
         return currentEx.correctScienceAnswer;
+      case DrillType.storyPassage:
+        return currentEx.correctStoryAnswer;
     }
   }
 
@@ -600,6 +633,16 @@ class _LessonScreenState extends State<LessonScreen> {
           disabledOptions: _disabledScienceOptions,
           onAnswerSelected: (ans) {
             setState(() => _selectedScienceAnswer = ans);
+          },
+        );
+        break;
+      case DrillType.storyPassage:
+        drillBody = StoryPassageDrill(
+          exercise: currentEx,
+          selectedAnswer: _selectedStoryAnswer,
+          disabledOptions: _disabledStoryOptions,
+          onAnswerSelected: (ans) {
+            setState(() => _selectedStoryAnswer = ans);
           },
         );
         break;

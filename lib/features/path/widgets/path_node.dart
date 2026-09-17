@@ -89,6 +89,49 @@ class PathNode extends StatelessWidget {
 
           // Minimalist Flat Level Circle
           _buildNodeCircle(context),
+
+          // Level Focus Badge Pill
+          const SizedBox(height: 5),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: node.state == NodeState.active
+                    ? const Color(0xFFC7D2FE)
+                    : const Color(0xFFE2E8F0),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  offset: const Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(node.focusEmoji, style: const TextStyle(fontSize: 10)),
+                const SizedBox(width: 4),
+                Text(
+                  node.focusLabel,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: node.state == NodeState.active
+                        ? const Color(0xFF4F46E5)
+                        : (node.state == NodeState.completed
+                            ? const Color(0xFF16A34A)
+                            : const Color(0xFF64748B)),
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -102,6 +145,21 @@ class PathNode extends StatelessWidget {
     final isLocked = state == NodeState.locked;
 
     const double size = 66.0;
+
+    IconData getFocusIcon(LevelFocusType type) {
+      switch (type) {
+        case LevelFocusType.storyReading:
+          return Icons.auto_stories_rounded;
+        case LevelFocusType.listeningLab:
+          return Icons.headphones_rounded;
+        case LevelFocusType.scienceExplore:
+          return Icons.science_rounded;
+        case LevelFocusType.dialogueBoss:
+          return Icons.emoji_events_rounded;
+        case LevelFocusType.syntaxBattle:
+          return Icons.sort_by_alpha_rounded;
+      }
+    }
 
     Color bg;
     Color border;
@@ -117,7 +175,7 @@ class PathNode extends StatelessWidget {
       bg = const Color(0xFF6366F1); // Vibrant Violet
       border = const Color(0xFF4F46E5);
       iconColor = Colors.white;
-      icon = Icons.play_arrow_rounded;
+      icon = getFocusIcon(node.focusType);
     } else if (isBoss) {
       bg = const Color(0xFF8B5CF6); // Royal Violet
       border = const Color(0xFF7C3AED);
@@ -127,7 +185,7 @@ class PathNode extends StatelessWidget {
       bg = const Color(0xFFF8FAFC); // Clean Light Slate
       border = const Color(0xFFE2E8F0);
       iconColor = const Color(0xFF94A3B8);
-      icon = Icons.lock_rounded;
+      icon = isLocked ? Icons.lock_rounded : getFocusIcon(node.focusType);
     }
 
     Widget circle = Container(

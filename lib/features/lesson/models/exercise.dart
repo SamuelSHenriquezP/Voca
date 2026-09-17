@@ -6,6 +6,7 @@ enum DrillType {
   syllableStress,
   listeningComprehension,
   scienceFactContext,
+  storyPassage,
 }
 
 class PictureChoiceOption {
@@ -67,6 +68,14 @@ class ExerciseModel {
   final List<String> scienceOptions;
   final String correctScienceAnswer;
 
+  // For Story Passage & Lore Reading
+  final String storyChapterTitle;
+  final String storyPassageLeading;
+  final String storyPassageTrailing;
+  final List<String> storyOptions;
+  final String correctStoryAnswer;
+  final String storyExplanation;
+
   const ExerciseModel({
     required this.id,
     required this.type,
@@ -95,5 +104,11 @@ class ExerciseModel {
     this.factQuestion = '',
     this.scienceOptions = const [],
     this.correctScienceAnswer = '',
+    this.storyChapterTitle = '',
+    this.storyPassageLeading = '',
+    this.storyPassageTrailing = '',
+    this.storyOptions = const [],
+    this.correctStoryAnswer = '',
+    this.storyExplanation = '',
   });
 }
