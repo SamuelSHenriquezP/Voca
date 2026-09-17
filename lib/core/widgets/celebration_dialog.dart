@@ -264,12 +264,11 @@ class _CelebrationDialogState extends State<CelebrationDialog>
 
                   const SizedBox(height: 24),
 
-                  // Chunky Mechanical 3D Action Button
+                  // Clean Flat Action Button
                   VocaButton(
-                    text: 'CONTINUE',
+                    text: 'CONTINUAR',
                     variant: VocaButtonVariant.success,
                     height: 52,
-                    depth: 4.5,
                     isFullWidth: true,
                     onPressed: () {
                       Navigator.of(context).pop();

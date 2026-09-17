@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/curriculum/data/conversation_topics_catalog.dart';
 import '../../../core/curriculum/services/adaptive_curriculum_engine.dart';
-import '../../../core/curriculum/services/curriculum_engine.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
@@ -515,7 +514,7 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                               VocaButton(
                                 text: 'INICIAR NIVEL (+15 XP)',
                                 icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
-                                variant: isUnlocked ? VocaButtonVariant.primary : VocaButtonVariant.outline,
+                                variant: isUnlocked ? VocaButtonVariant.primary : VocaButtonVariant.neutral,
                                 isFullWidth: true,
                                 height: 44,
                                 onPressed: () => _launchTopicLesson(topic),

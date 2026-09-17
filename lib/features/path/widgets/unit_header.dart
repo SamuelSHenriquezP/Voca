@@ -21,17 +21,17 @@ class UnitHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A), // Slate 900
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF1E293B), width: 1.5),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(0.03),
             offset: const Offset(0, 4),
-            blurRadius: 16,
+            blurRadius: 12,
           ),
         ],
       ),
@@ -44,17 +44,17 @@ class UnitHeader extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF334155), width: 1),
+                  color: const Color(0xFFEEF2FF),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFC7D2FE), width: 1),
                 ),
                 child: Text(
-                  'UNIT $unitNumber',
+                  'UNIDAD $unitNumber',
                   style: const TextStyle(
-                    color: Color(0xFF94A3B8),
+                    color: Color(0xFF4F46E5),
                     fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),
@@ -63,28 +63,28 @@ class UnitHeader extends StatelessWidget {
               BouncyTap(
                 onTap: onGuidebookTap,
                 child: Container(
-                  padding: const EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFF334155), width: 1),
+                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                   ),
                   child: const Icon(
                     Icons.menu_book_rounded,
-                    color: Colors.white,
+                    color: Color(0xFF4F46E5),
                     size: 16,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           Text(
             title,
             style: VocaTypography.heading2.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
+              color: const Color(0xFF0F172A),
+              fontWeight: FontWeight.w800,
               fontSize: 18,
             ),
           ),
@@ -92,44 +92,35 @@ class UnitHeader extends StatelessWidget {
           Text(
             description,
             style: const TextStyle(
-              color: Color(0xFF94A3B8),
+              color: Color(0xFF64748B),
               fontSize: 13,
               fontWeight: FontWeight.w400,
-              height: 1.4,
+              height: 1.35,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Clean Minimalist Progress Bar
           Row(
             children: [
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Container(
-                    height: 6,
-                    color: const Color(0xFF1E293B),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: FractionallySizedBox(
-                        widthFactor: progress.clamp(0.05, 1.0),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF4F46E5), // Indigo
-                          ),
-                        ),
-                      ),
-                    ),
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 8,
+                    backgroundColor: const Color(0xFFF1F5F9),
+                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
                 '${(progress * 100).toInt()}%',
                 style: const TextStyle(
-                  color: Color(0xFF94A3B8),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF10B981),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ],

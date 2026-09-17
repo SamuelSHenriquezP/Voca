@@ -40,10 +40,10 @@ class ActionDrawer extends StatelessWidget {
         child: SafeArea(
           top: false,
           child: VocaButton(
-            text: 'CHECK ANSWER',
+            text: 'COMPROBAR',
             variant: isCheckEnabled ? VocaButtonVariant.primary : VocaButtonVariant.neutral,
             isFullWidth: true,
-            height: 48,
+            height: 50,
             onPressed: isCheckEnabled ? onCheck : null,
           ),
         ),
@@ -88,11 +88,11 @@ class ActionDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Correct',
+                          '¡Excelente!',
                           style: VocaTypography.heading2.copyWith(
                             color: const Color(0xFF059669),
                             fontSize: 18,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                         Text(
@@ -108,10 +108,10 @@ class ActionDrawer extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               VocaButton(
-                text: 'CONTINUE',
+                text: 'CONTINUAR',
                 variant: VocaButtonVariant.success,
                 isFullWidth: true,
-                height: 48,
+                height: 50,
                 onPressed: onContinue,
               ),
             ],
@@ -158,16 +158,16 @@ class ActionDrawer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Incorrect',
+                        'Solución correcta',
                         style: VocaTypography.heading2.copyWith(
                           color: const Color(0xFFDC2626),
                           fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                       if (correctAnswer.isNotEmpty)
                         Text(
-                          'Expected: $correctAnswer',
+                          'Respuesta: $correctAnswer',
                           style: VocaTypography.bodySmall.copyWith(
                             color: const Color(0xFF991B1B),
                             fontWeight: FontWeight.w600,
@@ -206,10 +206,10 @@ class ActionDrawer extends StatelessWidget {
             ],
             const SizedBox(height: 16),
             VocaButton(
-              text: 'GOT IT',
+              text: 'ENTENDIDO',
               variant: VocaButtonVariant.danger,
               isFullWidth: true,
-              height: 48,
+              height: 50,
               onPressed: onGotIt,
             ),
           ],

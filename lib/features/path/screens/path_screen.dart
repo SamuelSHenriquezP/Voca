@@ -102,8 +102,8 @@ class _PathScreenState extends State<PathScreen> {
       VocaHaptics.light();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Complete previous levels to unlock ${node.title}!'),
-          backgroundColor: const Color(0xFF0F172A),
+          content: Text('¡Completa los niveles anteriores para desbloquear "${node.title}"!'),
+          backgroundColor: const Color(0xFF334155),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           duration: const Duration(seconds: 2),
