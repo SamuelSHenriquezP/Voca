@@ -254,7 +254,7 @@ class _AdventureHeroCreatorSheetState extends State<AdventureHeroCreatorSheet> {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: _archetypes.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      separatorBuilder: (_, index) => const SizedBox(width: 12),
                       itemBuilder: (context, index) {
                         final arch = _archetypes[index]['archetype'] as AdventureArchetype;
                         final name = _archetypes[index]['name'] as String;
@@ -417,3 +417,4 @@ class _AdventureHeroCreatorSheetState extends State<AdventureHeroCreatorSheet> {
     );
   }
 }
+

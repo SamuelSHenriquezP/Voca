@@ -261,7 +261,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _archetypes.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 10),
+              separatorBuilder: (_, index) => const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 final arch = _archetypes[index]['archetype'] as AdventureArchetype;
                 final name = _archetypes[index]['name'] as String;

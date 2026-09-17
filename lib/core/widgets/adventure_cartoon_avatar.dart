@@ -660,3 +660,4 @@ class _AdventureTimePainter extends CustomPainter {
         oldDelegate.animT != animT;
   }
 }
+

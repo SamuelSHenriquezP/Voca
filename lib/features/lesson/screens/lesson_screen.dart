@@ -397,10 +397,18 @@ class _LessonScreenState extends State<LessonScreen> {
     } else {
       // Completed all drills!
       final totalXp = _isDoubleXpActive ? 50 : 25;
-      LocalStorageService().addXp(totalXp);
+      final storage = LocalStorageService();
+      storage.addXp(totalXp);
+      final accuracy = ((_hearts / 5.0) * 100).round();
+      final isPerfect = _hearts == 5;
+      storage.recordLessonResult(isPerfect: isPerfect);
+      final awardedCard = storage.awardCardForLevelCompletion(
+        heartsLeft: _hearts,
+        accuracy: accuracy,
+      );
       SoundEffects.playCelebration();
       _confettiController.play();
-      _showCompletionDialog(totalXp);
+      _showCompletionDialog(totalXp, awardedCard, accuracy);
     }
   }
 
@@ -410,13 +418,15 @@ class _LessonScreenState extends State<LessonScreen> {
     });
   }
 
-  void _showCompletionDialog(int xpGained) {
+  void _showCompletionDialog(int xpGained, String awardedCard, int accuracy) {
     CelebrationDialog.show(
       context,
-      title: 'LESSON COMPLETED!',
-      subtitle: _isDoubleXpActive ? 'Speech reinforced • 2x XP Boost applied!' : 'Speech rhythm & vocabulary reinforced',
+      title: '¡LECCIÓN SUPERADA!',
+      subtitle: _isDoubleXpActive
+          ? '¡Refuerzo auditivo completado • 2x XP aplicado!'
+          : '¡Has ganado +1 Carta por tu desempeño en este nivel!',
       xpEarned: xpGained,
-      accuracyPercent: 96,
+      accuracyPercent: accuracy,
       streakDays: LocalStorageService().getStreak(),
       characterId: 'alex',
       onContinue: () {
@@ -614,7 +624,27 @@ class _LessonScreenState extends State<LessonScreen> {
                       );
                     },
                   ),
-                  drillBody,
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 320),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.06, 0.0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: KeyedSubtree(
+                      key: ValueKey<int>(_currentIndex),
+                      child: drillBody,
+                    ),
+                  ),
                 ],
               ),
             ),

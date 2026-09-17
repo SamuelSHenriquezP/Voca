@@ -427,6 +427,37 @@ class LocalStorageService {
   String getUserGoal() => _prefs?.getString('voca_user_goal') ?? '15 min';
   void setUserGoal(String goal) => _prefs?.setString('voca_user_goal', goal);
 
+  // =========================================================================
+  // Adaptive Mastery & Card Rewards Progression
+  // =========================================================================
+  int getPerfectLessonStreak() => _prefs?.getInt('voca_perfect_streak') ?? 0;
+
+  void recordLessonResult({required bool isPerfect}) {
+    final cur = getPerfectLessonStreak();
+    if (isPerfect) {
+      _prefs?.setInt('voca_perfect_streak', cur + 1);
+    } else {
+      _prefs?.setInt('voca_perfect_streak', (cur - 1) < 0 ? 0 : cur - 1);
+    }
+  }
+
+  /// Automatically awards a tactical card upon level completion based on performance
+  String awardCardForLevelCompletion({required int heartsLeft, required int accuracy}) {
+    if (heartsLeft == 5 && accuracy >= 95) {
+      addDoubleXp(1);
+      return 'doubleXp';
+    } else if (heartsLeft <= 2) {
+      addShield(1);
+      return 'shield';
+    } else if (accuracy >= 80) {
+      addClue(1);
+      return 'clue';
+    } else {
+      addSkip(1);
+      return 'skip';
+    }
+  }
+
   static const List<Map<String, dynamic>> _defaultVaultWords = [
     {
       'id': 'v1',

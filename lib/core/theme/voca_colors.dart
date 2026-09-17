@@ -7,8 +7,9 @@ class VocaColors {
   // Dark Canvas & Obsidian Neutrals
   static const Color darkSlate = Color(0xFF09090B);
   static const Color darkSurface = Color(0xFF18181B);
-  static const Color backgroundNeutral = Color(0xFFFBFBFC);
+  static const Color backgroundNeutral = Color(0xFFFDFBF7); // Warm cozy ivory cream
   static const Color cardBackground = Color(0xFFFFFFFF);
+  static const Color warmBorder = Color(0xFFF1EAE0);
   
   // Borders & Dividers
   static const Color borderSubtle = Color(0xFFE4E4E7);

@@ -1,5 +1,6 @@
 import '../data/conversation_topics_catalog.dart';
 import '../../../../features/lesson/models/exercise.dart';
+import '../../storage/local_storage_service.dart';
 
 enum LearnerWeakness {
   vowels,
@@ -44,6 +45,8 @@ class AdaptiveCurriculumEngine {
 
     final weakness = dominantWeakness;
     final List<ExerciseModel> exercises = [];
+    final perfectStreak = LocalStorageService().getPerfectLessonStreak();
+    final isAdaptiveHard = perfectStreak >= 1;
 
     // 1. Scramble Drill (Target syntax & grammar of the specific topic)
     final scrambleData = _buildScrambleForTopic(topic);
@@ -51,8 +54,12 @@ class AdaptiveCurriculumEngine {
       ExerciseModel(
         id: '${topic.id}_scramble',
         type: DrillType.sentenceScramble,
-        prompt: 'Organiza la oración para expresar:',
-        subtitle: '"${scrambleData['meaning']}"',
+        prompt: isAdaptiveHard
+            ? '🔥 Desafío de Racha: Organiza con precisión:'
+            : 'Organiza la oración para expresar:',
+        subtitle: isAdaptiveHard
+            ? 'Racha perfecta x$perfectStreak: Mayor dificultad • "${scrambleData['meaning']}"'
+            : '"${scrambleData['meaning']}"',
         trickTip: scrambleData['trick'] as String,
         targetSentenceWords: List<String>.from(scrambleData['target'] as List),
         bankWords: List<String>.from(scrambleData['bank'] as List),
@@ -65,8 +72,12 @@ class AdaptiveCurriculumEngine {
       ExerciseModel(
         id: '${topic.id}_cloze',
         type: DrillType.clozeFill,
-        prompt: 'Completa la frase con la opción correcta:',
-        subtitle: 'Tema: ${topic.title} (${topic.targetGrammar})',
+        prompt: isAdaptiveHard
+            ? '🔥 Desafío Gramatical: Selecciona la forma exacta:'
+            : 'Completa la frase con la opción correcta:',
+        subtitle: isAdaptiveHard
+            ? '🔥 Alta precisión requerida • ${topic.title} (${topic.targetGrammar})'
+            : 'Tema: ${topic.title} (${topic.targetGrammar})',
         trickTip: clozeData['trick'] as String,
         clozePrefix: clozeData['prefix'] as String,
         clozeSuffix: clozeData['suffix'] as String,
@@ -127,13 +138,23 @@ class AdaptiveCurriculumEngine {
     String trick,
     List<String> distractors,
   ) {
-    final bank = List<String>.from(target)..addAll(distractors);
+    final streak = LocalStorageService().getPerfectLessonStreak();
+    final isAdaptiveHard = streak >= 1;
+    final extraDistractors = isAdaptiveHard
+        ? ['will', 'have', 'does', 'been', 'at', 'in', 'the', 'for']
+            .where((w) => !target.contains(w) && !distractors.contains(w))
+            .take(2)
+            .toList()
+        : <String>[];
+    final bank = List<String>.from(target)..addAll(distractors)..addAll(extraDistractors);
     bank.shuffle();
     return {
       'meaning': meaning,
       'target': target,
       'bank': bank,
-      'trick': trick,
+      'trick': isAdaptiveHard
+          ? '$trick (🔥 Racha x$streak: Distractores adicionales agregados)'
+          : trick,
     };
   }
 

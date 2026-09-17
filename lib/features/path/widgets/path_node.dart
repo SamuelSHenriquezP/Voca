@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/widgets/adventure_cartoon_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/cartoon_character_avatar.dart';
 import '../models/level_node.dart';
 
 class PathNode extends StatelessWidget {
@@ -61,11 +63,24 @@ class PathNode extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 6),
-                const CartoonCharacterAvatar(
-                  type: CartoonCharacterType.alex,
-                  size: 38,
-                  showRipple: false,
+                const SizedBox(width: 8),
+                Builder(
+                  builder: (context) {
+                    final storage = LocalStorageService();
+                    final archStr = storage.getHeroArchetype();
+                    final arch = AdventureArchetype.values.firstWhere(
+                      (a) => a.name == archStr,
+                      orElse: () => AdventureArchetype.finn,
+                    );
+                    final heroColor = storage.getHeroColor();
+
+                    return AdventureCartoonAvatar(
+                      archetype: arch,
+                      size: 42,
+                      customColor: Color(heroColor),
+                      expression: 'happy',
+                    );
+                  },
                 ),
               ],
             ),
@@ -115,54 +130,67 @@ class PathNode extends StatelessWidget {
       icon = Icons.lock_rounded;
     }
 
-    return BouncyTap(
-      onTap: onTap,
-      scaleFactor: isLocked ? 1.0 : 0.94,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: bg,
-          shape: BoxShape.circle,
-          border: Border.all(color: border, width: isActive || isBoss ? 2.5 : 2.0),
-          boxShadow: (isActive || isBoss)
-              ? [
-                  BoxShadow(
-                    color: bg.withOpacity(0.28),
-                    offset: const Offset(0, 4),
-                    blurRadius: 10,
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    offset: const Offset(0, 2),
-                    blurRadius: 4,
-                  ),
-                ],
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Icon(icon, color: iconColor, size: isCompleted ? 30 : 32),
-            if (isCompleted)
-              Positioned(
-                bottom: 4,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                    3,
-                    (i) => const Icon(
-                      Icons.star_rounded,
-                      size: 11,
-                      color: Color(0xFFF59E0B),
-                    ),
+    Widget circle = Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: bg,
+        shape: BoxShape.circle,
+        border: Border.all(color: border, width: isActive || isBoss ? 2.5 : 2.0),
+        boxShadow: (isActive || isBoss)
+            ? [
+                BoxShadow(
+                  color: bg.withOpacity(0.28),
+                  offset: const Offset(0, 4),
+                  blurRadius: 10,
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  offset: const Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(icon, color: iconColor, size: isCompleted ? 30 : 32),
+          if (isCompleted)
+            Positioned(
+              bottom: 4,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(
+                  3,
+                  (i) => const Icon(
+                    Icons.star_rounded,
+                    size: 11,
+                    color: Color(0xFFF59E0B),
                   ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
+    );
+
+    if (isActive) {
+      circle = circle
+          .animate(onPlay: (controller) => controller.repeat(reverse: true))
+          .scale(
+            begin: const Offset(1.0, 1.0),
+            end: const Offset(1.07, 1.07),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeInOut,
+          );
+    }
+
+    return BouncyTap(
+      onTap: onTap,
+      scaleFactor: isLocked ? 1.0 : 0.94,
+      child: circle,
     );
   }
 }
