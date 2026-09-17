@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/widgets/adventure_cartoon_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 
 class HeroProfileCard extends StatelessWidget {
@@ -43,28 +45,41 @@ class HeroProfileCard extends StatelessWidget {
             onTap: onEditAvatar,
             child: Stack(
               children: [
-                Container(
-                  width: 76,
-                  height: 76,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [VocaColors.electricCyan, VocaColors.primaryPurple],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: VocaColors.primaryPurple.withOpacity(0.35),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                Builder(
+                  builder: (context) {
+                    final storage = LocalStorageService();
+                    final archStr = storage.getHeroArchetype();
+                    final arch = AdventureArchetype.values.firstWhere(
+                      (a) => a.name == archStr,
+                      orElse: () => AdventureArchetype.finn,
+                    );
+                    final heroColor = storage.getHeroColor();
+
+                    return Container(
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(heroColor).withOpacity(0.15),
+                        border: Border.all(color: Color(heroColor), width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(heroColor).withOpacity(0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.person_rounded, size: 38, color: Colors.white),
-                  ),
+                      child: Center(
+                        child: AdventureCartoonAvatar(
+                          archetype: arch,
+                          size: 64,
+                          customColor: Color(heroColor),
+                          expression: storage.getHeroExpression(),
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 Positioned(
                   bottom: 0,

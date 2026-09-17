@@ -1098,20 +1098,21 @@ class AdaptiveCurriculumEngine {
       ),
     );
 
-    // 7. Second Science Context Challenge
-    final sci2 = _buildScienceForTopic(tBoss);
+    // 7. Lore Story Reading Comprehension Challenge
+    final storyDrill = _buildStoryPassageForTopic(tBoss);
     exam.add(
       ExerciseModel(
-        id: 'exam_u${unitNumber}_science_2',
-        type: DrillType.scienceFactContext,
-        prompt: '⚡ EXAMEN DE SALTO [7/8]: Análisis contextual complejo:',
-        subtitle: 'Terminología y deducción lógica en inglés',
-        trickTip: sci2.trickTip,
-        factBadge: sci2.factBadge,
-        factSnippet: sci2.factSnippet,
-        factQuestion: sci2.factQuestion,
-        scienceOptions: sci2.scienceOptions,
-        correctScienceAnswer: sci2.correctScienceAnswer,
+        id: 'exam_u${unitNumber}_story_1',
+        type: DrillType.storyPassage,
+        prompt: '⚡ EXAMEN DE SALTO [7/8]: Lectura crítica en contexto:',
+        subtitle: 'Capítulo: ${storyDrill.storyChapterTitle}',
+        trickTip: storyDrill.trickTip,
+        storyChapterTitle: storyDrill.storyChapterTitle,
+        storyPassageLeading: storyDrill.storyPassageLeading,
+        storyPassageTrailing: storyDrill.storyPassageTrailing,
+        storyOptions: storyDrill.storyOptions,
+        correctStoryAnswer: storyDrill.correctStoryAnswer,
+        storyExplanation: storyDrill.storyExplanation,
       ),
     );
 

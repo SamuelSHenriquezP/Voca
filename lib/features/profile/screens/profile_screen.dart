@@ -3,7 +3,10 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/network/network_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/widgets/adventure_cartoon_avatar.dart';
+import '../../../core/widgets/adventure_hero_creator_sheet.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../../lesson/models/tactical_card.dart';
 import '../widgets/activity_velocity_chart.dart';
 import '../widgets/fluency_radar_chart.dart';
 import '../widgets/badge_gallery.dart';
@@ -69,12 +72,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'initials': 'JW',
       },
       {
-        'name': 'Alex Rivera (Tú)',
+        'name': '${LocalStorageService().getUserName()} (Tú)',
         'title': 'A1 • Spoken Explorer',
         'xp': '$userXp XP',
         'rank': userXp > 500 ? '4' : '24',
         'color': const Color(0xFF4F46E5),
-        'initials': 'AR',
+        'initials': LocalStorageService().getUserName().substring(0, LocalStorageService().getUserName().length >= 2 ? 2 : 1).toUpperCase(),
       },
     ];
   }
@@ -206,6 +209,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     StatGridCard.buildAccuracyCard(score: LocalStorageService().getXp() > 0 ? 94 : 0),
                   ],
                 ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Tactical Cards Deck Overview
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'BARAJA TÁCTICA ROGUELITE',
+                      style: VocaTypography.caption.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: VocaColors.darkSlate,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Recompensas de Lección',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFB45309),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _buildTacticalDeckGrid(),
               ),
 
               const SizedBox(height: 24),
@@ -559,56 +603,141 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 18),
 
             // User Info
-            Row(
-              children: [
-                // Minimalist Avatar
-                Container(
-                  width: 58,
-                  height: 58,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF4F46E5),
-                    border: Border.all(color: const Color(0xFF312E81), width: 2),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'AR',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+            Builder(
+              builder: (context) {
+                final storage = LocalStorageService();
+                final userName = storage.getUserName();
+                final archStr = storage.getHeroArchetype();
+                final archetype = AdventureArchetype.values.firstWhere(
+                  (a) => a.name == archStr,
+                  orElse: () => AdventureArchetype.finn,
+                );
+                final heroColor = storage.getHeroColor();
+                final heroExpression = storage.getHeroExpression();
+
+                return Row(
+                  children: [
+                    // Adventure Time Interactive Avatar
+                    BouncyTap(
+                      onTap: () {
+                        AdventureHeroCreatorSheet.show(
+                          context,
+                          onSaved: () => setState(() {}),
+                        );
+                      },
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Color(heroColor), width: 2.5),
+                            ),
+                            child: AdventureCartoonAvatar(
+                              archetype: archetype,
+                              size: 58,
+                              customColor: Color(heroColor),
+                              expression: heroExpression,
+                            ),
+                          ),
+                          Positioned(
+                            bottom: -2,
+                            right: -2,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Color(heroColor),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: const Color(0xFF0F172A), width: 1.5),
+                              ),
+                              child: const Icon(Icons.palette_rounded, color: Colors.white, size: 10),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 14),
+                    const SizedBox(width: 14),
 
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Alex Rivera',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  userName,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.3,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Color(heroColor).withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Color(heroColor).withOpacity(0.5), width: 1),
+                                ),
+                                child: Text(
+                                  archetype.name.toUpperCase(),
+                                  style: TextStyle(
+                                    color: Color(heroColor),
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Meta diaria: ${storage.getUserGoal()} • ${storage.getXp()} XP',
+                            style: const TextStyle(
+                              color: Color(0xFF94A3B8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Quick Customize Hero Button
+                    BouncyTap(
+                      onTap: () {
+                        AdventureHeroCreatorSheet.show(
+                          context,
+                          onSaved: () => setState(() {}),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFF334155), width: 1),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.tune_rounded, color: Colors.white70, size: 13),
+                            SizedBox(width: 4),
+                            Text('Héroe', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 2),
-                      Text(
-                        'A1 • Principiante desde cero',
-                        style: TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 18),
 
@@ -659,6 +788,105 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTacticalDeckGrid() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: _buildTacticalCardTile(TacticalCard.shieldCard)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildTacticalCardTile(TacticalCard.clueCard)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: _buildTacticalCardTile(TacticalCard.skipCard)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildTacticalCardTile(TacticalCard.doubleXpCard)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTacticalCardTile(TacticalCard card) {
+    final count = TacticalCard.getCount(card.type);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            offset: const Offset(0, 3),
+            blurRadius: 6,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: card.lightBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: card.borderColor),
+                ),
+                child: Icon(card.icon, size: 18, color: card.primaryColor),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: count > 0 ? card.lightBg : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: count > 0 ? card.borderColor : const Color(0xFFCBD5E1),
+                  ),
+                ),
+                child: Text(
+                  '$count disp.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: count > 0 ? card.primaryColor : const Color(0xFF94A3B8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            card.title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            card.description,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Color(0xFF64748B),
+              height: 1.3,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }
