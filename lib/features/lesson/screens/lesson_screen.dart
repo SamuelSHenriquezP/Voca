@@ -14,6 +14,7 @@ import '../widgets/picture_choice_drill.dart';
 import '../widgets/scramble_drill.dart';
 import '../widgets/shadowing_drill.dart';
 import '../widgets/syllable_stress_drill.dart';
+import '../../../core/widgets/adventure_cartoon_avatar.dart';
 import '../widgets/tactical_cards_bar.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -45,8 +46,12 @@ class _LessonScreenState extends State<LessonScreen> {
   final Set<String> _disabledClozeOptions = {};
   final Set<String> _disabledPictureOptionIds = {};
 
-  // Exercise 1: Scramble
-  final List<String> _selectedScrambleWords = [];
+  // Exercise 1: Scramble (Bank index tracking)
+  final List<int> _selectedScrambleBankIndices = [];
+  List<String> get _selectedScrambleWords => _selectedScrambleBankIndices
+      .where((idx) => idx >= 0 && idx < _exercises[_currentIndex].bankWords.length)
+      .map((idx) => _exercises[_currentIndex].bankWords[idx])
+      .toList();
 
   // Exercise 2: Cloze Fill
   String? _selectedClozeAnswer;
@@ -71,77 +76,77 @@ class _LessonScreenState extends State<LessonScreen> {
       _exercises = widget.customExercises!;
     } else {
       _exercises = const [
-        ExerciseModel(
-          id: 'ex_scramble',
-          type: DrillType.sentenceScramble,
-          prompt: 'Arrange the words to say:',
-          subtitle: '"Hello, nice to meet you, my name is Alex."',
-          trickTip: 'Consejo: En inglés natural, decir "Nice to meet you" es el saludo amigable por excelencia.',
-          targetSentenceWords: ['Hello,', 'nice', 'to', 'meet', 'you,', 'my', 'name', 'is', 'Alex.'],
-          bankWords: ['nice', 'Alex.', 'is', 'Hello,', 'goodbye', 'to', 'meet', 'my', 'coffee', 'you,', 'name'],
-        ),
-        ExerciseModel(
-          id: 'ex_cloze',
-          type: DrillType.clozeFill,
-          prompt: 'Completa con la forma correcta del verbo "to be":',
-          subtitle: 'Presente simple para presentaciones',
-          trickTip: 'Regla: Con "My name" (tercera persona singular "it"), siempre usamos "is".',
-          clozePrefix: 'Hi! My name',
-          clozeSuffix: 'Emma. What is your name?',
-          clozeOptions: ['is', 'are', 'am', 'be'],
-          correctClozeAnswer: 'is',
-        ),
-        ExerciseModel(
-          id: 'ex_stress',
-          type: DrillType.syllableStress,
-          prompt: 'Toca la sílaba con mayor acento:',
-          subtitle: '¿Dónde recae el énfasis de la palabra?',
-          trickTip: 'El acento en "WELCOME" recae con fuerza en la primera sílaba: /ˈwɛl.kəm/.',
-          ipaPhonetic: '/ˈwɛl.kəm/',
-          syllables: ['WEL', 'COME'],
-          correctSyllableIndex: 0,
-        ),
-        ExerciseModel(
-          id: 'ex_choice',
-          type: DrillType.pictureChoice,
-          prompt: '¿Cómo respondes cordialmente a "Nice to meet you"?',
-          subtitle: 'Selecciona la respuesta conversacional adecuada',
-          pictureOptions: [
-            PictureChoiceOption(
-              id: 'opt_meet_too',
-              label: 'Nice to meet you too!',
-              audioPhonetic: '/naɪs tuː miːt juː tuː/',
-              isCorrect: true,
-            ),
-            PictureChoiceOption(
-              id: 'opt_bye',
-              label: 'Goodbye, see you!',
-              audioPhonetic: '/ɡʊdˈbaɪ siː juː/',
-              isCorrect: false,
-            ),
-            PictureChoiceOption(
-              id: 'opt_no',
-              label: 'No, thank you.',
-              audioPhonetic: '/noʊ θæŋk juː/',
-              isCorrect: false,
-            ),
-            PictureChoiceOption(
-              id: 'opt_what',
-              label: 'What is this?',
-              audioPhonetic: '/wʌt ɪz ðɪs/',
-              isCorrect: false,
-            ),
-          ],
-        ),
-        ExerciseModel(
-          id: 'ex_shadow',
-          type: DrillType.shadowing,
-          prompt: 'Pronuncia esta frase en voz alta:',
-          targetSpeechText: '"Hello! It is wonderful to meet you. My name is Alex."',
-          phoneticTokens: ['[heh-LOH]', '[it iz]', '[WUHN-der-ful]', '[to meet yoo]', '[my naym iz AL-eks]'],
-          expectedAccentTip: 'Enlaza con suavidad "It is" -> suena fluido como "it-iz".',
-        ),
-      ];
+      ExerciseModel(
+        id: 'ex_scramble',
+        type: DrillType.sentenceScramble,
+        prompt: 'Organiza las palabras para decir:',
+        subtitle: '"Hello, nice to meet you, my name is Alex."',
+        trickTip: 'Truco Nativo: "Nice to meet you" es la fórmula indispensable para presentarse con amabilidad y soltura.',
+        targetSentenceWords: ['Hello,', 'nice', 'to', 'meet', 'you,', 'my', 'name', 'is', 'Alex.'],
+        bankWords: ['nice', 'Alex.', 'Hello,', 'they', 'meet', 'is', 'to', 'you,', 'my', 'name', 'are'],
+      ),
+      ExerciseModel(
+        id: 'ex_cloze',
+        type: DrillType.clozeFill,
+        prompt: 'Completa con la forma correcta del verbo "to be":',
+        subtitle: 'Presente simple en presentaciones personales',
+        trickTip: 'Truco Nativo: Con tercera persona singular ("My name"), la forma correcta es siempre "is".',
+        clozePrefix: 'Hi! My name',
+        clozeSuffix: 'Emma. Nice to meet you!',
+        clozeOptions: ['is', 'am', 'are', 'be'],
+        correctClozeAnswer: 'is',
+      ),
+      ExerciseModel(
+        id: 'ex_stress',
+        type: DrillType.syllableStress,
+        prompt: 'Toca la sílaba tónica (acento principal):',
+        subtitle: '¿Dónde recae la mayor fuerza de voz?',
+        trickTip: 'Truco Nativo: En sustantivos y saludos de dos sílabas, el acento casi siempre va en la primera sílaba.',
+        ipaPhonetic: '/ˈwel.kəm/',
+        syllables: ['WEL', 'COME'],
+        correctSyllableIndex: 0,
+      ),
+      ExerciseModel(
+        id: 'ex_choice',
+        type: DrillType.pictureChoice,
+        prompt: '¿Cuál es la respuesta cortés más natural a "How are you doing today?"',
+        subtitle: 'Selecciona la respuesta conversacional auténtica',
+        pictureOptions: [
+          PictureChoiceOption(
+            id: 'opt_good',
+            label: "I'm doing great, thank you! And you?",
+            audioPhonetic: "/aɪm ˈduː.ɪŋ ɡreɪt/",
+            isCorrect: true,
+          ),
+          PictureChoiceOption(
+            id: 'opt_literal',
+            label: 'Yes, I am existing.',
+            audioPhonetic: '/jes aɪ æm/',
+            isCorrect: false,
+          ),
+          PictureChoiceOption(
+            id: 'opt_bad',
+            label: 'Today is Tuesday afternoon.',
+            audioPhonetic: '/təˈdeɪ ɪz ˈtjuːz.deɪ/',
+            isCorrect: false,
+          ),
+          PictureChoiceOption(
+            id: 'opt_bye',
+            label: 'Goodbye, see you yesterday.',
+            audioPhonetic: '/ɡʊdˈbaɪ/',
+            isCorrect: false,
+          ),
+        ],
+      ),
+      ExerciseModel(
+        id: 'ex_shadow',
+        type: DrillType.shadowing,
+        prompt: 'Pronuncia en voz alta con entonación natural:',
+        targetSpeechText: '"Hello! It is wonderful to meet you. My name is Alex."',
+        phoneticTokens: ['[hel-LOH]', '[it iz]', '[WUN-der-ful]', '[to meet yoo]', '[my naym iz al-eks]'],
+        expectedAccentTip: 'Enlaza "it is" suavemente como "it-iz" para sonar completamente natural.',
+      ),
+    ];
     }
   }
 
@@ -268,14 +273,23 @@ class _LessonScreenState extends State<LessonScreen> {
 
     switch (currentEx.type) {
       case DrillType.sentenceScramble:
-        final currentLen = _selectedScrambleWords.length;
+        final currentLen = _selectedScrambleBankIndices.length;
         if (currentLen < currentEx.targetSentenceWords.length) {
           final nextWord = currentEx.targetSentenceWords[currentLen];
-          setState(() {
-            _selectedScrambleWords.add(nextWord);
-          });
-          applied = true;
-          _showPerkMessage('💡 ¡Pista aplicada! Se colocó la palabra "$nextWord".');
+          int foundIdx = -1;
+          for (int i = 0; i < currentEx.bankWords.length; i++) {
+            if (!_selectedScrambleBankIndices.contains(i) && currentEx.bankWords[i] == nextWord) {
+              foundIdx = i;
+              break;
+            }
+          }
+          if (foundIdx != -1) {
+            setState(() {
+              _selectedScrambleBankIndices.add(foundIdx);
+            });
+            applied = true;
+            _showPerkMessage('💡 ¡Pista aplicada! Se colocó la palabra "$nextWord".');
+          }
         } else {
           _showPerkMessage('Ya has colocado todas las palabras de la oración.');
         }
@@ -372,7 +386,7 @@ class _LessonScreenState extends State<LessonScreen> {
       setState(() {
         _currentIndex++;
         _drawerState = DrawerState.standard;
-        _selectedScrambleWords.clear();
+        _selectedScrambleBankIndices.clear();
         _selectedClozeAnswer = null;
         _selectedSyllableIndex = null;
         _selectedPictureOptionId = null;
@@ -427,8 +441,11 @@ class _LessonScreenState extends State<LessonScreen> {
             ? currentEx.syllables[currentEx.correctSyllableIndex]
             : '';
       case DrillType.pictureChoice:
-        final correct = currentEx.pictureOptions.where((o) => o.isCorrect);
-        return correct.isNotEmpty ? correct.first.label : '';
+        final correctOpt = currentEx.pictureOptions.firstWhere(
+          (o) => o.isCorrect,
+          orElse: () => currentEx.pictureOptions.first,
+        );
+        return correctOpt.label;
       case DrillType.shadowing:
         return currentEx.targetSpeechText;
     }
@@ -444,12 +461,12 @@ class _LessonScreenState extends State<LessonScreen> {
       case DrillType.sentenceScramble:
         drillBody = ScrambleDrill(
           exercise: currentEx,
-          selectedWords: _selectedScrambleWords,
-          onWordSelected: (word) {
-            setState(() => _selectedScrambleWords.add(word));
+          selectedBankIndices: _selectedScrambleBankIndices,
+          onBankIndexSelected: (idx) {
+            setState(() => _selectedScrambleBankIndices.add(idx));
           },
-          onWordRemoved: (index) {
-            setState(() => _selectedScrambleWords.removeAt(index));
+          onWordRemoved: (pos) {
+            setState(() => _selectedScrambleBankIndices.removeAt(pos));
           },
         );
         break;
@@ -516,8 +533,90 @@ class _LessonScreenState extends State<LessonScreen> {
           // Drill Content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: drillBody,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Animated Adventure Time Hero Companion Banner
+                  Builder(
+                    builder: (context) {
+                      final storage = LocalStorageService();
+                      final archStr = storage.getHeroArchetype();
+                      final archetype = AdventureArchetype.values.firstWhere(
+                        (a) => a.name == archStr,
+                        orElse: () => AdventureArchetype.finn,
+                      );
+                      final heroColor = storage.getHeroColor();
+                      final userName = storage.getUserName();
+
+                      String expression;
+                      String speech;
+                      if (_drawerState == DrawerState.success) {
+                        expression = 'victory';
+                        speech = '¡Matemático, $userName! ¡Respuesta perfecta!';
+                      } else if (_drawerState == DrawerState.error) {
+                        expression = 'sweat';
+                        speech = '¡Ouch! No te rindas, $userName, ¡vamos!';
+                      } else {
+                        expression = 'happy';
+                        speech = '¡Hora de aprender inglés, $userName!';
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Row(
+                          children: [
+                            AdventureCartoonAvatar(
+                              archetype: archetype,
+                              size: 50,
+                              customColor: Color(heroColor),
+                              expression: expression,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: _drawerState == DrawerState.success
+                                        ? const Color(0xFF10B981)
+                                        : (_drawerState == DrawerState.error
+                                            ? const Color(0xFFE11D48)
+                                            : const Color(0xFFE2E8F0)),
+                                    width: 1.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.02),
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  speech,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: _drawerState == DrawerState.success
+                                        ? const Color(0xFF047857)
+                                        : (_drawerState == DrawerState.error
+                                            ? const Color(0xFFBE123C)
+                                            : const Color(0xFF334155)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  drillBody,
+                ],
+              ),
             ),
           ),
 

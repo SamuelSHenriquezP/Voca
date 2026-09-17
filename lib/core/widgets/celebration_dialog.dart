@@ -4,7 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/haptic_feedback_utils.dart';
 import '../utils/sound_effects.dart';
 import '../../features/lesson/models/tactical_card.dart';
-import 'cartoon_character_avatar.dart';
+import 'adventure_cartoon_avatar.dart';
+import '../storage/local_storage_service.dart';
 import 'voca_button.dart';
 
 class CelebrationDialog extends StatefulWidget {
@@ -143,13 +144,24 @@ class _CelebrationDialogState extends State<CelebrationDialog>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Celebrating Character Mascot
-                  CartoonCharacterAvatar.fromId(
-                    widget.characterId,
-                    size: 96,
-                    isSpeaking: true,
-                    showRipple: false,
-                    emotion: 'celebrating',
+                  // Celebrating Adventure Time Hero Mascot
+                  Builder(
+                    builder: (context) {
+                      final storage = LocalStorageService();
+                      final archStr = storage.getHeroArchetype();
+                      final arch = AdventureArchetype.values.firstWhere(
+                        (a) => a.name == archStr,
+                        orElse: () => AdventureArchetype.finn,
+                      );
+                      final heroColor = storage.getHeroColor();
+
+                      return AdventureCartoonAvatar(
+                        archetype: arch,
+                        size: 96,
+                        customColor: Color(heroColor),
+                        expression: 'victory',
+                      );
+                    },
                   )
                       .animate()
                       .scale(

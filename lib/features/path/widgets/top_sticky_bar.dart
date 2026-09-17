@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/widgets/adventure_cartoon_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 
 class TopStickyBar extends StatelessWidget {
@@ -169,22 +171,30 @@ class TopStickyBar extends StatelessWidget {
               ),
             ),
 
-            // Optional Profile / Settings button
+            // User Adventure Time Hero Avatar & Session Button
             if (onProfileTap != null)
               BouncyTap(
                 onTap: onProfileTap,
-                child: Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-                  ),
-                  child: const Icon(
-                    Icons.person_outline_rounded,
-                    size: 16,
-                    color: Color(0xFF475569),
-                  ),
+                child: Builder(
+                  builder: (context) {
+                    final storage = LocalStorageService();
+                    final archStr = storage.getHeroArchetype();
+                    final archetype = AdventureArchetype.values.firstWhere(
+                      (a) => a.name == archStr,
+                      orElse: () => AdventureArchetype.finn,
+                    );
+                    final heroColor = storage.getHeroColor();
+
+                    return Tooltip(
+                      message: 'Tu Héroe y Sesión',
+                      child: AdventureCartoonAvatar(
+                        archetype: archetype,
+                        size: 34,
+                        customColor: Color(heroColor),
+                        isAnimated: false,
+                      ),
+                    );
+                  },
                 ),
               ),
           ],

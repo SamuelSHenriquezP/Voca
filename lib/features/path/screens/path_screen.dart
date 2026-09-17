@@ -12,7 +12,8 @@ import '../widgets/milestone_decorations.dart';
 import '../widgets/path_node.dart';
 import '../widgets/top_sticky_bar.dart';
 import '../widgets/unit_header.dart';
-import '../../profile/screens/profile_screen.dart';
+import '../../../core/widgets/adventure_cartoon_avatar.dart';
+import '../../../core/widgets/adventure_hero_creator_sheet.dart';
 
 class PathScreen extends StatefulWidget {
   final VoidCallback? onOpenLesson;
@@ -212,8 +213,9 @@ class _PathScreenState extends State<PathScreen> {
             hearts: LocalStorageService().getLives(),
             onProfileTap: () {
               VocaHaptics.selection();
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              AdventureHeroCreatorSheet.show(
+                context,
+                onSaved: () => setState(() {}),
               );
             },
           ),
@@ -234,7 +236,125 @@ class _PathScreenState extends State<PathScreen> {
                   progress: activeUnit['progress'],
                 ),
 
-                const SizedBox(height: 10),
+                // Adventure Time Hero Session Banner
+                Builder(
+                  builder: (context) {
+                    final storage = LocalStorageService();
+                    final archStr = storage.getHeroArchetype();
+                    final archetype = AdventureArchetype.values.firstWhere(
+                      (a) => a.name == archStr,
+                      orElse: () => AdventureArchetype.finn,
+                    );
+                    final heroColor = storage.getHeroColor();
+                    final userName = storage.getUserName();
+
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.02),
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            AdventureCartoonAvatar(
+                              archetype: archetype,
+                              size: 52,
+                              customColor: Color(heroColor),
+                              expression: 'happy',
+                              onTap: () {
+                                AdventureHeroCreatorSheet.show(
+                                  context,
+                                  onSaved: () => setState(() {}),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        userName,
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEEF2FF),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: const Text(
+                                          'HÉROE',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF4F46E5),
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Meta diaria: ${storage.getUserGoal()}',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Color(0xFF64748B),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            BouncyTap(
+                              onTap: () {
+                                AdventureHeroCreatorSheet.show(
+                                  context,
+                                  onSaved: () => setState(() {}),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  'Personalizar',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF334155),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 6),
 
                 // Winding Path Nodes
                 for (int i = 0; i < nodes.length; i++) ...[

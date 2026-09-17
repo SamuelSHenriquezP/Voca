@@ -406,6 +406,27 @@ class LocalStorageService {
     return false;
   }
 
+  // =========================================================================
+  // User Session & Hero Customization (Adventure Time)
+  // =========================================================================
+  String getUserName() => _prefs?.getString('voca_user_name') ?? 'Aventurero';
+  void setUserName(String name) => _prefs?.setString('voca_user_name', name);
+
+  String getHeroArchetype() => _prefs?.getString('voca_hero_archetype') ?? 'finn';
+  void setHeroArchetype(String arch) => _prefs?.setString('voca_hero_archetype', arch);
+
+  int getHeroColor() => _prefs?.getInt('voca_hero_color') ?? 0xFF38BDF8;
+  void setHeroColor(int color) => _prefs?.setInt('voca_hero_color', color);
+
+  String getHeroExpression() => _prefs?.getString('voca_hero_expression') ?? 'happy';
+  void setHeroExpression(String expr) => _prefs?.setString('voca_hero_expression', expr);
+
+  String getHeroAccessory() => _prefs?.getString('voca_hero_accessory') ?? 'backpack';
+  void setHeroAccessory(String acc) => _prefs?.setString('voca_hero_accessory', acc);
+
+  String getUserGoal() => _prefs?.getString('voca_user_goal') ?? '15 min';
+  void setUserGoal(String goal) => _prefs?.setString('voca_user_goal', goal);
+
   static const List<Map<String, dynamic>> _defaultVaultWords = [
     {
       'id': 'v1',

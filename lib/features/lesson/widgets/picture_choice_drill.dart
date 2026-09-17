@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
+import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../models/exercise.dart';
@@ -46,49 +47,62 @@ class PictureChoiceDrill extends StatelessWidget {
 
         // Prompt
         Text(
-          'Select the correct visual representation',
+          exercise.prompt,
           style: VocaTypography.heading1.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: VocaColors.darkSlate,
           ),
         ),
-        const SizedBox(height: 10),
+        if (exercise.subtitle.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            exercise.subtitle,
+            style: VocaTypography.bodyMedium.copyWith(color: VocaColors.textMuted),
+          ),
+        ],
+        const SizedBox(height: 14),
 
-        // Audio Prompt Row
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-              ),
-              child: const Icon(
-                Icons.volume_up_rounded,
-                color: Color(0xFF4F46E5),
-                size: 18,
-              ),
+        // Dynamic Audio Prompt Row
+        BouncyTap(
+          onTap: () {
+            VocaHaptics.light();
+            final correctOpt = exercise.pictureOptions.firstWhere(
+              (o) => o.isCorrect,
+              orElse: () => exercise.pictureOptions.first,
+            );
+            AudioTtsService().speak(correctOpt.label);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
             ),
-            const SizedBox(width: 10),
-            Text(
-              'The Check / Bill',
-              style: VocaTypography.heading2.copyWith(
-                fontSize: 17,
-                color: const Color(0xFF4F46E5),
-                fontWeight: FontWeight.w700,
-              ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.volume_up_rounded,
+                  color: Color(0xFF4F46E5),
+                  size: 20,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Escuchar pronunciación nativa',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF4F46E5),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Text(
-              '/ðə tʃɛk/',
-              style: VocaTypography.caption.copyWith(color: VocaColors.textMuted),
-            ),
-          ],
+          ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
         // 2x2 Custom Vector Illustrated Cards
         GridView.builder(

@@ -121,79 +121,95 @@ class AdaptiveCurriculumEngine {
   // =========================================================================
   // 1. SCRAMBLE BUILDER (TOPIC-SPECIFIC REAL GRAMMAR)
   // =========================================================================
+  static Map<String, dynamic> _makeScramble(
+    List<String> target,
+    String meaning,
+    String trick,
+    List<String> distractors,
+  ) {
+    final bank = List<String>.from(target)..addAll(distractors);
+    bank.shuffle();
+    return {
+      'meaning': meaning,
+      'target': target,
+      'bank': bank,
+      'trick': trick,
+    };
+  }
+
   static Map<String, dynamic> _buildScrambleForTopic(ConversationTopicMeta topic) {
     // Curated exact mappings for foundation topics
     switch (topic.id) {
       case 'a1_01':
-        return {
-          'meaning': 'Hola, mi nombre es Alex y me alegro de conocerte.',
-          'target': ['Hello,', 'my', 'name', 'is', 'Alex', 'and', 'I', 'am', 'glad', 'to', 'meet', 'you.'],
-          'bank': ['nice', 'Alex', 'Hello,', 'is', 'meet', 'glad', 'to', 'I', 'you.', 'my', 'name', 'am', 'they', 'are'],
-          'trick': 'Truco Nativo: "Glad to meet you" o "Nice to meet you" es la frase imprescindible para romper el hielo.',
-        };
+        return _makeScramble(
+          ['Hello,', 'my', 'name', 'is', 'Alex', 'and', 'I', 'am', 'glad', 'to', 'meet', 'you.'],
+          'Hola, mi nombre es Alex y me alegro de conocerte.',
+          'Truco Nativo: "Glad to meet you" o "Nice to meet you" es la frase imprescindible para romper el hielo.',
+          ['nice', 'they', 'are'],
+        );
       case 'a1_02':
-        return {
-          'meaning': '¿Podría pedir un café con leche caliente para llevar, por favor?',
-          'target': ['Could', 'I', 'please', 'get', 'a', 'hot', 'latte', 'to', 'go?'],
-          'bank': ['latte', 'hot', 'Could', 'I', 'cup', 'to', 'go?', 'please', 'get', 'a', 'want', 'water'],
-          'trick': 'Truco Nativo: En inglés americano de cafetería siempre se dice "to go" (para llevar), nunca "for go".',
-        };
+        return _makeScramble(
+          ['Could', 'I', 'please', 'get', 'a', 'hot', 'latte', 'to', 'go?'],
+          '¿Podría pedir un café con leche caliente para llevar, por favor?',
+          'Truco Nativo: En inglés americano de cafetería siempre se dice "to go" (para llevar), nunca "for go".',
+          ['cup', 'want', 'water'],
+        );
       case 'a1_03':
-        return {
-          'meaning': 'Pagaré con mi tarjeta de crédito hoy, muchas gracias.',
-          'target': ['I', 'will', 'pay', 'with', 'my', 'credit', 'card', 'today,', 'thanks.'],
-          'bank': ['credit', 'pay', 'card', 'with', 'I', 'will', 'today,', 'thanks.', 'money', 'cash'],
-          'trick': 'Truco Nativo: "Pay with [card]" o "pay by card" son las colocaciones estándar al pagar.',
-        };
+        return _makeScramble(
+          ['I', 'will', 'pay', 'with', 'my', 'credit', 'card', 'today,', 'thanks.'],
+          'Pagaré con mi tarjeta de crédito hoy, muchas gracias.',
+          'Truco Nativo: "Pay with [card]" o "pay by card" son las colocaciones estándar al pagar.',
+          ['money', 'cash'],
+        );
       case 'a1_04':
-        return {
-          'meaning': 'Siga derecho por dos cuadras y doble a la izquierda en la esquina.',
-          'target': ['Go', 'straight', 'for', 'two', 'blocks', 'and', 'turn', 'left.'],
-          'bank': ['blocks', 'turn', 'Go', 'left.', 'straight', 'for', 'right', 'two', 'and', 'run'],
-          'trick': 'Truco Nativo: Para direcciones se usan imperativos directos: "Go straight", "Turn left".',
-        };
+        return _makeScramble(
+          ['Go', 'straight', 'for', 'two', 'blocks', 'and', 'turn', 'left.'],
+          'Siga derecho por dos cuadras y doble a la izquierda en la esquina.',
+          'Truco Nativo: Para direcciones se usan imperativos directos: "Go straight", "Turn left".',
+          ['right', 'run'],
+        );
       case 'a1_05':
-        return {
-          'meaning': 'Tengo una reserva a nombre de Miller por dos noches.',
-          'target': ['I', 'have', 'a', 'reservation', 'under', 'the', 'name', 'of', 'Miller.'],
-          'bank': ['reservation', 'name', 'I', 'have', 'under', 'the', 'of', 'Miller.', 'a', 'room', 'hotel'],
-          'trick': 'Truco Nativo: En hoteles se dice "under the name of..." para indicar el titular de la reserva.',
-        };
+        return _makeScramble(
+          ['I', 'have', 'a', 'reservation', 'under', 'the', 'name', 'of', 'Miller.'],
+          'Tengo una reserva a nombre de Miller por dos noches.',
+          'Truco Nativo: En hoteles se dice "under the name of..." para indicar el titular de la reserva.',
+          ['room', 'hotel'],
+        );
       case 'a1_06':
-        return {
-          'meaning': '¿Puedo pedir el combo número dos con salsa barbacoa extra?',
-          'target': ['Can', 'I', 'have', 'combo', 'number', 'two', 'with', 'extra', 'sauce?'],
-          'bank': ['combo', 'two', 'Can', 'I', 'have', 'number', 'sauce?', 'with', 'extra', 'fries', 'soda'],
-          'trick': 'Truco Nativo: "Can I have combo number..." es la forma más rápida y natural en ventanillas.',
-        };
+        return _makeScramble(
+          ['Can', 'I', 'have', 'combo', 'number', 'two', 'with', 'extra', 'sauce?'],
+          '¿Puedo pedir el combo número dos con salsa barbacoa extra?',
+          'Truco Nativo: "Can I have combo number..." es la forma más rápida y natural en ventanillas.',
+          ['fries', 'soda'],
+        );
       case 'a1_07':
-        return {
-          'meaning': 'Reunámonos en la biblioteca a las cuatro y media en punto.',
-          'target': ['Let', 'us', 'meet', 'at', 'the', 'library', 'at', 'half', 'past', 'four.'],
-          'bank': ['meet', 'half', 'Let', 'us', 'at', 'library', 'the', 'past', 'four.', 'in', 'on'],
-          'trick': 'Truco Nativo: Con horas exactas siempre usamos la preposición "at" (ej: at half past four).',
-        };
+        return _makeScramble(
+          ['Let', 'us', 'meet', 'at', 'the', 'library', 'at', 'half', 'past', 'four.'],
+          'Reunámonos en la biblioteca a las cuatro y media en punto.',
+          'Truco Nativo: Con horas exactas siempre usamos la preposición "at" (ej: at half past four).',
+          ['in', 'on'],
+        );
       case 'a1_08':
-        return {
-          'meaning': '¿Cuánto cuesta una tarjeta de metro para viajar hoy?',
-          'target': ['How', 'much', 'does', 'a', 'metro', 'card', 'cost', 'today?'],
-          'bank': ['much', 'cost', 'How', 'metro', 'card', 'does', 'a', 'today?', 'many', 'fare'],
-          'trick': 'Truco Nativo: Para precios incontables usamos siempre "How much does... cost?".',
-        };
+        return _makeScramble(
+          ['How', 'much', 'does', 'a', 'metro', 'card', 'cost', 'today?'],
+          '¿Cuánto cuesta una tarjeta de metro para viajar hoy?',
+          'Truco Nativo: Para precios incontables usamos siempre "How much does... cost?".',
+          ['many', 'fare'],
+        );
       case 'a1_09':
-        return {
-          'meaning': '¿Podría probarme esta camisa azul en una talla mediana?',
-          'target': ['Could', 'I', 'try', 'on', 'this', 'blue', 'shirt', 'in', 'medium?'],
-          'bank': ['try', 'blue', 'Could', 'I', 'on', 'this', 'medium?', 'shirt', 'in', 'wear', 'large'],
-          'trick': 'Truco Nativo: El phrasal verb separable para ropa es "try on" (probarse).',
-        };
+        return _makeScramble(
+          ['Could', 'I', 'try', 'on', 'this', 'blue', 'shirt', 'in', 'medium?'],
+          '¿Podría probarme esta camisa azul en una talla mediana?',
+          'Truco Nativo: El phrasal verb separable para ropa es "try on" (probarse).',
+          ['wear', 'large'],
+        );
       case 'a1_10':
-        return {
-          'meaning': 'Mi hermano mayor vive en Londres y tiene dos perros.',
-          'target': ['My', 'older', 'brother', 'lives', 'in', 'London', 'and', 'has', 'dogs.'],
-          'bank': ['lives', 'brother', 'My', 'older', 'has', 'in', 'London', 'and', 'dogs.', 'have', 'live'],
-          'trick': 'Truco Nativo: En tercera persona singular (he/she) añadimos "-s" al verbo: "he lives", "he has".',
-        };
+        return _makeScramble(
+          ['My', 'older', 'brother', 'lives', 'in', 'London', 'and', 'has', 'dogs.'],
+          'Mi hermano mayor vive en Londres y tiene dos perros.',
+          'Truco Nativo: En tercera persona singular (he/she) añadimos "-s" al verbo: "he lives", "he has".',
+          ['have', 'live'],
+        );
     }
 
     // Dynamic Grammar Parser for all other CEFR topics
