@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../core/curriculum/data/conversation_topics_catalog.dart';
+import '../../../core/curriculum/services/adaptive_curriculum_engine.dart';
 import '../../../core/curriculum/services/curriculum_engine.dart';
 import '../../../core/storage/local_storage_service.dart';
+import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../../../core/widgets/cartoon_character_avatar.dart';
+import '../../../core/widgets/voca_button.dart';
+import '../../lesson/models/exercise.dart';
 import '../../lesson/screens/lesson_screen.dart';
-import '../../roguelike/games/intonation_rider_game.dart';
-import '../../roguelike/games/minimal_pair_game.dart';
-import '../../roguelike/games/speed_blitz_game.dart';
-import '../../roguelike/screens/expedition_map_screen.dart';
-import '../../roguelike/screens/roguelike_run_screen.dart';
 
 class ArcadeScreen extends StatefulWidget {
   const ArcadeScreen({super.key});
@@ -22,8 +22,15 @@ class ArcadeScreen extends StatefulWidget {
 class _ArcadeScreenState extends State<ArcadeScreen> {
   String _selectedCefr = 'ALL';
   String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> _cefrFilters = const ['ALL', 'A1', 'A2', 'B1', 'B2', 'C1'];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   List<ConversationTopicMeta> get _filteredTopics {
     return ConversationTopicsCatalog.allTopics.where((t) {
@@ -32,19 +39,55 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
       final matchesQuery = _searchQuery.isEmpty ||
           t.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           t.pedagogicalObjective.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          t.npcRole.toLowerCase().contains(_searchQuery.toLowerCase());
+          t.targetGrammar.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          t.category.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          t.npcName.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesLevel && matchesQuery;
     }).toList();
   }
 
-  void _launchTopicUnit(ConversationTopicMeta topic) {
+  void _launchTopicLesson(ConversationTopicMeta topic) {
     VocaHaptics.medium();
-    final unit = CurriculumEngine.generateUnitForTopic(topic.id);
+    final exercises = AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(topic.id);
 
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => LessonScreen(
-          lessonTitle: '${unit.metadata.cefrLevel}: ${unit.metadata.title}',
+          lessonTitle: '${topic.cefrLevel}: ${topic.title}',
+          customExercises: exercises,
+          onCompleted: () {
+            LocalStorageService().unlockTopic(topic.id);
+            setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
+  void _launchQuickSkillDrill(DrillType type, String title) {
+    VocaHaptics.medium();
+    final topics = ConversationTopicsCatalog.allTopics;
+    final List<ExerciseModel> drills = [];
+
+    for (int i = 0; i < 4; i++) {
+      final topic = topics[i % topics.length];
+      final lesson = AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(topic.id);
+      final matching = lesson.firstWhere(
+        (e) => e.type == type,
+        orElse: () => lesson.first,
+      );
+      drills.add(matching);
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LessonScreen(
+          lessonTitle: 'Práctica Rápida: $title',
+          customExercises: drills,
+          onCompleted: () {
+            LocalStorageService().addXp(20);
+            setState(() {});
+          },
         ),
       ),
     );
@@ -53,282 +96,439 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
   @override
   Widget build(BuildContext context) {
     final topics = _filteredTopics;
+    final unlockedCount = LocalStorageService().getUnlockedTopicIds().length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBFC),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 90),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Obsidian Header
-            _buildHeader(),
-
-            const SizedBox(height: 20),
-
-            // 2. Roguelike Run Hero Card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildRoguelikeHeroCard(),
-            ),
-
-            const SizedBox(height: 28),
-
-            // 3. Minigames Quick-Play Grid
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'FLUENCY ARCADE MINIGAMES',
-                style: VocaTypography.caption.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xFF0F172A),
-                  letterSpacing: 1.1,
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  _buildMinigameRow(
-                    title: 'Acoustic Ear: Minimal Pair Duel',
-                    subtitle: 'Train your brain to distinguish /θ/ vs /s/ and /iː/ vs /ɪ/ under noise.',
-                    badge: 'EAR TRAINING',
-                    accentColor: const Color(0xFF0284C7),
-                    icon: Icons.graphic_eq_rounded,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => MinimalPairDuelGame(
-                            onVictory: () => Navigator.of(context).pop(),
-                            onDefeat: () => Navigator.of(context).pop(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  _buildMinigameRow(
-                    title: 'Intonation Wave Rider',
-                    subtitle: 'Match native vocal pitch rise and fall contours with your voice live.',
-                    badge: 'PITCH MATCH',
-                    accentColor: const Color(0xFF4F46E5),
-                    icon: Icons.waves_rounded,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => IntonationRiderGame(
-                            onVictory: () => Navigator.of(context).pop(),
-                            onDefeat: () => Navigator.of(context).pop(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  _buildMinigameRow(
-                    title: 'Speed Blitz: 45s Survival',
-                    subtitle: 'Rapid-fire conversational reflex game. Answer fast to build combos.',
-                    badge: 'TIME ATTACK',
-                    accentColor: const Color(0xFFE11D48),
-                    icon: Icons.bolt_rounded,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => SpeedBlitzGame(
-                            onVictory: () => Navigator.of(context).pop(),
-                            onDefeat: () => Navigator.of(context).pop(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            // 4. 100 Topics Registry (Search & Filter)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '300 CONVERSATION TOPICS',
-                    style: VocaTypography.caption.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF0F172A),
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  Text(
-                    '${topics.length} topics',
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // CEFR Filter Chips
-            SizedBox(
-              height: 36,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                scrollDirection: Axis.horizontal,
-                itemCount: _cefrFilters.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final filter = _cefrFilters[index];
-                  final isSelected = _selectedCefr == filter;
-                  return BouncyTap(
-                    onTap: () {
-                      VocaHaptics.selection();
-                      setState(() => _selectedCefr = filter);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF0F172A) : Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          filter,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                            color: isSelected ? Colors.white : const Color(0xFF64748B),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 14),
-
-            // Search Box
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: TextField(
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.search_rounded, size: 18, color: Color(0xFF94A3B8)),
-                    border: InputBorder.none,
-                    hintText: 'Search 100 topics, CEFR, or roles...',
-                    hintStyle: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Topics List
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: topics.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final t = topics[index];
-                final levelColor = t.cefrLevel == 'A1'
-                    ? const Color(0xFF059669)
-                    : (t.cefrLevel == 'A2'
-                        ? const Color(0xFF0284C7)
-                        : (t.cefrLevel == 'B1'
-                            ? const Color(0xFFD97706)
-                            : const Color(0xFFE11D48)));
-
-                return Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: levelColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          t.cefrLevel,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            color: levelColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          slivers: [
+            // 1. Clean Top Header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              t.title,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF0F172A),
+                              'TEMAS Y NIVELES',
+                              style: VocaTypography.caption.copyWith(
+                                color: VocaColors.primaryPurple,
+                                letterSpacing: 1.2,
+                                fontWeight: FontWeight.w800,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 4),
                             Text(
-                              '${t.npcName} (${t.npcRole}) • ${t.category}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF64748B),
+                              'Catálogo de Aprendizaje',
+                              style: VocaTypography.heading1.copyWith(
+                                fontSize: 24,
+                                color: const Color(0xFF0F172A),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      BouncyTap(
-                        onTap: () => _launchTopicUnit(t),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: const Color(0xFFEEF2FF),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFC7D2FE)),
                           ),
-                          child: const Icon(
-                            Icons.play_arrow_rounded,
-                            size: 16,
-                            color: Color(0xFF4F46E5),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.check_circle_rounded, size: 16, color: VocaColors.primaryPurple),
+                              const SizedBox(width: 6),
+                              Text(
+                                '$unlockedCount/300 Desbloqueados',
+                                style: VocaTypography.caption.copyWith(
+                                  color: VocaColors.primaryPurple,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '300 temas con ejercicios estructurados de gramática, sintaxis y pronunciación directa.',
+                      style: VocaTypography.bodySmall.copyWith(
+                        color: const Color(0xFF64748B),
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 2. Focused Quick Skill Drills
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ENTRENAMIENTO FOCALIZADO',
+                      style: VocaTypography.caption.copyWith(
+                        letterSpacing: 1.1,
+                        color: const Color(0xFF475569),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSkillCard(
+                            icon: Icons.format_list_numbered_rounded,
+                            title: 'Sintaxis',
+                            subtitle: 'Ordenar frases',
+                            color: const Color(0xFF4F46E5),
+                            onTap: () => _launchQuickSkillDrill(
+                              DrillType.sentenceScramble,
+                              'Sintaxis y Orden de Palabras',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _buildSkillCard(
+                            icon: Icons.edit_note_rounded,
+                            title: 'Completar',
+                            subtitle: 'Preposiciones',
+                            color: const Color(0xFF059669),
+                            onTap: () => _launchQuickSkillDrill(
+                              DrillType.clozeFill,
+                              'Completar Espacios y Colocaciones',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSkillCard(
+                            icon: Icons.graphic_eq_rounded,
+                            title: 'Acento Silábico',
+                            subtitle: 'Ritmo y cadencia',
+                            color: const Color(0xFFD97706),
+                            onTap: () => _launchQuickSkillDrill(
+                              DrillType.syllableStress,
+                              'Acento Silábico y Ritmo',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _buildSkillCard(
+                            icon: Icons.record_voice_over_rounded,
+                            title: 'Shadowing',
+                            subtitle: 'Pronunciación',
+                            color: const Color(0xFFE11D48),
+                            onTap: () => _launchQuickSkillDrill(
+                              DrillType.shadowing,
+                              'Shadowing y Fluidez Oral',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 3. Search Bar
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                  decoration: InputDecoration(
+                    hintText: 'Buscar tema o gramática (ej: Present Perfect, Coffee, Airport)...',
+                    hintStyle: VocaTypography.bodySmall,
+                    prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: VocaColors.primaryPurple, width: 2),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // 4. CEFR Level Filter Pills
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 44,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _cefrFilters.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final filter = _cefrFilters[index];
+                    final isSelected = _selectedCefr == filter;
+
+                    return BouncyTap(
+                      onTap: () => setState(() => _selectedCefr = filter),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? VocaColors.primaryPurple : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? VocaColors.primaryPurple : const Color(0xFFE2E8F0),
+                            width: 1.5,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: VocaColors.primaryPurple.withOpacity(0.25),
+                                    offset: const Offset(0, 3),
+                                    blurRadius: 6,
+                                  )
+                                ]
+                              : null,
+                        ),
+                        child: Center(
+                          child: Text(
+                            filter == 'ALL' ? 'Todos los Niveles' : 'Nivel $filter',
+                            style: VocaTypography.caption.copyWith(
+                              color: isSelected ? Colors.white : const Color(0xFF475569),
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            // 5. Results Counter
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${topics.length} TEMAS ENCONTRADOS',
+                      style: VocaTypography.caption.copyWith(
+                        letterSpacing: 1.1,
+                        color: const Color(0xFF64748B),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'Toca para practicar',
+                      style: VocaTypography.caption.copyWith(color: const Color(0xFF94A3B8)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 6. Topic Cards List
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final topic = topics[index];
+                    final isUnlocked = LocalStorageService().getUnlockedTopicIds().contains(topic.id);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: isUnlocked ? const Color(0xFFE2E8F0) : const Color(0xFFF1F5F9),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.02),
+                              offset: const Offset(0, 2),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Avatar
+                                  CartoonCharacterAvatar.fromId(
+                                    topic.npcName,
+                                    size: 46,
+                                    showRipple: false,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: _getLevelColor(topic.cefrLevel).withOpacity(0.12),
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                topic.cefrLevel,
+                                                style: VocaTypography.caption.copyWith(
+                                                  color: _getLevelColor(topic.cefrLevel),
+                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              topic.category.toUpperCase(),
+                                              style: VocaTypography.caption.copyWith(
+                                                color: const Color(0xFF94A3B8),
+                                                fontSize: 10,
+                                                letterSpacing: 0.8,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          topic.title,
+                                          style: VocaTypography.heading3.copyWith(
+                                            fontSize: 16,
+                                            color: const Color(0xFF0F172A),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                topic.pedagogicalObjective,
+                                style: VocaTypography.bodySmall.copyWith(
+                                  color: const Color(0xFF475569),
+                                  height: 1.3,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              // Grammar & Phonetics badges
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.menu_book_rounded, size: 12, color: Color(0xFF64748B)),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          topic.targetGrammar,
+                                          style: VocaTypography.caption.copyWith(
+                                            color: const Color(0xFF334155),
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.record_voice_over_rounded, size: 12, color: Color(0xFF64748B)),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          topic.targetPhonemeFocus,
+                                          style: VocaTypography.caption.copyWith(
+                                            color: const Color(0xFF334155),
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              // Direct action button
+                              VocaButton(
+                                text: 'INICIAR NIVEL (+15 XP)',
+                                icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
+                                variant: isUnlocked ? VocaButtonVariant.primary : VocaButtonVariant.outline,
+                                isFullWidth: true,
+                                height: 44,
+                                onPressed: () => _launchTopicLesson(topic),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  childCount: topics.length,
+                ),
+              ),
             ),
           ],
         ),
@@ -336,261 +536,57 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF0F172A),
-        border: Border(bottom: BorderSide(color: Color(0xFF1E293B), width: 1.5)),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'ARCADE & RUNS',
-                  style: VocaTypography.caption.copyWith(
-                    color: const Color(0xFF94A3B8),
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                const Text(
-                  'Roguelike Fluency Gauntlet',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF334155)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.military_tech_rounded, size: 14, color: Color(0xFFFBBF24)),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Floor ${LocalStorageService().getHighestFloor()} • ${LocalStorageService().getXp()} XP',
-                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRoguelikeHeroCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF38BDF8).withOpacity(0.5), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0284C7).withOpacity(0.15),
-            offset: const Offset(0, 8),
-            blurRadius: 20,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0284C7).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Text(
-                  'ROGUELIKE EXPEDITION',
-                  style: TextStyle(
-                    color: Color(0xFF38BDF8),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ),
-              const Row(
-                children: [
-                  Icon(Icons.favorite_rounded, color: Color(0xFFDC2626), size: 16),
-                  SizedBox(width: 4),
-                  Text('5 Lives', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'The Spoken Gauntlet',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Procedural branching map, authentic English card deck-building, tactical boss duels, and acoustic mini-puzzles.',
-            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.4),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: BouncyTap(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ExpeditionMapScreen()),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF0284C7), Color(0xFF0369A1)],
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0284C7).withOpacity(0.4),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.map_rounded, color: Colors.white, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          'PROCEDURAL MAP',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 2,
-                child: BouncyTap(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const RoguelikeRunScreen()),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF334155)),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.bolt_rounded, color: Color(0xFFF59E0B), size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          'DRILLS',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMinigameRow({
+  Widget _buildSkillCard({
+    required IconData icon,
     required String title,
     required String subtitle,
-    required String badge,
-    required Color accentColor,
-    required IconData icon,
+    required Color color,
     required VoidCallback onTap,
   }) {
     return BouncyTap(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              offset: const Offset(0, 2),
+              blurRadius: 6,
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: accentColor, size: 20),
+              child: Icon(icon, color: color, size: 20),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    title,
+                    style: VocaTypography.caption.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF0F172A),
+                      fontSize: 12,
+                    ),
                   ),
-                  const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF64748B),
+                    style: VocaTypography.caption.copyWith(
+                      color: const Color(0xFF64748B),
+                      fontSize: 10,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -598,10 +594,26 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFF94A3B8)),
           ],
         ),
       ),
     );
+  }
+
+  Color _getLevelColor(String level) {
+    switch (level.toUpperCase()) {
+      case 'A1':
+        return const Color(0xFF059669);
+      case 'A2':
+        return const Color(0xFF0284C7);
+      case 'B1':
+        return const Color(0xFF4F46E5);
+      case 'B2':
+        return const Color(0xFFD97706);
+      case 'C1':
+        return const Color(0xFFE11D48);
+      default:
+        return const Color(0xFF64748B);
+    }
   }
 }

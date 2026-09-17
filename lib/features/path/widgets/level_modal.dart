@@ -62,7 +62,7 @@ class LevelModal extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              'UNIT ${node.unitNumber} • LEVEL ${node.levelNumber}',
+              'UNIDAD ${node.unitNumber} • NIVEL ${node.levelNumber}',
               style: VocaTypography.caption.copyWith(
                 color: VocaColors.electricCyanShadow,
                 letterSpacing: 1.1,
@@ -73,7 +73,7 @@ class LevelModal extends StatelessWidget {
 
           Text(
             node.title,
-            style: VocaTypography.heading1.copyWith(fontSize: 24),
+            style: VocaTypography.heading1.copyWith(fontSize: 22),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
@@ -97,10 +97,10 @@ class LevelModal extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.track_changes_rounded, color: VocaColors.primaryPurple, size: 20),
+                    const Icon(Icons.school_rounded, color: VocaColors.primaryPurple, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      'Lesson Objectives',
+                      'Objetivos de la Lección',
                       style: VocaTypography.heading3.copyWith(fontSize: 16),
                     ),
                   ],
@@ -131,7 +131,7 @@ class LevelModal extends StatelessWidget {
 
           // Large Start Button
           VocaButton(
-            text: 'START LESSON (+${node.xpReward} XP)',
+            text: 'EMPEZAR LECCIÓN (+${node.xpReward} XP)',
             icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
             variant: VocaButtonVariant.success,
             isFullWidth: true,

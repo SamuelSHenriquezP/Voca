@@ -5,7 +5,6 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../conversation/screens/conversation_screen.dart';
 import '../../lesson/screens/lesson_screen.dart';
 import '../models/level_node.dart';
 import '../widgets/level_modal.dart';
@@ -115,28 +114,11 @@ class _PathScreenState extends State<PathScreen> {
 
     if (node.state == NodeState.boss) {
       VocaHaptics.medium();
-      if (widget.onOpenConversation != null) {
-        widget.onOpenConversation!();
-      } else {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const ConversationScreen(),
-          ),
-        ).then((_) {
-          _onLevelCompleted(node.id);
-        });
-      }
-      return;
-    }
-
-    LevelModal.show(context, node, () {
-      if (widget.onOpenLesson != null) {
-        widget.onOpenLesson!();
-      } else {
+      LevelModal.show(context, node, () {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => LessonScreen(
-              lessonTitle: node.title,
+              lessonTitle: 'Unidad ${node.unitNumber}: Desafío Final • ${node.title}',
               customExercises: AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(node.id),
               onCompleted: () {
                 _onLevelCompleted(node.id);
@@ -145,7 +127,24 @@ class _PathScreenState extends State<PathScreen> {
             ),
           ),
         );
-      }
+      });
+      return;
+    }
+
+    LevelModal.show(context, node, () {
+      VocaHaptics.medium();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => LessonScreen(
+            lessonTitle: node.title,
+            customExercises: AdaptiveCurriculumEngine.generateAdaptiveLessonForTopic(node.id),
+            onCompleted: () {
+              _onLevelCompleted(node.id);
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      );
     });
   }
 

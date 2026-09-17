@@ -24,10 +24,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      PathScreen(
-        onOpenLesson: () => _navigateToIndex(1),
-        onOpenConversation: () => _navigateToIndex(2),
-      ),
+      const PathScreen(),
       const ArcadeScreen(),
       const ConversationScreen(),
       const VaultScreen(),
@@ -62,31 +59,31 @@ class _MainNavScreenState extends State<MainNavScreen> {
               _buildNavItem(
                 index: 0,
                 icon: Icons.map_rounded,
-                label: 'PATH',
+                label: 'NIVELES',
                 activeColor: const Color(0xFF4F46E5),
               ),
               _buildNavItem(
                 index: 1,
-                icon: Icons.sports_esports_rounded,
-                label: 'ARCADE',
+                icon: Icons.school_rounded,
+                label: 'PRÁCTICA',
                 activeColor: const Color(0xFF059669),
               ),
               _buildNavItem(
                 index: 2,
-                icon: Icons.mic_external_on_rounded,
-                label: 'VOICE AI',
+                icon: Icons.record_voice_over_rounded,
+                label: 'CONVERSAR',
                 activeColor: const Color(0xFFE11D48),
               ),
               _buildNavItem(
                 index: 3,
                 icon: Icons.style_rounded,
-                label: 'VAULT',
+                label: 'PALABRAS',
                 activeColor: const Color(0xFF0284C7),
               ),
               _buildNavItem(
                 index: 4,
                 icon: Icons.person_rounded,
-                label: 'PROFILE',
+                label: 'PERFIL',
                 activeColor: const Color(0xFFD97706),
               ),
             ],
