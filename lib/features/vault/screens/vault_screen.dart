@@ -516,11 +516,23 @@ class _VaultScreenState extends State<VaultScreen> {
 
           const SizedBox(height: 16),
 
-          // Interactive 3D Card
-          FlashcardCard(
-            key: ValueKey(activeWord.id),
-            word: activeWord,
-            onRate: (tier) => _handleRateWord(activeWord, tier),
+          // Interactive 3D Card with Snappy Deck Transition
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.12, 0),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
+            child: FlashcardCard(
+              key: ValueKey(activeWord.id),
+              word: activeWord,
+              onRate: (tier) => _handleRateWord(activeWord, tier),
+            ),
           ),
         ],
       ),

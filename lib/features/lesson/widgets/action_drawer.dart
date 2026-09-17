@@ -74,7 +74,14 @@ class ActionDrawer extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.check_rounded, color: Color(0xFF059669), size: 20),
-                  ),
+                  )
+                      .animate()
+                      .scale(
+                        begin: const Offset(0.65, 0.65),
+                        end: const Offset(1.0, 1.0),
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.elasticOut,
+                      ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -142,7 +149,9 @@ class ActionDrawer extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.close_rounded, color: Color(0xFFDC2626), size: 20),
-                ),
+                )
+                    .animate()
+                    .shake(hz: 4, curve: Curves.easeInOutCubic, duration: const Duration(milliseconds: 350)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(

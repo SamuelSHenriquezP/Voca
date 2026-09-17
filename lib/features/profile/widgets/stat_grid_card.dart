@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
 
 class StatGridCard extends StatelessWidget {
@@ -97,7 +98,15 @@ class StatGridCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    )
+        .animate()
+        .fadeIn(duration: const Duration(milliseconds: 260))
+        .scale(
+          begin: const Offset(0.92, 0.92),
+          end: const Offset(1.0, 1.0),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+        );
   }
 
   // Builder 1: Streak Card (Obsidian Minimalist)

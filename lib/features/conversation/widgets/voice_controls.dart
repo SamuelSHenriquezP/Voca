@@ -263,6 +263,14 @@ class _VoiceControlsState extends State<VoiceControls> {
                     color: Colors.white,
                     size: 30,
                   ),
+                ).animate(
+                  target: widget.isRecording ? 0 : 1,
+                  onPlay: (c) => c.repeat(reverse: true),
+                ).scale(
+                  begin: const Offset(0.96, 0.96),
+                  end: const Offset(1.04, 1.04),
+                  duration: const Duration(milliseconds: 1100),
+                  curve: Curves.easeInOutSine,
                 ),
               ],
             ),

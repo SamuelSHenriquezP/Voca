@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../../../core/widgets/cartoon_character_avatar.dart';
 import '../models/chat_message.dart';
 
 class SpeechBubble extends StatelessWidget {
@@ -25,16 +27,10 @@ class SpeechBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[
-            Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF0F172A),
-              ),
-              child: const Center(
-                child: Icon(Icons.shield_outlined, size: 15, color: Colors.white),
-              ),
+            CartoonCharacterAvatar.fromId(
+              message.id,
+              size: 32,
+              showRipple: false,
             ),
             const SizedBox(width: 8),
           ],
@@ -200,6 +196,20 @@ class SpeechBubble extends StatelessWidget {
           ],
         ],
       ),
-    );
+    )
+        .animate()
+        .scale(
+          begin: const Offset(0.88, 0.88),
+          end: const Offset(1.0, 1.0),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.elasticOut,
+        )
+        .fadeIn(duration: const Duration(milliseconds: 200))
+        .slideY(
+          begin: 0.1,
+          end: 0,
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+        );
   }
 }
