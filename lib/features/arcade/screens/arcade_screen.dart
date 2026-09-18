@@ -6,7 +6,7 @@ import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/cartoon_character_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../../lesson/models/exercise.dart';
 import '../../lesson/screens/lesson_screen.dart';
@@ -400,10 +400,10 @@ class _ArcadeScreenState extends State<ArcadeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Avatar
-                                  CartoonCharacterAvatar.fromId(
+                                  NotionAvatar.fromId(
                                     topic.npcName,
                                     size: 46,
-                                    showRipple: false,
+                                    isAnimated: false,
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(

@@ -3,7 +3,7 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/cartoon_character_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 
 class ConversationHistorySheet extends StatefulWidget {
   const ConversationHistorySheet({super.key});
@@ -208,10 +208,10 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
             ),
             child: Row(
               children: [
-                CartoonCharacterAvatar.fromId(
+                NotionAvatar.fromId(
                   session['scenario_id']?.toString() ?? persona,
                   size: 44,
-                  showRipple: false,
+                  isAnimated: false,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -274,10 +274,10 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isUser ? const Color(0xFFEEF2FF) : Colors.white,
+            color: isUser ? const Color(0xFF0F172A) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isUser ? const Color(0xFFC7D2FE) : const Color(0xFFE2E8F0),
+              color: isUser ? Colors.black : const Color(0xFFE2E8F0),
               width: 1.2,
             ),
           ),
@@ -292,7 +292,7 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 11,
-                      color: isUser ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+                      color: isUser ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     ),
                   ),
                   Row(
@@ -301,13 +301,13 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDCFCE7),
+                            color: Colors.white.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             '$score% Match',
                             style: const TextStyle(
-                              color: Color(0xFF15803D),
+                              color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                             ),
@@ -316,7 +316,11 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
                       const SizedBox(width: 6),
                       BouncyTap(
                         onTap: () => AudioTtsService().speak(text),
-                        child: const Icon(Icons.volume_up_rounded, size: 16, color: Color(0xFF4F46E5)),
+                        child: Icon(
+                          Icons.volume_up_rounded,
+                          size: 16,
+                          color: isUser ? Colors.white : const Color(0xFF0F172A),
+                        ),
                       ),
                     ],
                   ),
@@ -325,7 +329,11 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
               const SizedBox(height: 6),
               Text(
                 text,
-                style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A), height: 1.3),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isUser ? Colors.white : const Color(0xFF0F172A),
+                  height: 1.3,
+                ),
               ),
               if (grammar != null && grammar.isNotEmpty) ...[
                 const SizedBox(height: 8),

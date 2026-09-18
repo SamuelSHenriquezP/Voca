@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/cartoon_character_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 import '../models/chat_message.dart';
 
 class SpeechBubble extends StatelessWidget {
@@ -27,10 +28,10 @@ class SpeechBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[
-            CartoonCharacterAvatar.fromId(
+            NotionAvatar.fromId(
               message.id,
               size: 32,
-              showRipple: false,
+              isAnimated: false,
             ),
             const SizedBox(width: 8),
           ],
@@ -38,7 +39,7 @@ class SpeechBubble extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isUser ? const Color(0xFF4F46E5) : Colors.white,
+                color: isUser ? VocaColors.darkSlate : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -53,7 +54,7 @@ class SpeechBubble extends StatelessWidget {
                   ),
                 ],
                 border: Border.all(
-                  color: isUser ? const Color(0xFF4338CA) : const Color(0xFFE2E8F0),
+                  color: isUser ? Colors.black : const Color(0xFFE2E8F0),
                   width: 1.2,
                 ),
               ),
@@ -83,13 +84,13 @@ class SpeechBubble extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isUser
                                 ? Colors.white.withOpacity(0.18)
-                                : const Color(0xFFEEF2FF),
+                                : const Color(0xFFF1F5F9),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.volume_up_rounded,
                             size: 13,
-                            color: isUser ? Colors.white : const Color(0xFF4F46E5),
+                            color: isUser ? Colors.white : VocaColors.darkSlate,
                           ),
                         ),
                       ),
@@ -182,16 +183,20 @@ class SpeechBubble extends StatelessWidget {
           ),
           if (isUser) ...[
             const SizedBox(width: 8),
-            Container(
-              width: 30,
-              height: 30,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF4F46E5),
-              ),
-              child: const Center(
-                child: Icon(Icons.person_rounded, size: 16, color: Colors.white),
-              ),
+            Builder(
+              builder: (_) {
+                final storage = LocalStorageService();
+                return NotionAvatar(
+                  head: storage.getNotionHead(),
+                  hair: storage.getNotionHair(),
+                  eyes: storage.getNotionEyes(),
+                  mouth: storage.getNotionMouth(),
+                  outfit: storage.getNotionOutfit(),
+                  backdrop: storage.getNotionBackdrop(),
+                  size: 32,
+                  isAnimated: false,
+                );
+              },
             ),
           ],
         ],

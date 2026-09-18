@@ -36,6 +36,81 @@ class NotionAvatar extends StatefulWidget {
         outfitStyle = outfit ?? outfitStyle,
         backdropIndex = backdrop ?? backdropIndex;
 
+  /// Generate a deterministic, personality-aligned Notion avatar from an ID or Name
+  factory NotionAvatar.fromId(
+    String idOrName, {
+    Key? key,
+    double size = 64,
+    bool isAnimated = true,
+    VoidCallback? onTap,
+  }) {
+    final lower = idOrName.toLowerCase();
+    int head = 0;
+    int hair = 0;
+    int eyes = 0;
+    int mouth = 0;
+    int outfit = 0;
+    int backdrop = 0;
+
+    if (lower.contains('miller') || lower.contains('customs') || lower.contains('officer')) {
+      head = 1; // Square
+      hair = 6; // Buzz
+      eyes = 2; // Square Glasses
+      mouth = 2; // Focused Line
+      outfit = 2; // Collar
+      backdrop = 4; // Slate
+    } else if (lower.contains('mateo') || lower.contains('barista') || lower.contains('coffee')) {
+      head = 0; // Oval
+      hair = 1; // Curls
+      eyes = 4; // Smile
+      mouth = 3; // Mustache
+      outfit = 1; // Hoodie
+      backdrop = 3; // Apricot
+    } else if (lower.contains('marcus') || lower.contains('tech') || lower.contains('director') || lower.contains('interview')) {
+      head = 3; // Oblong
+      hair = 0; // Part
+      eyes = 0; // Round Glasses
+      mouth = 0; // Smirk
+      outfit = 0; // Turtleneck
+      backdrop = 1; // Sage
+    } else if (lower.contains('pierre') || lower.contains('concierge') || lower.contains('hotel')) {
+      head = 2; // Round
+      hair = 2; // Bun
+      eyes = 1; // Dots
+      mouth = 4; // Beard
+      outfit = 4; // Scarf
+      backdrop = 2; // Lavender
+    } else if (lower.contains('alex')) {
+      head = 0; // Oval
+      hair = 4; // Fringe
+      eyes = 0; // Round Glasses
+      mouth = 1; // Smile
+      outfit = 3; // Crewneck
+      backdrop = 0; // Cream
+    } else {
+      final hash = idOrName.hashCode.abs();
+      head = hash % 4;
+      hair = (hash ~/ 4) % 8;
+      eyes = (hash ~/ 32) % 6;
+      mouth = (hash ~/ 192) % 5;
+      outfit = (hash ~/ 960) % 5;
+      backdrop = (hash ~/ 4800) % 5;
+    }
+
+    return NotionAvatar(
+      key: key,
+      head: head,
+      hair: hair,
+      eyes: eyes,
+      mouth: mouth,
+      outfit: outfit,
+      backdrop: backdrop,
+      size: size,
+      isAnimated: isAnimated,
+      onTap: onTap,
+    );
+  }
+
   @override
   State<NotionAvatar> createState() => _NotionAvatarState();
 }

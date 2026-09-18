@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/cartoon_character_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 
 class NpcAvatarCard extends StatelessWidget {
   final String name;
@@ -21,7 +21,7 @@ class NpcAvatarCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color statusColor;
     if (statusText.contains('Speaking')) {
-      statusColor = const Color(0xFF6366F1);
+      statusColor = const Color(0xFF38BDF8);
     } else if (statusText.contains('Listening')) {
       statusColor = const Color(0xFF10B981);
     } else {
@@ -30,12 +30,11 @@ class NpcAvatarCard extends StatelessWidget {
 
     return Column(
       children: [
-        // Expressive Animated Cartoon Avatar
-        CartoonCharacterAvatar.fromId(
+        // Vector Notion Ink Avatar
+        NotionAvatar.fromId(
           name,
           size: 96,
-          isSpeaking: isSpeaking,
-          showRipple: true,
+          isAnimated: isSpeaking,
         ),
         const SizedBox(height: 12),
 

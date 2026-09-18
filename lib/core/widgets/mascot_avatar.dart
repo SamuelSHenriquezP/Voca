@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'cartoon_character_avatar.dart';
+import 'notion_avatar.dart';
 
-/// Cartoon mascot avatar for VOCA path nodes, coaching, and onboarding
+/// Mascot avatar for VOCA coaching, onboarding, and feedback
 class MascotAvatar extends StatelessWidget {
   final double size;
   final bool isAnimated;
@@ -16,12 +16,10 @@ class MascotAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CartoonCharacterAvatar(
-      type: CartoonCharacterType.alex,
+    return NotionAvatar.fromId(
+      'alex',
       size: size,
-      isSpeaking: emotion == 'speaking' || emotion == 'focus',
-      showRipple: false,
-      emotion: emotion,
+      isAnimated: isAnimated,
     );
   }
 }
