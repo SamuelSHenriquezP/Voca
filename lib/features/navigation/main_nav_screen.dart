@@ -57,7 +57,6 @@ class _MainNavScreenState extends State<MainNavScreen> {
         children: _screens,
       ),
       bottomNavigationBar: Container(
-        height: 62,
         decoration: const BoxDecoration(
           color: Colors.white,
           border: Border(
@@ -66,7 +65,9 @@ class _MainNavScreenState extends State<MainNavScreen> {
         ),
         child: SafeArea(
           top: false,
-          child: Row(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
             children: List.generate(_tabs.length, (index) {
               final isSelected = _currentIndex == index;
               final tab = _tabs[index];
@@ -128,6 +129,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

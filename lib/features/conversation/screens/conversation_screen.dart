@@ -8,7 +8,6 @@ import '../../../core/widgets/bouncy_tap.dart';
 import '../../../core/widgets/celebration_dialog.dart';
 import '../models/chat_message.dart';
 import '../services/contextual_conversation_engine.dart';
-import '../widgets/coach_tip_card.dart';
 import '../widgets/conversation_history_sheet.dart';
 import '../widgets/harmonic_spectrum_visualizer.dart';
 import '../widgets/npc_avatar_card.dart';
@@ -55,8 +54,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
   String _statusText = 'Ready to converse';
 
   int _currentTurnIndex = 0;
-  String _currentGrammarTip = 'Use natural modal formulas like "Could I get..." or "I\'ll be staying...".';
-  String _currentPronunciationTip = 'Maintain smooth connected speech rhythm.';
   int _currentFluencyScore = 92;
   int _composure = 100;
   String? _dynamicSuggestedPhrase;
@@ -218,8 +215,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final turns = _activeTurns;
     final firstTurn = turns.first;
 
-    _currentGrammarTip = firstTurn.coachGrammarTip;
-    _currentPronunciationTip = firstTurn.coachPronunciationTip;
     _currentFluencyScore = 92;
     _composure = 100;
     _dynamicSuggestedPhrase = firstTurn.suggestedUserResponse;
@@ -310,8 +305,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
     if (!mounted) return;
 
     setState(() {
-      _currentGrammarTip = result.grammarTip;
-      _currentPronunciationTip = result.pronunciationTip;
+      if (_messages.isNotEmpty && _messages.last.isUser) {
+        final lastMsg = _messages.last;
+        _messages[_messages.length - 1] = ChatMessage(
+          id: lastMsg.id,
+          text: lastMsg.text,
+          isUser: true,
+          time: lastMsg.time,
+          accuracyScore: result.accuracyScore,
+          coachGrammarTip: result.grammarTip,
+          coachPronunciationTip: result.pronunciationTip,
+        );
+      }
       _currentFluencyScore = result.accuracyScore;
       _dynamicSuggestedPhrase = result.suggestedFollowUp;
       _dynamicHint = result.hint;
@@ -647,25 +652,23 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // NPC Persona Avatar & Status Card
+                  // NPC Persona Avatar & Status Card + Real-Time Composure
                   NpcAvatarCard(
                     name: _activeScenario.personaName,
                     role: _activeScenario.personaRole,
                     isSpeaking: _isNpcSpeaking,
                     statusText: _statusText,
+                    trailing: _buildComposureBar(),
                   ),
 
-                  // Real-Time High-Stakes Composure Indicator
-                  _buildComposureBar(),
-
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
 
                   // Animated Harmonic Spectrum Canvas (Multi-sine waves & sound particles)
                   HarmonicSpectrumVisualizer(
                     isSpeaking: _isUserRecording || _isNpcSpeaking,
                     primaryColor: _isUserRecording ? const Color(0xFFF43F5E) : _activeScenario.accentColor,
                     secondaryColor: const Color(0xFF38BDF8),
-                    height: 44,
+                    height: 26,
                   ),
                 ],
               ),
@@ -736,11 +739,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
           if (!isCompleted) ...[
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2FF),
+                color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFC7D2FE), width: 1),
+                border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
               ),
               child: Row(
                 children: [
@@ -753,7 +756,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF4F46E5),
+                        color: Color(0xFF0F172A),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.volume_up_rounded, color: Colors.white, size: 14),
@@ -764,13 +767,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'YOUR TURN (RESPONSE):',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.7,
-                            color: Colors.indigo.shade700,
+                            color: Color(0xFF64748B),
                           ),
                         ),
                         Text(
@@ -778,7 +781,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF1E1B4B),
+                            color: Color(0xFF0F172A),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -790,13 +793,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
               ),
             ),
           ],
-
-          // Collapsible Silent Coach Tip Card with real feedback
-          CoachTipCard(
-            grammarTip: _currentGrammarTip,
-            pronunciationTip: _currentPronunciationTip,
-            fluencyScore: _currentFluencyScore,
-          ),
 
           // Bottom Floating Voice Controls
           VoiceControls(
@@ -819,36 +815,35 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
     if (_composure >= 70) {
       barColor = const Color(0xFF10B981); // Emerald
-      statusLabel = 'STEADY & COMPOSED';
+      statusLabel = 'STEADY';
       barIcon = Icons.psychology_rounded;
     } else if (_composure >= 40) {
       barColor = const Color(0xFFF59E0B); // Amber
-      statusLabel = 'UNDER PRESSURE';
+      statusLabel = 'PRESSURE';
       barIcon = Icons.speed_rounded;
     } else {
       barColor = const Color(0xFFEF4444); // Crimson
-      statusLabel = 'CRITICAL HESITATION';
+      statusLabel = 'HESITATION';
       barIcon = Icons.warning_amber_rounded;
     }
 
     return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: barColor.withOpacity(0.4), width: 1.0),
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: barColor.withOpacity(0.5), width: 1.0),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(barIcon, color: barColor, size: 13),
-          const SizedBox(width: 6),
+          Icon(barIcon, color: barColor, size: 12),
+          const SizedBox(width: 4),
           Text(
             '$_composure% $statusLabel',
             style: TextStyle(
               color: barColor,
-              fontSize: 10,
+              fontSize: 9.5,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.5,
             ),

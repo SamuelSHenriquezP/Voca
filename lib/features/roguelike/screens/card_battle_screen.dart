@@ -518,78 +518,84 @@ class _CardBattleScreenState extends State<CardBattleScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Player Health & Block
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.4)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.favorite_rounded, color: Color(0xFFEF4444), size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      '$_playerHp / $_playerMaxHp',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 13,
+          // Player Health, Block & Relics
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.4)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.favorite_rounded, color: Color(0xFFEF4444), size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$_playerHp / $_playerMaxHp',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_playerBlock > 0) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0284C7).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFF38BDF8)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.shield_rounded, color: Color(0xFF38BDF8), size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$_playerBlock',
+                            style: const TextStyle(
+                              color: Color(0xFF38BDF8),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
-              if (_playerBlock > 0) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0284C7).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFF38BDF8)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.shield_rounded, color: Color(0xFF38BDF8), size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$_playerBlock',
-                        style: const TextStyle(
-                          color: Color(0xFF38BDF8),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 13,
+                  if (widget.relics.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    ...widget.relics.take(4).map(
+                      (relic) => Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Tooltip(
+                          message: '${relic.name}: ${relic.description}',
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E293B),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: relic.color.withOpacity(0.6), width: 1.2),
+                            ),
+                            child: Icon(relic.icon, size: 12, color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              if (widget.relics.isNotEmpty) ...[
-                const SizedBox(width: 8),
-                ...widget.relics.take(4).map(
-                  (relic) => Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: Tooltip(
-                      message: '${relic.name}: ${relic.description}',
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: relic.color.withOpacity(0.6), width: 1.2),
-                        ),
-                        child: Icon(relic.icon, size: 12, color: Colors.white),
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ],
+                  ],
+                ],
+              ),
+            ),
           ),
+          const SizedBox(width: 8),
 
           // Energy & End Turn
           Row(

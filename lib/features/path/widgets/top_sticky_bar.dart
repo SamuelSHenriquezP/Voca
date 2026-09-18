@@ -48,58 +48,65 @@ class TopStickyBar extends StatelessWidget {
           children: [
             // Left: Notion Avatar & User Identity
             if (onProfileTap != null)
-              BouncyTap(
-                onTap: onProfileTap,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(1.5),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF0F172A), width: 1.5),
-                      ),
-                      child: NotionAvatar(
-                        head: storage.getNotionHead(),
-                        hair: storage.getNotionHair(),
-                        eyes: storage.getNotionEyes(),
-                        mouth: storage.getNotionMouth(),
-                        outfit: storage.getNotionOutfit(),
-                        backdrop: storage.getNotionBackdrop(),
-                        size: 32,
-                        isAnimated: false,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          userName,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF0F172A),
-                            letterSpacing: -0.2,
-                          ),
+              Expanded(
+                child: BouncyTap(
+                  onTap: onProfileTap,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(1.5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFF0F172A), width: 1.5),
                         ),
-                        const Text(
-                          'INGLÉS CEFR',
-                          style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF94A3B8),
-                            letterSpacing: 0.8,
-                          ),
+                        child: NotionAvatar(
+                          head: storage.getNotionHead(),
+                          hair: storage.getNotionHair(),
+                          eyes: storage.getNotionEyes(),
+                          mouth: storage.getNotionMouth(),
+                          outfit: storage.getNotionOutfit(),
+                          backdrop: storage.getNotionBackdrop(),
+                          size: 32,
+                          isAnimated: false,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              userName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A),
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            const Text(
+                              'INGLÉS CEFR',
+                              style: TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF94A3B8),
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              )
+            else
+              const Spacer(),
 
-            const Spacer(),
+            const SizedBox(width: 8),
 
             // Right: Clean Unified Stats Pill (Monochrome / Paper)
             Container(

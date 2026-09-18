@@ -78,23 +78,27 @@ class SyllabusModuleCard extends StatelessWidget {
                   Row(
                     children: [
                       // Focus Type Chip
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                        decoration: BoxDecoration(
-                          color: isBoss
-                              ? const Color(0xFF1E293B)
-                              : (isActive ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          node.focusLabel,
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          decoration: BoxDecoration(
                             color: isBoss
-                                ? const Color(0xFFE2E8F0)
-                                : (isActive ? Colors.white : const Color(0xFF475569)),
+                                ? const Color(0xFF1E293B)
+                                : (isActive ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            node.focusLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.6,
+                              color: isBoss
+                                  ? const Color(0xFFE2E8F0)
+                                  : (isActive ? Colors.white : const Color(0xFF475569)),
+                            ),
                           ),
                         ),
                       ),
@@ -103,13 +107,14 @@ class SyllabusModuleCard extends StatelessWidget {
                       // Level Index
                       Text(
                         'MOD ${node.unitNumber}.${node.levelNumber}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: isBoss ? const Color(0xFF94A3B8) : const Color(0xFF94A3B8),
+                          color: Color(0xFF94A3B8),
                           letterSpacing: 0.5,
                         ),
                       ),
+                      const SizedBox(width: 6),
                       const Spacer(),
 
                       // XP Reward

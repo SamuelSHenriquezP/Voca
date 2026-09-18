@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/theme/voca_typography.dart';
 import '../../../core/widgets/notion_avatar.dart';
 
 class NpcAvatarCard extends StatelessWidget {
@@ -8,6 +7,7 @@ class NpcAvatarCard extends StatelessWidget {
   final String role;
   final bool isSpeaking;
   final String statusText;
+  final Widget? trailing;
 
   const NpcAvatarCard({
     super.key,
@@ -15,6 +15,7 @@ class NpcAvatarCard extends StatelessWidget {
     this.role = 'Border & Customs Clearance',
     this.isSpeaking = false,
     this.statusText = 'Ready',
+    this.trailing,
   });
 
   @override
@@ -28,75 +29,81 @@ class NpcAvatarCard extends StatelessWidget {
       statusColor = const Color(0xFF94A3B8);
     }
 
-    return Column(
-      children: [
-        // Vector Notion Ink Avatar
-        NotionAvatar.fromId(
-          name,
-          size: 96,
-          isAnimated: isSpeaking,
-        ),
-        const SizedBox(height: 12),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B).withOpacity(0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Row(
+        children: [
+          // Compact Vector Notion Ink Avatar
+          NotionAvatar.fromId(
+            name,
+            size: 42,
+            isAnimated: isSpeaking,
+          ),
+          const SizedBox(width: 12),
 
-        // Name & Role
-        Text(
-          name,
-          style: VocaTypography.heading2.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          role,
-          style: const TextStyle(
-            color: Color(0xFF94A3B8),
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.3,
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Minimalist Status Pill Badge
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E293B),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor.withOpacity(0.4), width: 1.0),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: statusColor,
-                  shape: BoxShape.circle,
+          // Name, Role & Status Dot
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .scale(
+                          begin: const Offset(0.8, 0.8),
+                          end: const Offset(1.3, 1.3),
+                          duration: const Duration(milliseconds: 600),
+                        ),
+                  ],
                 ),
-              )
-                  .animate(onPlay: (c) => c.repeat(reverse: true))
-                  .scale(
-                    begin: const Offset(0.8, 0.8),
-                    end: const Offset(1.3, 1.3),
-                    duration: const Duration(milliseconds: 600),
+                const SizedBox(height: 2),
+                Text(
+                  role,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                   ),
-              const SizedBox(width: 8),
-              Text(
-                statusText,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+
+          if (trailing != null) ...[
+            const SizedBox(width: 8),
+            trailing!,
+          ],
+        ],
+      ),
     );
   }
 }
