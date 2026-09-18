@@ -189,16 +189,18 @@ class _NotionAvatarState extends State<NotionAvatar>
                 shape: BoxShape.circle,
                 color: _getBackdropColor(),
                 border: Border.all(
-                  color: isDarkBackdrop ? const Color(0xFF3F3F46) : const Color(0xFF18181B),
-                  width: s > 50 ? 2.4 : 1.8,
+                  color: isDarkBackdrop ? const Color(0xFF3F3F46) : const Color(0xFF0F172A),
+                  width: s > 50 ? 2.0 : 1.3,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 3),
-                    blurRadius: 6,
-                  ),
-                ],
+                boxShadow: s > 50
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          offset: const Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ]
+                    : null,
               ),
               child: ClipOval(
                 child: CustomPaint(
@@ -244,183 +246,203 @@ class _NotionAvatarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
+    final h = size.height;
 
-    final strokeColor = isDark ? Colors.white : const Color(0xFF18181B);
-    final fillSkinColor = isDark ? const Color(0xFF27272A) : Colors.white;
+    final strokeColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final skinColor = isDark ? const Color(0xFF27272A) : const Color(0xFFFAF9F6);
+    final hairColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final garmentColor = isDark ? const Color(0xFF3F3F46) : const Color(0xFF1E293B);
+
+    final strokeW = (w * 0.034).clamp(1.1, 2.5);
 
     final line = Paint()
       ..color = strokeColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = math.max(1.8, w * 0.034)
+      ..strokeWidth = strokeW
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
     final fillSkin = Paint()
-      ..color = fillSkinColor
+      ..color = skinColor
       ..style = PaintingStyle.fill;
 
-    final fillDark = Paint()
-      ..color = strokeColor
+    final fillHair = Paint()
+      ..color = hairColor
       ..style = PaintingStyle.fill;
 
-    // 1. OUTFIT / TORSO (Behind head)
-    _drawOutfit(canvas, size, line, fillSkin, fillDark);
+    final fillGarment = Paint()
+      ..color = garmentColor
+      ..style = PaintingStyle.fill;
 
-    // 2. HEAD & EARS
-    _drawHeadAndEars(canvas, size, line, fillSkin);
+    // Center coordinates & proportions
+    final cx = w * 0.50;
+    final cy = h * 0.43;
+    final hw = w * 0.42;
+    final hh = h * 0.44;
 
-    // 3. HAIR
-    _drawHair(canvas, size, line, fillDark, fillSkin);
+    // 1. GARMENT / SHOULDERS (Seamlessly anchors the bottom)
+    _drawGarment(canvas, size, line, fillGarment, strokeColor);
 
-    // 4. EYES & GLASSES
-    _drawEyes(canvas, size, line, fillDark);
+    // 2. NECK
+    _drawNeck(canvas, cx, cy, hw, hh, h, line, fillSkin);
 
-    // 5. NOSE
-    _drawNose(canvas, size, line);
+    // 3. EARS
+    _drawEars(canvas, cx, cy, hw, hh, w, h, line, fillSkin);
 
-    // 6. MOUTH & FACIAL HAIR
-    _drawMouth(canvas, size, line, fillDark);
+    // 4. HEAD
+    _drawHead(canvas, cx, cy, hw, hh, line, fillSkin);
+
+    // 5. HAIR
+    _drawHair(canvas, cx, cy, hw, hh, w, h, line, fillHair, fillSkin);
+
+    // 6. EYES & GLASSES
+    _drawEyes(canvas, cx, cy, hw, hh, w, h, line, fillHair);
+
+    // 7. NOSE
+    _drawNose(canvas, cx, cy, hh, w, line);
+
+    // 8. MOUTH & FACIAL DETAILS
+    _drawMouth(canvas, cx, cy, hh, w, h, line, fillSkin, fillHair);
   }
 
-  // =========================================================================
-  // 1. OUTFIT / SHOULDERS
-  // =========================================================================
-  void _drawOutfit(Canvas canvas, Size size, Paint line, Paint fillSkin, Paint fillDark) {
+  void _drawGarment(Canvas canvas, Size size, Paint line, Paint fillGarment, Color strokeColor) {
     final w = size.width;
     final h = size.height;
 
-    final bodyPath = Path()
-      ..moveTo(w * 0.12, h)
-      ..lineTo(w * 0.88, h)
-      ..lineTo(w * 0.82, h * 0.80)
-      ..quadraticBezierTo(w * 0.5, h * 0.85, w * 0.18, h * 0.80)
+    final body = Path()
+      ..moveTo(0, h)
+      ..lineTo(w, h)
+      ..lineTo(w * 0.88, h * 0.74)
+      ..quadraticBezierTo(w * 0.50, h * 0.71, w * 0.12, h * 0.74)
       ..close();
-
-    canvas.drawPath(bodyPath, fillSkin);
-    canvas.drawPath(bodyPath, line);
+    canvas.drawPath(body, fillGarment);
 
     switch (outfitStyle) {
-      case 0: // Turtleneck (Classic Notion)
-        final neckPath = Path()
-          ..moveTo(w * 0.36, h * 0.82)
-          ..lineTo(w * 0.36, h * 0.68)
-          ..quadraticBezierTo(w * 0.50, h * 0.70, w * 0.64, h * 0.68)
-          ..lineTo(w * 0.64, h * 0.82)
-          ..close();
-        canvas.drawPath(neckPath, fillSkin);
-        canvas.drawPath(neckPath, line);
-
-        // Turtleneck rib folds
-        canvas.drawLine(Offset(w * 0.38, h * 0.74), Offset(w * 0.62, h * 0.74), line);
+      case 0: // Turtleneck
+        final turtleRect = RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(w * 0.50, h * 0.70), width: w * 0.22, height: h * 0.10),
+          Radius.circular(w * 0.04),
+        );
+        canvas.drawRRect(turtleRect, fillGarment);
+        canvas.drawRRect(turtleRect, line);
+        canvas.drawLine(Offset(w * 0.41, h * 0.70), Offset(w * 0.59, h * 0.70), line);
         break;
 
       case 1: // Hoodie
-        final hoodLeft = Path()
-          ..moveTo(w * 0.28, h * 0.80)
-          ..quadraticBezierTo(w * 0.36, h * 0.66, w * 0.44, h * 0.80);
-        final hoodRight = Path()
-          ..moveTo(w * 0.56, h * 0.80)
-          ..quadraticBezierTo(w * 0.64, h * 0.66, w * 0.72, h * 0.80);
-        canvas.drawPath(hoodLeft, line);
-        canvas.drawPath(hoodRight, line);
-        // Drawstrings
-        canvas.drawLine(Offset(w * 0.46, h * 0.82), Offset(w * 0.46, h * 0.94), line);
-        canvas.drawLine(Offset(w * 0.54, h * 0.82), Offset(w * 0.54, h * 0.94), line);
+        final hoodL = Path()
+          ..moveTo(w * 0.36, h * 0.74)
+          ..quadraticBezierTo(w * 0.42, h * 0.65, w * 0.48, h * 0.75);
+        final hoodR = Path()
+          ..moveTo(w * 0.52, h * 0.75)
+          ..quadraticBezierTo(w * 0.58, h * 0.65, w * 0.64, h * 0.74);
+        canvas.drawPath(hoodL, line);
+        canvas.drawPath(hoodR, line);
+        canvas.drawLine(Offset(w * 0.46, h * 0.76), Offset(w * 0.46, h * 0.86), line);
+        canvas.drawLine(Offset(w * 0.54, h * 0.76), Offset(w * 0.54, h * 0.86), line);
         break;
 
-      case 2: // Collared button-up
-        final collarLeft = Path()
-          ..moveTo(w * 0.50, h * 0.78)
-          ..lineTo(w * 0.34, h * 0.74)
-          ..lineTo(w * 0.44, h * 0.84)
+      case 2: // Collared Button-up
+        final collarL = Path()
+          ..moveTo(w * 0.50, h * 0.74)
+          ..lineTo(w * 0.38, h * 0.70)
+          ..lineTo(w * 0.46, h * 0.78)
           ..close();
-        final collarRight = Path()
-          ..moveTo(w * 0.50, h * 0.78)
-          ..lineTo(w * 0.66, h * 0.74)
-          ..lineTo(w * 0.56, h * 0.84)
+        final collarR = Path()
+          ..moveTo(w * 0.50, h * 0.74)
+          ..lineTo(w * 0.62, h * 0.70)
+          ..lineTo(w * 0.54, h * 0.78)
           ..close();
-        canvas.drawPath(collarLeft, fillSkin);
-        canvas.drawPath(collarLeft, line);
-        canvas.drawPath(collarRight, fillSkin);
-        canvas.drawPath(collarRight, line);
-        // Placket line
-        canvas.drawLine(Offset(w * 0.50, h * 0.84), Offset(w * 0.50, h), line);
+        final collarPaint = Paint()
+          ..color = strokeColor.withOpacity(0.12)
+          ..style = PaintingStyle.fill;
+        canvas.drawPath(collarL, collarPaint);
+        canvas.drawPath(collarL, line);
+        canvas.drawPath(collarR, collarPaint);
+        canvas.drawPath(collarR, line);
+        canvas.drawLine(Offset(w * 0.50, h * 0.78), Offset(w * 0.50, h), line);
         break;
 
       case 4: // Scarf
-        final scarfPath = Path()
-          ..moveTo(w * 0.30, h * 0.76)
-          ..quadraticBezierTo(w * 0.50, h * 0.85, w * 0.70, h * 0.76)
-          ..quadraticBezierTo(w * 0.75, h * 0.88, w * 0.50, h * 0.90)
-          ..quadraticBezierTo(w * 0.25, h * 0.88, w * 0.30, h * 0.76)
+        final scarf = Path()
+          ..moveTo(w * 0.33, h * 0.71)
+          ..quadraticBezierTo(w * 0.50, h * 0.78, w * 0.67, h * 0.71)
+          ..quadraticBezierTo(w * 0.71, h * 0.80, w * 0.50, h * 0.82)
+          ..quadraticBezierTo(w * 0.29, h * 0.80, w * 0.33, h * 0.71)
           ..close();
-        canvas.drawPath(scarfPath, fillDark);
-        // Scarf tail hanging
-        final tail = Path()
-          ..moveTo(w * 0.54, h * 0.88)
-          ..lineTo(w * 0.62, h * 0.88)
-          ..lineTo(w * 0.60, h)
-          ..lineTo(w * 0.52, h)
-          ..close();
-        canvas.drawPath(tail, fillDark);
+        canvas.drawPath(scarf, line);
         break;
 
-      case 3: // Crewneck T-shirt
+      case 3: // Crewneck
       default:
-        final crewCollar = Path()
-          ..moveTo(w * 0.38, h * 0.75)
-          ..quadraticBezierTo(w * 0.50, h * 0.83, w * 0.62, h * 0.75);
-        canvas.drawPath(crewCollar, line);
+        final crew = Path()
+          ..moveTo(w * 0.38, h * 0.72)
+          ..quadraticBezierTo(w * 0.50, h * 0.78, w * 0.62, h * 0.72);
+        canvas.drawPath(crew, line);
         break;
     }
   }
 
-  // =========================================================================
-  // 2. HEAD & EARS
-  // =========================================================================
-  void _drawHeadAndEars(Canvas canvas, Size size, Paint line, Paint fillSkin) {
-    final w = size.width;
-    final h = size.height;
+  void _drawNeck(Canvas canvas, double cx, double cy, double hw, double hh, double h, Paint line, Paint fillSkin) {
+    final neckWidth = hw * 0.40;
+    final neckTop = cy + hh * 0.30;
+    final neckBottom = h * 0.75;
 
-    // Ears
-    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.25, h * 0.50), width: w * 0.08, height: h * 0.12), fillSkin);
-    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.25, h * 0.50), width: w * 0.08, height: h * 0.12), line);
-    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.75, h * 0.50), width: w * 0.08, height: h * 0.12), fillSkin);
-    canvas.drawOval(Rect.fromCenter(center: Offset(w * 0.75, h * 0.50), width: w * 0.08, height: h * 0.12), line);
+    final neckPath = Path()
+      ..moveTo(cx - neckWidth / 2, neckTop)
+      ..lineTo(cx - neckWidth / 2, neckBottom)
+      ..lineTo(cx + neckWidth / 2, neckBottom)
+      ..lineTo(cx + neckWidth / 2, neckTop)
+      ..close();
+    canvas.drawPath(neckPath, fillSkin);
+    canvas.drawLine(Offset(cx - neckWidth / 2, neckTop), Offset(cx - neckWidth / 2, neckBottom), line);
+    canvas.drawLine(Offset(cx + neckWidth / 2, neckTop), Offset(cx + neckWidth / 2, neckBottom), line);
+  }
 
-    // Inner ear lines
-    canvas.drawArc(Rect.fromCenter(center: Offset(w * 0.25, h * 0.50), width: w * 0.04, height: h * 0.06), math.pi * 0.5, math.pi, false, line);
-    canvas.drawArc(Rect.fromCenter(center: Offset(w * 0.75, h * 0.50), width: w * 0.04, height: h * 0.06), -math.pi * 0.5, math.pi, false, line);
+  void _drawEars(Canvas canvas, double cx, double cy, double hw, double hh, double w, double h, Paint line, Paint fillSkin) {
+    final earW = w * 0.065;
+    final earH = h * 0.095;
+    final earY = cy + hh * 0.05;
 
+    final leftEarRect = Rect.fromCenter(center: Offset(cx - hw * 0.49, earY), width: earW, height: earH);
+    canvas.drawOval(leftEarRect, fillSkin);
+    canvas.drawOval(leftEarRect, line);
+
+    final rightEarRect = Rect.fromCenter(center: Offset(cx + hw * 0.49, earY), width: earW, height: earH);
+    canvas.drawOval(rightEarRect, fillSkin);
+    canvas.drawOval(rightEarRect, line);
+  }
+
+  void _drawHead(Canvas canvas, double cx, double cy, double hw, double hh, Paint line, Paint fillSkin) {
     Path headPath;
     switch (headShape) {
       case 1: // Square Jaw
         headPath = Path()
-          ..moveTo(w * 0.30, h * 0.28)
-          ..quadraticBezierTo(w * 0.50, h * 0.22, w * 0.70, h * 0.28)
-          ..lineTo(w * 0.72, h * 0.58)
-          ..quadraticBezierTo(w * 0.68, h * 0.74, w * 0.50, h * 0.74)
-          ..quadraticBezierTo(w * 0.32, h * 0.74, w * 0.28, h * 0.58)
+          ..moveTo(cx - hw * 0.48, cy - hh * 0.40)
+          ..quadraticBezierTo(cx, cy - hh * 0.54, cx + hw * 0.48, cy - hh * 0.40)
+          ..lineTo(cx + hw * 0.48, cy + hh * 0.20)
+          ..quadraticBezierTo(cx + hw * 0.44, cy + hh * 0.48, cx + hw * 0.22, cy + hh * 0.48)
+          ..lineTo(cx - hw * 0.22, cy + hh * 0.48)
+          ..quadraticBezierTo(cx - hw * 0.44, cy + hh * 0.48, cx - hw * 0.48, cy + hh * 0.20)
           ..close();
         break;
 
-      case 2: // Round / Cute
+      case 2: // Round
         headPath = Path()
-          ..addOval(Rect.fromCenter(center: Offset(w * 0.50, h * 0.50), width: w * 0.52, height: h * 0.48));
+          ..addOval(Rect.fromCenter(center: Offset(cx, cy), width: hw * 1.04, height: hh * 0.96));
         break;
 
       case 3: // Oblong
         headPath = Path()
           ..addRRect(RRect.fromRectAndRadius(
-            Rect.fromCenter(center: Offset(w * 0.50, h * 0.49), width: w * 0.44, height: h * 0.52),
-            Radius.circular(w * 0.20),
+            Rect.fromCenter(center: Offset(cx, cy), width: hw * 0.90, height: hh * 1.04),
+            Radius.circular(hw * 0.42),
           ));
         break;
 
-      case 0: // Classic Oval
+      case 0: // Oval
       default:
         headPath = Path()
-          ..addOval(Rect.fromCenter(center: Offset(w * 0.50, h * 0.49), width: w * 0.47, height: h * 0.50));
+          ..addOval(Rect.fromCenter(center: Offset(cx, cy), width: hw, height: hh));
         break;
     }
 
@@ -428,299 +450,256 @@ class _NotionAvatarPainter extends CustomPainter {
     canvas.drawPath(headPath, line);
   }
 
-  // =========================================================================
-  // 3. HAIR (Minimalist Notion Ink Silhouette)
-  // =========================================================================
-  void _drawHair(Canvas canvas, Size size, Paint line, Paint fillDark, Paint fillSkin) {
-    final w = size.width;
-    final h = size.height;
-
+  void _drawHair(Canvas canvas, double cx, double cy, double hw, double hh, double w, double h, Paint line, Paint fillHair, Paint fillSkin) {
     switch (hairStyle) {
-      case 0: // Classic Side Part (Notion signature)
+      case 0: // Classic Side Part
         final hair = Path()
-          ..moveTo(w * 0.26, h * 0.46)
-          ..quadraticBezierTo(w * 0.24, h * 0.22, w * 0.50, h * 0.20)
-          ..quadraticBezierTo(w * 0.76, h * 0.22, w * 0.74, h * 0.46)
-          ..quadraticBezierTo(w * 0.62, h * 0.32, w * 0.44, h * 0.32)
-          ..quadraticBezierTo(w * 0.32, h * 0.36, w * 0.26, h * 0.46)
+          ..moveTo(cx - hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx - hw * 0.52, cy - hh * 0.60, cx, cy - hh * 0.60)
+          ..quadraticBezierTo(cx + hw * 0.52, cy - hh * 0.60, cx + hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx + hw * 0.35, cy - hh * 0.32, cx - hw * 0.05, cy - hh * 0.35)
+          ..quadraticBezierTo(cx - hw * 0.35, cy - hh * 0.25, cx - hw * 0.50, cy - hh * 0.05)
           ..close();
-        canvas.drawPath(hair, fillDark);
+        canvas.drawPath(hair, fillHair);
         canvas.drawPath(hair, line);
         break;
 
-      case 1: // Messy Curls / Afro
+      case 1: // Soft Waves / Curls
         final curls = Path()
-          ..moveTo(w * 0.24, h * 0.48)
-          ..arcToPoint(Offset(w * 0.26, h * 0.32), radius: Radius.circular(w * 0.10))
-          ..arcToPoint(Offset(w * 0.38, h * 0.20), radius: Radius.circular(w * 0.10))
-          ..arcToPoint(Offset(w * 0.56, h * 0.18), radius: Radius.circular(w * 0.10))
-          ..arcToPoint(Offset(w * 0.72, h * 0.26), radius: Radius.circular(w * 0.10))
-          ..arcToPoint(Offset(w * 0.76, h * 0.48), radius: Radius.circular(w * 0.10))
-          ..quadraticBezierTo(w * 0.50, h * 0.34, w * 0.24, h * 0.48)
+          ..moveTo(cx - hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx - hw * 0.54, cy - hh * 0.56, cx - hw * 0.20, cy - hh * 0.62)
+          ..quadraticBezierTo(cx, cy - hh * 0.66, cx + hw * 0.20, cy - hh * 0.62)
+          ..quadraticBezierTo(cx + hw * 0.54, cy - hh * 0.56, cx + hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx + hw * 0.25, cy - hh * 0.30, cx, cy - hh * 0.32)
+          ..quadraticBezierTo(cx - hw * 0.25, cy - hh * 0.30, cx - hw * 0.50, cy - hh * 0.05)
           ..close();
-        canvas.drawPath(curls, fillDark);
+        canvas.drawPath(curls, fillHair);
         canvas.drawPath(curls, line);
         break;
 
       case 2: // Top Bun
-        // Base hair
         final base = Path()
-          ..moveTo(w * 0.26, h * 0.44)
-          ..quadraticBezierTo(w * 0.28, h * 0.22, w * 0.50, h * 0.22)
-          ..quadraticBezierTo(w * 0.72, h * 0.22, w * 0.74, h * 0.44)
-          ..quadraticBezierTo(w * 0.50, h * 0.32, w * 0.26, h * 0.44)
+          ..moveTo(cx - hw * 0.50, cy - hh * 0.08)
+          ..quadraticBezierTo(cx - hw * 0.50, cy - hh * 0.58, cx, cy - hh * 0.58)
+          ..quadraticBezierTo(cx + hw * 0.50, cy - hh * 0.58, cx + hw * 0.50, cy - hh * 0.08)
+          ..quadraticBezierTo(cx, cy - hh * 0.36, cx - hw * 0.50, cy - hh * 0.08)
           ..close();
-        canvas.drawPath(base, fillDark);
+        canvas.drawPath(base, fillHair);
         canvas.drawPath(base, line);
-
-        // Bun on top
-        final bun = Path()
-          ..addOval(Rect.fromCenter(center: Offset(w * 0.50, h * 0.16), width: w * 0.18, height: h * 0.14));
-        canvas.drawPath(bun, fillDark);
-        canvas.drawPath(bun, line);
+        final bunRect = Rect.fromCenter(center: Offset(cx, cy - hh * 0.68), width: w * 0.16, height: h * 0.13);
+        canvas.drawOval(bunRect, fillHair);
+        canvas.drawOval(bunRect, line);
         break;
 
-      case 3: // Bob Cut / Shoulder Length
+      case 3: // Sleek Bob Cut
         final bob = Path()
-          ..moveTo(w * 0.22, h * 0.62)
-          ..lineTo(w * 0.24, h * 0.38)
-          ..quadraticBezierTo(w * 0.26, h * 0.20, w * 0.50, h * 0.20)
-          ..quadraticBezierTo(w * 0.74, h * 0.20, w * 0.76, h * 0.38)
-          ..lineTo(w * 0.78, h * 0.62)
-          ..quadraticBezierTo(w * 0.72, h * 0.52, w * 0.68, h * 0.38)
-          ..quadraticBezierTo(w * 0.50, h * 0.34, w * 0.32, h * 0.38)
-          ..quadraticBezierTo(w * 0.28, h * 0.52, w * 0.22, h * 0.62)
+          ..moveTo(cx - hw * 0.52, cy + hh * 0.20)
+          ..lineTo(cx - hw * 0.50, cy - hh * 0.30)
+          ..quadraticBezierTo(cx - hw * 0.50, cy - hh * 0.58, cx, cy - hh * 0.58)
+          ..quadraticBezierTo(cx + hw * 0.50, cy - hh * 0.58, cx + hw * 0.50, cy - hh * 0.30)
+          ..lineTo(cx + hw * 0.52, cy + hh * 0.20)
+          ..quadraticBezierTo(cx + hw * 0.40, cy - hh * 0.10, cx + hw * 0.36, cy - hh * 0.28)
+          ..quadraticBezierTo(cx, cy - hh * 0.35, cx - hw * 0.36, cy - hh * 0.28)
+          ..quadraticBezierTo(cx - hw * 0.40, cy - hh * 0.10, cx - hw * 0.52, cy + hh * 0.20)
           ..close();
-        canvas.drawPath(bob, fillDark);
+        canvas.drawPath(bob, fillHair);
         canvas.drawPath(bob, line);
         break;
 
-      case 4: // Modern Messy Fringe
+      case 4: // Fringe
         final fringe = Path()
-          ..moveTo(w * 0.26, h * 0.44)
-          ..quadraticBezierTo(w * 0.24, h * 0.20, w * 0.50, h * 0.18)
-          ..quadraticBezierTo(w * 0.76, h * 0.20, w * 0.74, h * 0.44)
-          ..lineTo(w * 0.64, h * 0.34)
-          ..lineTo(w * 0.56, h * 0.40)
-          ..lineTo(w * 0.48, h * 0.32)
-          ..lineTo(w * 0.38, h * 0.40)
+          ..moveTo(cx - hw * 0.50, cy - hh * 0.10)
+          ..quadraticBezierTo(cx - hw * 0.50, cy - hh * 0.58, cx, cy - hh * 0.58)
+          ..quadraticBezierTo(cx + hw * 0.50, cy - hh * 0.58, cx + hw * 0.50, cy - hh * 0.10)
+          ..lineTo(cx + hw * 0.32, cy - hh * 0.24)
+          ..lineTo(cx + hw * 0.14, cy - hh * 0.20)
+          ..lineTo(cx - hw * 0.08, cy - hh * 0.25)
+          ..lineTo(cx - hw * 0.30, cy - hh * 0.20)
           ..close();
-        canvas.drawPath(fringe, fillDark);
+        canvas.drawPath(fringe, fillHair);
         canvas.drawPath(fringe, line);
         break;
 
-      case 5: // Beanie Cap
+      case 5: // Beanie
         final beanie = Path()
-          ..moveTo(w * 0.22, h * 0.38)
-          ..quadraticBezierTo(w * 0.26, h * 0.14, w * 0.50, h * 0.13)
-          ..quadraticBezierTo(w * 0.74, h * 0.14, w * 0.78, h * 0.38)
+          ..moveTo(cx - hw * 0.52, cy - hh * 0.25)
+          ..quadraticBezierTo(cx, cy - hh * 0.72, cx + hw * 0.52, cy - hh * 0.25)
           ..close();
-        canvas.drawPath(beanie, fillDark);
+        canvas.drawPath(beanie, fillHair);
         canvas.drawPath(beanie, line);
-        // Beanie folded rim
         final rim = RRect.fromRectAndRadius(
-          Rect.fromCenter(center: Offset(w * 0.50, h * 0.37), width: w * 0.56, height: h * 0.08),
+          Rect.fromCenter(center: Offset(cx, cy - hh * 0.25), width: hw * 1.10, height: h * 0.08),
           Radius.circular(w * 0.03),
         );
         canvas.drawRRect(rim, fillSkin);
         canvas.drawRRect(rim, line);
         break;
 
-      case 7: // Ponytail
-        // Base hair
+      case 7: // High Ponytail (Gracefully contained, NO exceeding boundary!)
         final basePony = Path()
-          ..moveTo(w * 0.26, h * 0.44)
-          ..quadraticBezierTo(w * 0.28, h * 0.22, w * 0.50, h * 0.22)
-          ..quadraticBezierTo(w * 0.72, h * 0.22, w * 0.74, h * 0.44)
-          ..quadraticBezierTo(w * 0.50, h * 0.34, w * 0.26, h * 0.44)
+          ..moveTo(cx - hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx - hw * 0.50, cy - hh * 0.58, cx, cy - hh * 0.58)
+          ..quadraticBezierTo(cx + hw * 0.50, cy - hh * 0.58, cx + hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx, cy - hh * 0.34, cx - hw * 0.50, cy - hh * 0.05)
           ..close();
-        canvas.drawPath(basePony, fillDark);
+        canvas.drawPath(basePony, fillHair);
         canvas.drawPath(basePony, line);
-        // Ponytail swoosh to the side
-        final ponySwoosh = Path()
-          ..moveTo(w * 0.70, h * 0.32)
-          ..quadraticBezierTo(w * 0.90, h * 0.36, w * 0.88, h * 0.58)
-          ..quadraticBezierTo(w * 0.82, h * 0.50, w * 0.72, h * 0.42)
+        final pony = Path()
+          ..moveTo(cx + hw * 0.38, cy - hh * 0.45)
+          ..quadraticBezierTo(cx + w * 0.25, cy - hh * 0.25, cx + w * 0.23, cy + hh * 0.10)
+          ..quadraticBezierTo(cx + w * 0.18, cy - hh * 0.05, cx + hw * 0.32, cy - hh * 0.30)
           ..close();
-        canvas.drawPath(ponySwoosh, fillDark);
-        canvas.drawPath(ponySwoosh, line);
+        canvas.drawPath(pony, fillHair);
+        canvas.drawPath(pony, line);
         break;
 
-      case 6: // Buzzcut / Clean
+      case 6: // Buzzcut / Clean Crop
       default:
-        // Subtle dotted texture or minimalist crop line
-        canvas.drawArc(
-          Rect.fromCenter(center: Offset(w * 0.50, h * 0.38), width: w * 0.46, height: h * 0.30),
-          math.pi * 0.85,
-          math.pi * 1.3,
-          false,
-          line,
-        );
+        final buzz = Path()
+          ..moveTo(cx - hw * 0.49, cy - hh * 0.15)
+          ..quadraticBezierTo(cx - hw * 0.50, cy - hh * 0.54, cx, cy - hh * 0.54)
+          ..quadraticBezierTo(cx + hw * 0.50, cy - hh * 0.54, cx + hw * 0.49, cy - hh * 0.15)
+          ..quadraticBezierTo(cx + hw * 0.30, cy - hh * 0.36, cx, cy - hh * 0.36)
+          ..quadraticBezierTo(cx - hw * 0.30, cy - hh * 0.36, cx - hw * 0.49, cy - hh * 0.15)
+          ..close();
+        canvas.drawPath(buzz, fillHair);
+        canvas.drawPath(buzz, line);
         break;
     }
   }
 
-  // =========================================================================
-  // 4. EYES & GLASSES
-  // =========================================================================
-  void _drawEyes(Canvas canvas, Size size, Paint line, Paint fillDark) {
-    final w = size.width;
-    final h = size.height;
-
-    final eyeY = h * 0.48;
-    final leftX = w * 0.42;
-    final rightX = w * 0.58;
+  void _drawEyes(Canvas canvas, double cx, double cy, double hw, double hh, double w, double h, Paint line, Paint fillHair) {
+    final eyeY = cy + hh * 0.02;
+    final eyeDist = w * 0.082;
+    final leftX = cx - eyeDist;
+    final rightX = cx + eyeDist;
 
     if (isBlinking && eyesStyle != 5) {
-      // Cute blinking closed eyelid arcs
-      final blinkLeft = Path()
-        ..moveTo(leftX - (w * 0.035), eyeY)
-        ..quadraticBezierTo(leftX, eyeY - (h * 0.02), leftX + (w * 0.035), eyeY);
-      final blinkRight = Path()
-        ..moveTo(rightX - (w * 0.035), eyeY)
-        ..quadraticBezierTo(rightX, eyeY - (h * 0.02), rightX + (w * 0.035), eyeY);
-      canvas.drawPath(blinkLeft, line);
-      canvas.drawPath(blinkRight, line);
+      final blinkL = Path()
+        ..moveTo(leftX - w * 0.03, eyeY)
+        ..quadraticBezierTo(leftX, eyeY + h * 0.015, leftX + w * 0.03, eyeY);
+      final blinkR = Path()
+        ..moveTo(rightX - w * 0.03, eyeY)
+        ..quadraticBezierTo(rightX, eyeY + h * 0.015, rightX + w * 0.03, eyeY);
+      canvas.drawPath(blinkL, line);
+      canvas.drawPath(blinkR, line);
       return;
     }
 
     switch (eyesStyle) {
-      case 0: // Iconic Notion Round Glasses
-        final glassR = w * 0.075;
-        // Lenses
+      case 0: // Round Glasses
+        final glassR = w * 0.065;
         canvas.drawCircle(Offset(leftX, eyeY), glassR, line);
         canvas.drawCircle(Offset(rightX, eyeY), glassR, line);
-        // Bridge
         canvas.drawLine(Offset(leftX + glassR, eyeY), Offset(rightX - glassR, eyeY), line);
-        // Temples
-        canvas.drawLine(Offset(leftX - glassR, eyeY), Offset(w * 0.28, eyeY - (h * 0.01)), line);
-        canvas.drawLine(Offset(rightX + glassR, eyeY), Offset(w * 0.72, eyeY - (h * 0.01)), line);
-        // Eyes inside
-        canvas.drawCircle(Offset(leftX, eyeY), w * 0.022, fillDark);
-        canvas.drawCircle(Offset(rightX, eyeY), w * 0.022, fillDark);
+        canvas.drawCircle(Offset(leftX, eyeY), w * 0.020, fillHair);
+        canvas.drawCircle(Offset(rightX, eyeY), w * 0.020, fillHair);
         break;
 
       case 2: // Square Wireframe Glasses
-        final rectL = Rect.fromCenter(center: Offset(leftX, eyeY), width: w * 0.15, height: h * 0.11);
-        final rectR = Rect.fromCenter(center: Offset(rightX, eyeY), width: w * 0.15, height: h * 0.11);
-        canvas.drawRRect(RRect.fromRectAndRadius(rectL, Radius.circular(w * 0.02)), line);
-        canvas.drawRRect(RRect.fromRectAndRadius(rectR, Radius.circular(w * 0.02)), line);
-        canvas.drawLine(Offset(rectL.right, eyeY), Offset(rectR.left, eyeY), line);
-        canvas.drawCircle(Offset(leftX, eyeY), w * 0.022, fillDark);
-        canvas.drawCircle(Offset(rightX, eyeY), w * 0.022, fillDark);
+        final rL = Rect.fromCenter(center: Offset(leftX, eyeY), width: w * 0.13, height: h * 0.09);
+        final rR = Rect.fromCenter(center: Offset(rightX, eyeY), width: w * 0.13, height: h * 0.09);
+        canvas.drawRRect(RRect.fromRectAndRadius(rL, Radius.circular(w * 0.02)), line);
+        canvas.drawRRect(RRect.fromRectAndRadius(rR, Radius.circular(w * 0.02)), line);
+        canvas.drawLine(Offset(rL.right, eyeY), Offset(rR.left, eyeY), line);
+        canvas.drawCircle(Offset(leftX, eyeY), w * 0.020, fillHair);
+        canvas.drawCircle(Offset(rightX, eyeY), w * 0.020, fillHair);
         break;
 
-      case 3: // Wink Eye
-        // Left eye: open dot with brow
-        canvas.drawCircle(Offset(leftX, eyeY), w * 0.028, fillDark);
-        // Right eye: wink arc
+      case 3: // Wink
+        canvas.drawCircle(Offset(leftX, eyeY), w * 0.024, fillHair);
         final wink = Path()
-          ..moveTo(rightX - (w * 0.04), eyeY)
-          ..quadraticBezierTo(rightX, eyeY - (h * 0.025), rightX + (w * 0.04), eyeY);
+          ..moveTo(rightX - w * 0.035, eyeY)
+          ..quadraticBezierTo(rightX, eyeY + h * 0.015, rightX + w * 0.035, eyeY);
         canvas.drawPath(wink, line);
-        // Eyebrows
-        canvas.drawLine(Offset(leftX - (w * 0.03), eyeY - (h * 0.04)), Offset(leftX + (w * 0.03), eyeY - (h * 0.045)), line);
+        canvas.drawLine(Offset(leftX - w * 0.03, eyeY - h * 0.04), Offset(leftX + w * 0.03, eyeY - h * 0.045), line);
         break;
 
-      case 4: // Gentle Smile Squints
-        final leftSmile = Path()
-          ..moveTo(leftX - (w * 0.04), eyeY)
-          ..quadraticBezierTo(leftX, eyeY - (h * 0.02), leftX + (w * 0.04), eyeY);
-        final rightSmile = Path()
-          ..moveTo(rightX - (w * 0.04), eyeY)
-          ..quadraticBezierTo(rightX, eyeY - (h * 0.02), rightX + (w * 0.04), eyeY);
-        canvas.drawPath(leftSmile, line);
-        canvas.drawPath(rightSmile, line);
+      case 4: // Friendly Smile Squint
+        final smileL = Path()
+          ..moveTo(leftX - w * 0.035, eyeY + h * 0.005)
+          ..quadraticBezierTo(leftX, eyeY - h * 0.015, leftX + w * 0.035, eyeY + h * 0.005);
+        final smileR = Path()
+          ..moveTo(rightX - w * 0.035, eyeY + h * 0.005)
+          ..quadraticBezierTo(rightX, eyeY - h * 0.015, rightX + w * 0.035, eyeY + h * 0.005);
+        canvas.drawPath(smileL, line);
+        canvas.drawPath(smileR, line);
         break;
 
-      case 5: // Dark Sunglasses
-        final shadesL = Rect.fromCenter(center: Offset(leftX, eyeY), width: w * 0.16, height: h * 0.10);
-        final shadesR = Rect.fromCenter(center: Offset(rightX, eyeY), width: w * 0.16, height: h * 0.10);
-        canvas.drawRRect(RRect.fromRectAndRadius(shadesL, Radius.circular(w * 0.02)), fillDark);
-        canvas.drawRRect(RRect.fromRectAndRadius(shadesR, Radius.circular(w * 0.02)), fillDark);
-        canvas.drawLine(Offset(shadesL.right, eyeY), Offset(shadesR.left, eyeY), line);
+      case 5: // Shades
+        final sL = Rect.fromCenter(center: Offset(leftX, eyeY), width: w * 0.14, height: h * 0.09);
+        final sR = Rect.fromCenter(center: Offset(rightX, eyeY), width: w * 0.14, height: h * 0.09);
+        canvas.drawRRect(RRect.fromRectAndRadius(sL, Radius.circular(w * 0.02)), fillHair);
+        canvas.drawRRect(RRect.fromRectAndRadius(sR, Radius.circular(w * 0.02)), fillHair);
+        canvas.drawLine(Offset(sL.right, eyeY), Offset(sR.left, eyeY), line);
         break;
 
-      case 1: // Focused Dot Eyes & Brows
+      case 1: // Clean Dots & Brows
       default:
-        canvas.drawCircle(Offset(leftX, eyeY), w * 0.028, fillDark);
-        canvas.drawCircle(Offset(rightX, eyeY), w * 0.028, fillDark);
-        // Eyebrows
-        canvas.drawLine(Offset(leftX - (w * 0.03), eyeY - (h * 0.045)), Offset(leftX + (w * 0.03), eyeY - (h * 0.045)), line);
-        canvas.drawLine(Offset(rightX - (w * 0.03), eyeY - (h * 0.045)), Offset(rightX + (w * 0.03), eyeY - (h * 0.045)), line);
+        canvas.drawCircle(Offset(leftX, eyeY), w * 0.024, fillHair);
+        canvas.drawCircle(Offset(rightX, eyeY), w * 0.024, fillHair);
+        canvas.drawLine(Offset(leftX - w * 0.03, eyeY - h * 0.042), Offset(leftX + w * 0.03, eyeY - h * 0.042), line);
+        canvas.drawLine(Offset(rightX - w * 0.03, eyeY - h * 0.042), Offset(rightX + w * 0.03, eyeY - h * 0.042), line);
         break;
     }
   }
 
-  // =========================================================================
-  // 5. NOSE
-  // =========================================================================
-  void _drawNose(Canvas canvas, Size size, Paint line) {
-    final w = size.width;
-    final h = size.height;
-
-    // Classic Notion L-shaped nose
+  void _drawNose(Canvas canvas, double cx, double cy, double hh, double w, Paint line) {
     final nose = Path()
-      ..moveTo(w * 0.50, h * 0.50)
-      ..lineTo(w * 0.50, h * 0.56)
-      ..lineTo(w * 0.54, h * 0.56);
+      ..moveTo(cx, cy + hh * 0.05)
+      ..lineTo(cx, cy + hh * 0.16)
+      ..lineTo(cx + w * 0.032, cy + hh * 0.16);
     canvas.drawPath(nose, line);
   }
 
-  // =========================================================================
-  // 6. MOUTH & FACIAL HAIR
-  // =========================================================================
-  void _drawMouth(Canvas canvas, Size size, Paint line, Paint fillDark) {
-    final w = size.width;
-    final h = size.height;
-    final mouthY = h * 0.63;
+  void _drawMouth(Canvas canvas, double cx, double cy, double hh, double w, double h, Paint line, Paint fillSkin, Paint fillHair) {
+    final mouthY = cy + hh * 0.28;
+    final mw = w * 0.065;
 
     switch (mouthStyle) {
-      case 1: // Warm Open Smile
-        final openMouth = Path()
-          ..moveTo(w * 0.44, mouthY)
-          ..quadraticBezierTo(w * 0.50, mouthY + (h * 0.06), w * 0.56, mouthY)
+      case 1: // Open Smile (Contoured Stroke, never a solid black cavern)
+        final openSmile = Path()
+          ..moveTo(cx - mw, mouthY)
+          ..quadraticBezierTo(cx, mouthY + h * 0.030, cx + mw, mouthY)
+          ..quadraticBezierTo(cx, mouthY + h * 0.010, cx - mw, mouthY)
           ..close();
-        canvas.drawPath(openMouth, fillDark);
+        canvas.drawPath(openSmile, fillSkin);
+        canvas.drawPath(openSmile, line);
         break;
 
-      case 2: // Focused / Straight line
-        canvas.drawLine(Offset(w * 0.45, mouthY + (h * 0.01)), Offset(w * 0.55, mouthY + (h * 0.01)), line);
+      case 2: // Focused Line
+        canvas.drawLine(Offset(cx - mw * 0.8, mouthY), Offset(cx + mw * 0.8, mouthY), line);
         break;
 
-      case 3: // Intellectual Mustache
+      case 3: // Mustache
         final stache = Path()
-          ..moveTo(w * 0.50, mouthY - (h * 0.01))
-          ..quadraticBezierTo(w * 0.44, mouthY - (h * 0.03), w * 0.40, mouthY + (h * 0.02))
-          ..quadraticBezierTo(w * 0.46, mouthY, w * 0.50, mouthY)
-          ..quadraticBezierTo(w * 0.54, mouthY, w * 0.60, mouthY + (h * 0.02))
-          ..quadraticBezierTo(w * 0.56, mouthY - (h * 0.03), w * 0.50, mouthY - (h * 0.01))
+          ..moveTo(cx, mouthY - h * 0.008)
+          ..quadraticBezierTo(cx - mw * 0.5, mouthY - h * 0.02, cx - mw, mouthY + h * 0.015)
+          ..quadraticBezierTo(cx - mw * 0.4, mouthY, cx, mouthY)
+          ..quadraticBezierTo(cx + mw * 0.4, mouthY, cx + mw, mouthY + h * 0.015)
+          ..quadraticBezierTo(cx + mw * 0.5, mouthY - h * 0.02, cx, mouthY - h * 0.008)
           ..close();
-        canvas.drawPath(stache, fillDark);
-        // Small smile under
-        canvas.drawLine(Offset(w * 0.47, mouthY + (h * 0.03)), Offset(w * 0.53, mouthY + (h * 0.03)), line);
+        canvas.drawPath(stache, fillHair);
+        canvas.drawLine(Offset(cx - mw * 0.5, mouthY + h * 0.02), Offset(cx + mw * 0.5, mouthY + h * 0.02), line);
         break;
 
-      case 4: // Neat Beard Outline
+      case 4: // Beard Contour
         final beard = Path()
-          ..moveTo(w * 0.36, h * 0.56)
-          ..quadraticBezierTo(w * 0.36, h * 0.72, w * 0.50, h * 0.73)
-          ..quadraticBezierTo(w * 0.64, h * 0.72, w * 0.64, h * 0.56);
+          ..moveTo(cx - mw * 1.8, mouthY - h * 0.04)
+          ..quadraticBezierTo(cx, mouthY + h * 0.12, cx + mw * 1.8, mouthY - h * 0.04);
         canvas.drawPath(beard, line);
-        // Goatee / soul patch
-        canvas.drawCircle(Offset(w * 0.50, mouthY + (h * 0.04)), w * 0.018, fillDark);
-        // Smile
+        canvas.drawCircle(Offset(cx, mouthY + h * 0.035), w * 0.018, fillHair);
         final smile = Path()
-          ..moveTo(w * 0.45, mouthY)
-          ..quadraticBezierTo(w * 0.50, mouthY + (h * 0.03), w * 0.55, mouthY);
+          ..moveTo(cx - mw, mouthY)
+          ..quadraticBezierTo(cx, mouthY + h * 0.02, cx + mw, mouthY);
         canvas.drawPath(smile, line);
         break;
 
       case 0: // Subtle Smirk
       default:
         final smirk = Path()
-          ..moveTo(w * 0.45, mouthY)
-          ..quadraticBezierTo(w * 0.51, mouthY + (h * 0.03), w * 0.56, mouthY - (h * 0.005));
+          ..moveTo(cx - mw, mouthY)
+          ..quadraticBezierTo(cx, mouthY + h * 0.022, cx + mw, mouthY - h * 0.005);
         canvas.drawPath(smirk, line);
         break;
     }

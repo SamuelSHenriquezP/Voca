@@ -226,6 +226,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         text: firstTurn.npcPrompt,
         isUser: false,
         time: '14:00',
+        personaName: _activeScenario.personaName,
       ),
     ];
 
@@ -312,6 +313,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           text: lastMsg.text,
           isUser: true,
           time: lastMsg.time,
+          personaName: lastMsg.personaName,
           accuracyScore: result.accuracyScore,
           coachGrammarTip: result.grammarTip,
           coachPronunciationTip: result.pronunciationTip,
@@ -347,6 +349,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             text: result.replyText,
             isUser: false,
             time: '14:05',
+            personaName: _activeScenario.personaName,
           ),
         );
         _scrollToBottom();

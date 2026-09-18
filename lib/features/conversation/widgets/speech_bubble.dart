@@ -25,13 +25,16 @@ class SpeechBubble extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       child: Row(
         mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
-            NotionAvatar.fromId(
-              message.id,
-              size: 32,
-              isAnimated: false,
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: NotionAvatar.fromId(
+                message.personaName ?? message.id,
+                size: 34,
+                isAnimated: false,
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -183,20 +186,23 @@ class SpeechBubble extends StatelessWidget {
           ),
           if (isUser) ...[
             const SizedBox(width: 8),
-            Builder(
-              builder: (_) {
-                final storage = LocalStorageService();
-                return NotionAvatar(
-                  head: storage.getNotionHead(),
-                  hair: storage.getNotionHair(),
-                  eyes: storage.getNotionEyes(),
-                  mouth: storage.getNotionMouth(),
-                  outfit: storage.getNotionOutfit(),
-                  backdrop: storage.getNotionBackdrop(),
-                  size: 32,
-                  isAnimated: false,
-                );
-              },
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Builder(
+                builder: (_) {
+                  final storage = LocalStorageService();
+                  return NotionAvatar(
+                    head: storage.getNotionHead(),
+                    hair: storage.getNotionHair(),
+                    eyes: storage.getNotionEyes(),
+                    mouth: storage.getNotionMouth(),
+                    outfit: storage.getNotionOutfit(),
+                    backdrop: storage.getNotionBackdrop(),
+                    size: 34,
+                    isAnimated: false,
+                  );
+                },
+              ),
             ),
           ],
         ],
