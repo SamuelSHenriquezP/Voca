@@ -54,6 +54,14 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     'Gorro Beanie',
     'Rapado clean',
     'Coleta',
+    'Ondulado medio',
+    'Dreadlocks / Trenzas',
+    'Tupé Pompadour',
+    'Afro esponjoso',
+    'Gorra delantera',
+    'Gorra hacia atrás',
+    'Melena lisa suelta',
+    'Calvo pulido',
   ];
 
   final List<String> _eyesNames = [
@@ -63,6 +71,12 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     'Guiño',
     'Sonrisa amable',
     'Gafas de sol',
+    'Monóculo retro',
+    'Gafas Cat-eye',
+    'Mirada curiosa',
+    'Gafas hexagonales',
+    'Ojos zen relajados',
+    'Gafas de lectura',
   ];
 
   final List<String> _mouthNames = [
@@ -71,6 +85,11 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     'Concentrado',
     'Bigote Notion',
     'Barba recortada',
+    'Pipa intelectual',
+    'Sonrisa pícara',
+    'Barba hipster',
+    'Perilla Van Dyke',
+    'Sonrisa con hoyuelos',
   ];
 
   final List<String> _outfitNames = [
@@ -79,6 +98,11 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     'Camisa cuello',
     'Camiseta',
     'Bufanda',
+    'Blazer & Corbata',
+    'Chaqueta Denim',
+    'Cuello Polo',
+    'Cazadora Bomber',
+    'Camisa hawaiana',
   ];
 
   final List<String> _headNames = [
@@ -86,6 +110,8 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     'Mandíbula angular',
     'Redonda',
     'Alargada',
+    'Corazón / Fina',
+    'Diamante',
   ];
 
   final List<Map<String, dynamic>> _backdropOptions = const [
@@ -94,6 +120,11 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     {'name': 'Lavanda', 'color': Color(0xFFF5F3FF)},
     {'name': 'Melocotón', 'color': Color(0xFFFFF7ED)},
     {'name': 'Carbón', 'color': Color(0xFF18181B)},
+    {'name': 'Azul Nórdico', 'color': Color(0xFFF0F9FF)},
+    {'name': 'Menta Fresca', 'color': Color(0xFFF0FDFA)},
+    {'name': 'Rosa Palo', 'color': Color(0xFFFFF1F2)},
+    {'name': 'Ámbar Cálido', 'color': Color(0xFFFFFBEB)},
+    {'name': 'Pizarra Obsidiana', 'color': Color(0xFF0F172A)},
   ];
 
   final List<String> _goals = ['10 min', '15 min', '25 min', '40 min'];
@@ -122,12 +153,12 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     VocaHaptics.selection();
     final rand = math.Random();
     setState(() {
-      _head = rand.nextInt(4);
-      _hair = rand.nextInt(8);
-      _eyes = rand.nextInt(6);
-      _mouth = rand.nextInt(5);
-      _outfit = rand.nextInt(5);
-      _backdrop = rand.nextInt(5);
+      _head = rand.nextInt(_headNames.length);
+      _hair = rand.nextInt(_hairNames.length);
+      _eyes = rand.nextInt(_eyesNames.length);
+      _mouth = rand.nextInt(_mouthNames.length);
+      _outfit = rand.nextInt(_outfitNames.length);
+      _backdrop = rand.nextInt(_backdropOptions.length);
     });
   }
 

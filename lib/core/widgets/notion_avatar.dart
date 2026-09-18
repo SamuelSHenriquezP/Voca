@@ -89,12 +89,12 @@ class NotionAvatar extends StatefulWidget {
       backdrop = 0; // Cream
     } else {
       final hash = idOrName.hashCode.abs();
-      head = hash % 4;
-      hair = (hash ~/ 4) % 8;
-      eyes = (hash ~/ 32) % 6;
-      mouth = (hash ~/ 192) % 5;
-      outfit = (hash ~/ 960) % 5;
-      backdrop = (hash ~/ 4800) % 5;
+      head = hash % 6;
+      hair = (hash ~/ 6) % 16;
+      eyes = (hash ~/ 96) % 12;
+      mouth = (hash ~/ 1152) % 10;
+      outfit = (hash ~/ 11520) % 10;
+      backdrop = (hash ~/ 115200) % 10;
     }
 
     return NotionAvatar(
@@ -157,6 +157,16 @@ class _NotionAvatarState extends State<NotionAvatar>
         return const Color(0xFFFFF7ED); // Warm apricot
       case 4:
         return const Color(0xFF18181B); // Obsidian Slate
+      case 5:
+        return const Color(0xFFF0F9FF); // Nordic Sky
+      case 6:
+        return const Color(0xFFF0FDFA); // Fresh Mint
+      case 7:
+        return const Color(0xFFFFF1F2); // Blush Rose
+      case 8:
+        return const Color(0xFFFFFBEB); // Warm Amber
+      case 9:
+        return const Color(0xFF0F172A); // Midnight Obsidian
       case 0:
       default:
         return const Color(0xFFFAF9F6); // Warm Ivory
@@ -166,7 +176,7 @@ class _NotionAvatarState extends State<NotionAvatar>
   @override
   Widget build(BuildContext context) {
     final s = widget.size;
-    final isDarkBackdrop = widget.backdropIndex == 4;
+    final isDarkBackdrop = widget.backdropIndex == 4 || widget.backdropIndex == 9;
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -302,7 +312,7 @@ class _NotionAvatarPainter extends CustomPainter {
     _drawNose(canvas, cx, cy, hh, w, line);
 
     // 8. MOUTH & FACIAL DETAILS
-    _drawMouth(canvas, cx, cy, hh, w, h, line, fillSkin, fillHair);
+    _drawMouth(canvas, cx, cy, hw, hh, w, h, line, fillSkin, fillHair);
   }
 
   void _drawGarment(Canvas canvas, Size size, Paint line, Paint fillGarment, Color strokeColor) {
@@ -372,6 +382,79 @@ class _NotionAvatarPainter extends CustomPainter {
         canvas.drawPath(scarf, line);
         break;
 
+      case 5: // Blazer & Tie
+        final shirtV = Path()
+          ..moveTo(w * 0.43, h * 0.73)
+          ..lineTo(w * 0.50, h * 0.88)
+          ..lineTo(w * 0.57, h * 0.73)
+          ..close();
+        canvas.drawPath(shirtV, Paint()..color = isDark ? const Color(0xFF27272A) : const Color(0xFFFAF9F6)..style = PaintingStyle.fill);
+        canvas.drawPath(shirtV, line);
+        final tie = Path()
+          ..moveTo(w * 0.48, h * 0.76)
+          ..lineTo(w * 0.52, h * 0.76)
+          ..lineTo(w * 0.53, h * 0.86)
+          ..lineTo(w * 0.50, h * 0.90)
+          ..lineTo(w * 0.47, h * 0.86)
+          ..close();
+        canvas.drawPath(tie, Paint()..color = strokeColor..style = PaintingStyle.fill);
+        canvas.drawLine(Offset(w * 0.38, h * 0.72), Offset(w * 0.46, h * 0.84), line);
+        canvas.drawLine(Offset(w * 0.62, h * 0.72), Offset(w * 0.54, h * 0.84), line);
+        break;
+
+      case 6: // Denim Jacket
+        final collarL = Path()
+          ..moveTo(w * 0.50, h * 0.73)
+          ..lineTo(w * 0.36, h * 0.70)
+          ..lineTo(w * 0.44, h * 0.78)
+          ..close();
+        final collarR = Path()
+          ..moveTo(w * 0.50, h * 0.73)
+          ..lineTo(w * 0.64, h * 0.70)
+          ..lineTo(w * 0.56, h * 0.78)
+          ..close();
+        canvas.drawPath(collarL, line);
+        canvas.drawPath(collarR, line);
+        canvas.drawLine(Offset(w * 0.40, h * 0.78), Offset(w * 0.40, h), line);
+        canvas.drawLine(Offset(w * 0.60, h * 0.78), Offset(w * 0.60, h), line);
+        canvas.drawLine(Offset(w * 0.50, h * 0.78), Offset(w * 0.50, h), line);
+        break;
+
+      case 7: // Polo
+        final poloL = Path()
+          ..moveTo(w * 0.50, h * 0.73)
+          ..lineTo(w * 0.39, h * 0.72)
+          ..lineTo(w * 0.46, h * 0.78)
+          ..close();
+        final poloR = Path()
+          ..moveTo(w * 0.50, h * 0.73)
+          ..lineTo(w * 0.61, h * 0.72)
+          ..lineTo(w * 0.54, h * 0.78)
+          ..close();
+        canvas.drawPath(poloL, line);
+        canvas.drawPath(poloR, line);
+        canvas.drawLine(Offset(w * 0.50, h * 0.78), Offset(w * 0.50, h * 0.88), line);
+        canvas.drawCircle(Offset(w * 0.48, h * 0.82), w * 0.012, Paint()..color = strokeColor..style = PaintingStyle.fill);
+        break;
+
+      case 8: // Bomber Jacket
+        final bomberRib = Path()
+          ..moveTo(w * 0.36, h * 0.73)
+          ..quadraticBezierTo(w * 0.50, h * 0.77, w * 0.64, h * 0.73);
+        canvas.drawPath(bomberRib, line);
+        canvas.drawLine(Offset(w * 0.50, h * 0.77), Offset(w * 0.50, h), line);
+        canvas.drawRect(Rect.fromCenter(center: Offset(w * 0.50, h * 0.80), width: w * 0.03, height: h * 0.04), Paint()..color = strokeColor..style = PaintingStyle.fill);
+        break;
+
+      case 9: // Casual Open Shirt
+        final innerTee = Path()
+          ..moveTo(w * 0.40, h * 0.74)
+          ..quadraticBezierTo(w * 0.50, h * 0.80, w * 0.60, h * 0.74);
+        canvas.drawPath(innerTee, line);
+        canvas.drawLine(Offset(w * 0.40, h * 0.74), Offset(w * 0.44, h), line);
+        canvas.drawLine(Offset(w * 0.60, h * 0.74), Offset(w * 0.56, h), line);
+        break;
+
       case 3: // Crewneck
       default:
         final crew = Path()
@@ -437,6 +520,27 @@ class _NotionAvatarPainter extends CustomPainter {
             Rect.fromCenter(center: Offset(cx, cy), width: hw * 0.90, height: hh * 1.04),
             Radius.circular(hw * 0.42),
           ));
+        break;
+
+      case 4: // Heart / Tapered Chin
+        headPath = Path()
+          ..moveTo(cx - hw * 0.48, cy - hh * 0.38)
+          ..quadraticBezierTo(cx, cy - hh * 0.54, cx + hw * 0.48, cy - hh * 0.38)
+          ..lineTo(cx + hw * 0.44, cy + hh * 0.10)
+          ..quadraticBezierTo(cx + hw * 0.28, cy + hh * 0.46, cx, cy + hh * 0.50)
+          ..quadraticBezierTo(cx - hw * 0.28, cy + hh * 0.46, cx - hw * 0.44, cy + hh * 0.10)
+          ..close();
+        break;
+
+      case 5: // Diamond
+        headPath = Path()
+          ..moveTo(cx, cy - hh * 0.50)
+          ..lineTo(cx + hw * 0.48, cy - hh * 0.10)
+          ..lineTo(cx + hw * 0.35, cy + hh * 0.32)
+          ..lineTo(cx, cy + hh * 0.50)
+          ..lineTo(cx - hw * 0.35, cy + hh * 0.32)
+          ..lineTo(cx - hw * 0.48, cy - hh * 0.10)
+          ..close();
         break;
 
       case 0: // Oval
@@ -553,6 +657,114 @@ class _NotionAvatarPainter extends CustomPainter {
         canvas.drawPath(pony, line);
         break;
 
+      case 8: // Medium Wavy Flow
+        final wavy = Path()
+          ..moveTo(cx - hw * 0.52, cy + hh * 0.22)
+          ..quadraticBezierTo(cx - hw * 0.55, cy - hh * 0.35, cx, cy - hh * 0.58)
+          ..quadraticBezierTo(cx + hw * 0.55, cy - hh * 0.58, cx + hw * 0.52, cy + hh * 0.22)
+          ..quadraticBezierTo(cx + hw * 0.44, cy + hh * 0.05, cx + hw * 0.38, cy - hh * 0.25)
+          ..quadraticBezierTo(cx, cy - hh * 0.36, cx - hw * 0.38, cy - hh * 0.25)
+          ..quadraticBezierTo(cx - hw * 0.44, cy + hh * 0.05, cx - hw * 0.52, cy + hh * 0.22)
+          ..close();
+        canvas.drawPath(wavy, fillHair);
+        canvas.drawPath(wavy, line);
+        break;
+
+      case 9: // Dreadlocks / Braids
+        final baseLocks = Path()
+          ..moveTo(cx - hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx, cy - hh * 0.60, cx + hw * 0.50, cy - hh * 0.05)
+          ..quadraticBezierTo(cx, cy - hh * 0.35, cx - hw * 0.50, cy - hh * 0.05)
+          ..close();
+        canvas.drawPath(baseLocks, fillHair);
+        canvas.drawPath(baseLocks, line);
+        for (int i = -3; i <= 3; i++) {
+          final lx = cx + (i * w * 0.048);
+          final lyEnd = cy + hh * (0.15 + (i.abs() * 0.05));
+          canvas.drawLine(Offset(lx, cy - hh * 0.38), Offset(lx, lyEnd), line);
+        }
+        break;
+
+      case 10: // Modern Pompadour / Quiff
+        final pomp = Path()
+          ..moveTo(cx - hw * 0.48, cy - hh * 0.15)
+          ..quadraticBezierTo(cx - hw * 0.50, cy - hh * 0.50, cx - hw * 0.10, cy - hh * 0.66)
+          ..quadraticBezierTo(cx + hw * 0.30, cy - hh * 0.70, cx + hw * 0.48, cy - hh * 0.40)
+          ..lineTo(cx + hw * 0.48, cy - hh * 0.15)
+          ..quadraticBezierTo(cx + hw * 0.20, cy - hh * 0.38, cx, cy - hh * 0.40)
+          ..quadraticBezierTo(cx - hw * 0.25, cy - hh * 0.32, cx - hw * 0.48, cy - hh * 0.15)
+          ..close();
+        canvas.drawPath(pomp, fillHair);
+        canvas.drawPath(pomp, line);
+        break;
+
+      case 11: // Rounded Afro
+        final afro = Path()
+          ..addOval(Rect.fromCenter(
+            center: Offset(cx, cy - hh * 0.20),
+            width: hw * 1.30,
+            height: hh * 1.25,
+          ));
+        canvas.drawPath(afro, fillHair);
+        canvas.drawPath(afro, line);
+        final foreCut = Path()
+          ..moveTo(cx - hw * 0.46, cy - hh * 0.15)
+          ..quadraticBezierTo(cx, cy - hh * 0.36, cx + hw * 0.46, cy - hh * 0.15)
+          ..close();
+        canvas.drawPath(foreCut, fillSkin);
+        canvas.drawPath(foreCut, line);
+        break;
+
+      case 12: // Baseball Cap Forward
+        final capDome = Path()
+          ..moveTo(cx - hw * 0.52, cy - hh * 0.20)
+          ..quadraticBezierTo(cx, cy - hh * 0.68, cx + hw * 0.52, cy - hh * 0.20)
+          ..close();
+        canvas.drawPath(capDome, fillHair);
+        canvas.drawPath(capDome, line);
+        final visor = Path()
+          ..moveTo(cx - hw * 0.52, cy - hh * 0.20)
+          ..quadraticBezierTo(cx - w * 0.10, cy - hh * 0.12, cx + hw * 0.42, cy - hh * 0.20)
+          ..quadraticBezierTo(cx - w * 0.10, cy - hh * 0.26, cx - hw * 0.52, cy - hh * 0.20)
+          ..close();
+        canvas.drawPath(visor, fillHair);
+        canvas.drawPath(visor, line);
+        break;
+
+      case 13: // Backwards Snapback
+        final snapDome = Path()
+          ..moveTo(cx - hw * 0.52, cy - hh * 0.15)
+          ..quadraticBezierTo(cx, cy - hh * 0.65, cx + hw * 0.52, cy - hh * 0.15)
+          ..close();
+        canvas.drawPath(snapDome, fillHair);
+        canvas.drawPath(snapDome, line);
+        canvas.drawCircle(Offset(cx, cy - hh * 0.65), w * 0.02, Paint()..color = line.color..style = PaintingStyle.fill);
+        final strapArc = Path()
+          ..moveTo(cx - w * 0.10, cy - hh * 0.15)
+          ..quadraticBezierTo(cx, cy - hh * 0.26, cx + w * 0.10, cy - hh * 0.15);
+        canvas.drawPath(strapArc, line);
+        break;
+
+      case 14: // Sleek Straight Long Hair
+        final longHair = Path()
+          ..moveTo(cx - hw * 0.50, cy + hh * 0.50)
+          ..lineTo(cx - hw * 0.50, cy - hh * 0.30)
+          ..quadraticBezierTo(cx, cy - hh * 0.60, cx + hw * 0.50, cy - hh * 0.30)
+          ..lineTo(cx + hw * 0.50, cy + hh * 0.50)
+          ..lineTo(cx + hw * 0.38, cy + hh * 0.50)
+          ..lineTo(cx + hw * 0.38, cy - hh * 0.20)
+          ..quadraticBezierTo(cx, cy - hh * 0.35, cx - hw * 0.38, cy - hh * 0.20)
+          ..lineTo(cx - hw * 0.38, cy + hh * 0.50)
+          ..close();
+        canvas.drawPath(longHair, fillHair);
+        canvas.drawPath(longHair, line);
+        break;
+
+      case 15: // Clean Bald with Sideburns
+        canvas.drawLine(Offset(cx - hw * 0.48, cy - hh * 0.10), Offset(cx - hw * 0.48, cy + hh * 0.10), line);
+        canvas.drawLine(Offset(cx + hw * 0.48, cy - hh * 0.10), Offset(cx + hw * 0.48, cy + hh * 0.10), line);
+        break;
+
       case 6: // Buzzcut / Clean Crop
       default:
         final buzz = Path()
@@ -634,6 +846,87 @@ class _NotionAvatarPainter extends CustomPainter {
         canvas.drawLine(Offset(sL.right, eyeY), Offset(sR.left, eyeY), line);
         break;
 
+      case 6: // Retro Monocle
+        canvas.drawCircle(Offset(leftX, eyeY), w * 0.024, fillHair);
+        canvas.drawLine(Offset(leftX - w * 0.03, eyeY - h * 0.042), Offset(leftX + w * 0.03, eyeY - h * 0.042), line);
+        final monoR = w * 0.065;
+        canvas.drawCircle(Offset(rightX, eyeY), monoR, line);
+        canvas.drawCircle(Offset(rightX, eyeY), w * 0.020, fillHair);
+        final chain = Path()
+          ..moveTo(rightX + monoR, eyeY)
+          ..quadraticBezierTo(cx + hw * 0.45, eyeY + h * 0.08, cx + hw * 0.30, eyeY + h * 0.18);
+        canvas.drawPath(chain, line);
+        break;
+
+      case 7: // Vintage Cat-Eye Glasses
+        final catL = Path()
+          ..moveTo(leftX - w * 0.065, eyeY)
+          ..lineTo(leftX - w * 0.08, eyeY - h * 0.025)
+          ..lineTo(leftX + w * 0.04, eyeY - h * 0.02)
+          ..quadraticBezierTo(leftX, eyeY + h * 0.03, leftX - w * 0.065, eyeY)
+          ..close();
+        final catR = Path()
+          ..moveTo(rightX + w * 0.065, eyeY)
+          ..lineTo(rightX + w * 0.08, eyeY - h * 0.025)
+          ..lineTo(rightX - w * 0.04, eyeY - h * 0.02)
+          ..quadraticBezierTo(rightX, eyeY + h * 0.03, rightX + w * 0.065, eyeY)
+          ..close();
+        canvas.drawPath(catL, line);
+        canvas.drawPath(catR, line);
+        canvas.drawLine(Offset(leftX + w * 0.04, eyeY - h * 0.015), Offset(rightX - w * 0.04, eyeY - h * 0.015), line);
+        canvas.drawCircle(Offset(leftX - w * 0.005, eyeY), w * 0.018, fillHair);
+        canvas.drawCircle(Offset(rightX + w * 0.005, eyeY), w * 0.018, fillHair);
+        break;
+
+      case 8: // Curious Side Glance
+        canvas.drawCircle(Offset(leftX + w * 0.012, eyeY), w * 0.025, fillHair);
+        canvas.drawCircle(Offset(rightX + w * 0.012, eyeY), w * 0.025, fillHair);
+        canvas.drawLine(Offset(leftX - w * 0.03, eyeY - h * 0.044), Offset(leftX + w * 0.03, eyeY - h * 0.038), line);
+        canvas.drawLine(Offset(rightX - w * 0.03, eyeY - h * 0.038), Offset(rightX + w * 0.03, eyeY - h * 0.044), line);
+        break;
+
+      case 9: // Hexagonal Glasses
+        Path hexPath(double ox) {
+          final hr = w * 0.065;
+          final p = Path();
+          for (int i = 0; i < 6; i++) {
+            final angle = (i * math.pi / 3) + (math.pi / 6);
+            final px = ox + hr * math.cos(angle);
+            final py = eyeY + hr * math.sin(angle);
+            if (i == 0) {
+              p.moveTo(px, py);
+            } else {
+              p.lineTo(px, py);
+            }
+          }
+          p.close();
+          return p;
+        }
+        canvas.drawPath(hexPath(leftX), line);
+        canvas.drawPath(hexPath(rightX), line);
+        canvas.drawLine(Offset(leftX + w * 0.055, eyeY), Offset(rightX - w * 0.055, eyeY), line);
+        canvas.drawCircle(Offset(leftX, eyeY), w * 0.020, fillHair);
+        canvas.drawCircle(Offset(rightX, eyeY), w * 0.020, fillHair);
+        break;
+
+      case 10: // Zen / Relaxed Eyes
+        canvas.drawLine(Offset(leftX - w * 0.035, eyeY), Offset(leftX + w * 0.035, eyeY), line);
+        canvas.drawLine(Offset(rightX - w * 0.035, eyeY), Offset(rightX + w * 0.035, eyeY), line);
+        canvas.drawLine(Offset(leftX - w * 0.03, eyeY - h * 0.035), Offset(leftX + w * 0.03, eyeY - h * 0.035), line);
+        canvas.drawLine(Offset(rightX - w * 0.03, eyeY - h * 0.035), Offset(rightX + w * 0.03, eyeY - h * 0.035), line);
+        break;
+
+      case 11: // Reading Glasses Perched Low
+        canvas.drawCircle(Offset(leftX, eyeY - h * 0.01), w * 0.024, fillHair);
+        canvas.drawCircle(Offset(rightX, eyeY - h * 0.01), w * 0.024, fillHair);
+        final lowY = eyeY + h * 0.03;
+        final rLowL = Rect.fromCenter(center: Offset(leftX, lowY), width: w * 0.11, height: h * 0.05);
+        final rLowR = Rect.fromCenter(center: Offset(rightX, lowY), width: w * 0.11, height: h * 0.05);
+        canvas.drawRect(rLowL, line);
+        canvas.drawRect(rLowR, line);
+        canvas.drawLine(Offset(rLowL.right, lowY), Offset(rLowR.left, lowY), line);
+        break;
+
       case 1: // Clean Dots & Brows
       default:
         canvas.drawCircle(Offset(leftX, eyeY), w * 0.024, fillHair);
@@ -652,7 +945,7 @@ class _NotionAvatarPainter extends CustomPainter {
     canvas.drawPath(nose, line);
   }
 
-  void _drawMouth(Canvas canvas, double cx, double cy, double hh, double w, double h, Paint line, Paint fillSkin, Paint fillHair) {
+  void _drawMouth(Canvas canvas, double cx, double cy, double hw, double hh, double w, double h, Paint line, Paint fillSkin, Paint fillHair) {
     final mouthY = cy + hh * 0.28;
     final mw = w * 0.065;
 
@@ -693,6 +986,70 @@ class _NotionAvatarPainter extends CustomPainter {
           ..moveTo(cx - mw, mouthY)
           ..quadraticBezierTo(cx, mouthY + h * 0.02, cx + mw, mouthY);
         canvas.drawPath(smile, line);
+        break;
+
+      case 5: // Pipe
+        final smile = Path()
+          ..moveTo(cx - mw, mouthY)
+          ..quadraticBezierTo(cx, mouthY + h * 0.015, cx + mw * 0.4, mouthY);
+        canvas.drawPath(smile, line);
+        final pipe = Path()
+          ..moveTo(cx + mw * 0.3, mouthY)
+          ..quadraticBezierTo(cx + mw * 1.1, mouthY + h * 0.03, cx + mw * 1.4, mouthY - h * 0.01)
+          ..lineTo(cx + mw * 1.55, mouthY - h * 0.04)
+          ..lineTo(cx + mw * 1.70, mouthY - h * 0.04)
+          ..lineTo(cx + mw * 1.60, mouthY + h * 0.02)
+          ..close();
+        canvas.drawPath(pipe, fillHair);
+        canvas.drawPath(pipe, line);
+        break;
+
+      case 6: // Cheeky Corner Grin
+        final grin = Path()
+          ..moveTo(cx - mw * 0.6, mouthY)
+          ..quadraticBezierTo(cx + mw * 0.2, mouthY + h * 0.01, cx + mw * 1.1, mouthY - h * 0.02);
+        canvas.drawPath(grin, line);
+        canvas.drawLine(Offset(cx + mw * 1.15, mouthY - h * 0.03), Offset(cx + mw * 1.15, mouthY - h * 0.01), line);
+        break;
+
+      case 7: // Full Hipster Beard
+        final fullBeard = Path()
+          ..moveTo(cx - hw * 0.48, cy + hh * 0.05)
+          ..lineTo(cx - hw * 0.45, cy + hh * 0.30)
+          ..quadraticBezierTo(cx, cy + hh * 0.65, cx + hw * 0.45, cy + hh * 0.30)
+          ..lineTo(cx + hw * 0.48, cy + hh * 0.05)
+          ..quadraticBezierTo(cx + hw * 0.30, cy + hh * 0.20, cx, cy + hh * 0.22)
+          ..quadraticBezierTo(cx - hw * 0.30, cy + hh * 0.20, cx - hw * 0.48, cy + hh * 0.05)
+          ..close();
+        canvas.drawPath(fullBeard, fillHair);
+        canvas.drawPath(fullBeard, line);
+        canvas.drawLine(Offset(cx - mw * 0.6, mouthY), Offset(cx + mw * 0.6, mouthY), line);
+        break;
+
+      case 8: // Van Dyke Goatee & French Moustache
+        final vanDyke = Path()
+          ..moveTo(cx - mw * 0.4, mouthY + h * 0.02)
+          ..lineTo(cx, mouthY + h * 0.08)
+          ..lineTo(cx + mw * 0.4, mouthY + h * 0.02)
+          ..close();
+        canvas.drawPath(vanDyke, fillHair);
+        final stacheL = Path()
+          ..moveTo(cx, mouthY - h * 0.005)
+          ..quadraticBezierTo(cx - mw * 0.6, mouthY - h * 0.02, cx - mw * 1.1, mouthY - h * 0.01);
+        final stacheR = Path()
+          ..moveTo(cx, mouthY - h * 0.005)
+          ..quadraticBezierTo(cx + mw * 0.6, mouthY - h * 0.02, cx + mw * 1.1, mouthY - h * 0.01);
+        canvas.drawPath(stacheL, line);
+        canvas.drawPath(stacheR, line);
+        break;
+
+      case 9: // Dimpled Wide Smile
+        final wideSmile = Path()
+          ..moveTo(cx - mw * 1.1, mouthY - h * 0.005)
+          ..quadraticBezierTo(cx, mouthY + h * 0.032, cx + mw * 1.1, mouthY - h * 0.005);
+        canvas.drawPath(wideSmile, line);
+        canvas.drawLine(Offset(cx - mw * 1.2, mouthY - h * 0.015), Offset(cx - mw * 1.2, mouthY + h * 0.005), line);
+        canvas.drawLine(Offset(cx + mw * 1.2, mouthY - h * 0.015), Offset(cx + mw * 1.2, mouthY + h * 0.005), line);
         break;
 
       case 0: // Subtle Smirk
