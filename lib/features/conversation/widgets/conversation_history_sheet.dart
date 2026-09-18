@@ -3,7 +3,7 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 
 class ConversationHistorySheet extends StatefulWidget {
   const ConversationHistorySheet({super.key});
@@ -208,7 +208,7 @@ class _ConversationHistorySheetState extends State<ConversationHistorySheet> {
             ),
             child: Row(
               children: [
-                NotionAvatar.fromId(
+                VocaAvatar.fromId(
                   session['scenario_id']?.toString() ?? persona,
                   size: 44,
                   isAnimated: false,

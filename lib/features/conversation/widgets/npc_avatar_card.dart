@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 
 class NpcAvatarCard extends StatelessWidget {
   final String name;
@@ -38,8 +38,8 @@ class NpcAvatarCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Compact Vector Notion Ink Avatar
-          NotionAvatar.fromId(
+          // Compact Vector VOCA Ink Avatar
+          VocaAvatar.fromId(
             name,
             size: 42,
             isAnimated: isSpeaking,

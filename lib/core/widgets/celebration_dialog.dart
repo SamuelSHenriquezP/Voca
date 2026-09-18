@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../utils/haptic_feedback_utils.dart';
 import '../utils/sound_effects.dart';
 import '../../features/lesson/models/tactical_card.dart';
-import 'notion_avatar.dart';
+import 'voca_avatar.dart';
 import '../storage/local_storage_service.dart';
 import 'voca_button.dart';
 
@@ -144,17 +144,17 @@ class _CelebrationDialogState extends State<CelebrationDialog>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Celebrating Notion Avatar Mascot
+                  // Celebrating VOCA Avatar Mascot
                   Builder(
                     builder: (context) {
                       final storage = LocalStorageService();
-                      return NotionAvatar(
-                        head: storage.getNotionHead(),
-                        hair: storage.getNotionHair(),
-                        eyes: storage.getNotionEyes(),
-                        mouth: storage.getNotionMouth(),
-                        outfit: storage.getNotionOutfit(),
-                        backdrop: storage.getNotionBackdrop(),
+                      return VocaAvatar(
+                        head: storage.getVocaHead(),
+                        hair: storage.getVocaHair(),
+                        eyes: storage.getVocaEyes(),
+                        mouth: storage.getVocaMouth(),
+                        outfit: storage.getVocaOutfit(),
+                        backdrop: storage.getVocaBackdrop(),
                         size: 96,
                       );
                     },

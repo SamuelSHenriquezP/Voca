@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 import 'npc_avatar_card.dart';
 
 class ScenarioItem {
@@ -249,8 +249,8 @@ class ScenarioSelectorSheet extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Notion Ink Avatar
-            NotionAvatar.fromId(
+            // VOCA Ink Avatar
+            VocaAvatar.fromId(
               sc.id,
               size: 50,
               isAnimated: false,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 
 /// Ultra-minimalist top bar for VOCA.
 /// Pure monochrome, quiet slate tones, zero exotic candy gamification colors.
@@ -46,7 +46,7 @@ class TopStickyBar extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
-            // Left: Notion Avatar & User Identity
+            // Left: VOCA Avatar & User Identity
             if (onProfileTap != null)
               Expanded(
                 child: BouncyTap(
@@ -59,13 +59,13 @@ class TopStickyBar extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: const Color(0xFF0F172A), width: 1.5),
                         ),
-                        child: NotionAvatar(
-                          head: storage.getNotionHead(),
-                          hair: storage.getNotionHair(),
-                          eyes: storage.getNotionEyes(),
-                          mouth: storage.getNotionMouth(),
-                          outfit: storage.getNotionOutfit(),
-                          backdrop: storage.getNotionBackdrop(),
+                        child: VocaAvatar(
+                          head: storage.getVocaHead(),
+                          hair: storage.getVocaHair(),
+                          eyes: storage.getVocaEyes(),
+                          mouth: storage.getVocaMouth(),
+                          outfit: storage.getVocaOutfit(),
+                          backdrop: storage.getVocaBackdrop(),
                           size: 32,
                           isAnimated: false,
                         ),

@@ -3,8 +3,8 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/network/network_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/notion_avatar.dart';
-import '../../../core/widgets/notion_avatar_creator_sheet.dart';
+import '../../../core/widgets/voca_avatar.dart';
+import '../../../core/widgets/voca_avatar_creator_sheet.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../../lesson/models/tactical_card.dart';
 import '../widgets/activity_velocity_chart.dart';
@@ -610,10 +610,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 return Row(
                   children: [
-                    // Notion Interactive Avatar
+                    // VOCA Interactive Avatar
                     BouncyTap(
                       onTap: () {
-                        NotionAvatarCreatorSheet.show(
+                        VocaAvatarCreatorSheet.show(
                           context,
                           onSaved: () => setState(() {}),
                         );
@@ -627,13 +627,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: const Color(0xFF0F172A), width: 2),
                             ),
-                            child: NotionAvatar(
-                              head: storage.getNotionHead(),
-                              hair: storage.getNotionHair(),
-                              eyes: storage.getNotionEyes(),
-                              mouth: storage.getNotionMouth(),
-                              outfit: storage.getNotionOutfit(),
-                              backdrop: storage.getNotionBackdrop(),
+                            child: VocaAvatar(
+                              head: storage.getVocaHead(),
+                              hair: storage.getVocaHair(),
+                              eyes: storage.getVocaEyes(),
+                              mouth: storage.getVocaMouth(),
+                              outfit: storage.getVocaOutfit(),
+                              backdrop: storage.getVocaBackdrop(),
                               size: 58,
                             ),
                           ),
@@ -709,7 +709,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // Quick Customize Avatar Button
                     BouncyTap(
                       onTap: () {
-                        NotionAvatarCreatorSheet.show(
+                        VocaAvatarCreatorSheet.show(
                           context,
                           onSaved: () => setState(() {}),
                         );

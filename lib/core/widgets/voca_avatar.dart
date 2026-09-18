@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-class NotionAvatar extends StatefulWidget {
+class VocaAvatar extends StatefulWidget {
   final int headShape;    // 0: Oval, 1: Square, 2: Round, 3: Oblong
   final int hairStyle;    // 0: Part, 1: Curls, 2: Bun, 3: Bob, 4: Fringe, 5: Beanie, 6: Buzz, 7: Ponytail
   final int eyesStyle;    // 0: Round Glasses, 1: Dots, 2: Square Glasses, 3: Wink, 4: Smile, 5: Shades
@@ -12,7 +12,7 @@ class NotionAvatar extends StatefulWidget {
   final bool isAnimated;
   final VoidCallback? onTap;
 
-  const NotionAvatar({
+  const VocaAvatar({
     super.key,
     int? head,
     int? hair,
@@ -36,8 +36,8 @@ class NotionAvatar extends StatefulWidget {
         outfitStyle = outfit ?? outfitStyle,
         backdropIndex = backdrop ?? backdropIndex;
 
-  /// Generate a deterministic, personality-aligned Notion avatar from an ID or Name
-  factory NotionAvatar.fromId(
+  /// Generate a deterministic, personality-aligned VOCA avatar from an ID or Name
+  factory VocaAvatar.fromId(
     String idOrName, {
     Key? key,
     double size = 64,
@@ -89,6 +89,12 @@ class NotionAvatar extends StatefulWidget {
       backdrop = 0; // Cream
     } else {
       final hash = idOrName.hashCode.abs();
+      head = hash % 4;
+      hair = (hash ~/ 4) % 8;
+      eyes = (hash ~/ 32) % 6;
+      mouth = (hash ~/ 192) % 5;
+      outfit = (hash ~/ 960) % 5;
+      backdrop = (hash ~/ 4800) % 5;
       head = hash % 6;
       hair = (hash ~/ 6) % 16;
       eyes = (hash ~/ 96) % 12;
@@ -97,7 +103,7 @@ class NotionAvatar extends StatefulWidget {
       backdrop = (hash ~/ 115200) % 10;
     }
 
-    return NotionAvatar(
+    return VocaAvatar(
       key: key,
       head: head,
       hair: hair,
@@ -112,10 +118,10 @@ class NotionAvatar extends StatefulWidget {
   }
 
   @override
-  State<NotionAvatar> createState() => _NotionAvatarState();
+  State<VocaAvatar> createState() => _VocaAvatarState();
 }
 
-class _NotionAvatarState extends State<NotionAvatar>
+class _VocaAvatarState extends State<VocaAvatar>
     with SingleTickerProviderStateMixin {
   late AnimationController _anim;
 
@@ -132,7 +138,7 @@ class _NotionAvatarState extends State<NotionAvatar>
   }
 
   @override
-  void didUpdateWidget(covariant NotionAvatar oldWidget) {
+  void didUpdateWidget(covariant VocaAvatar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isAnimated && !_anim.isAnimating) {
       _anim.repeat(reverse: true);
@@ -147,8 +153,8 @@ class _NotionAvatarState extends State<NotionAvatar>
     super.dispose();
   }
 
-  Color _getBackdropColor() {
-    switch (widget.backdropIndex) {
+  Color _getBackdropColor(int index) {
+    switch (index) {
       case 1:
         return const Color(0xFFF0FDF4); // Sage
       case 2:
@@ -176,6 +182,7 @@ class _NotionAvatarState extends State<NotionAvatar>
   @override
   Widget build(BuildContext context) {
     final s = widget.size;
+    final bg = _getBackdropColor(widget.backdropIndex);
     final isDarkBackdrop = widget.backdropIndex == 4 || widget.backdropIndex == 9;
 
     return GestureDetector(
@@ -184,30 +191,29 @@ class _NotionAvatarState extends State<NotionAvatar>
         animation: _anim,
         builder: (context, _) {
           final t = _anim.value;
-          final scaleY = widget.isAnimated ? 1.0 + (math.sin(t * math.pi) * 0.02) : 1.0;
-          final scaleX = widget.isAnimated ? 1.0 - (math.sin(t * math.pi) * 0.012) : 1.0;
-          final isBlinking = widget.isAnimated && (t > 0.90 && t < 0.98);
+          // Smooth breathing float (subtle 1.8px)
+          final breathY = math.sin(t * math.pi * 2) * (s * 0.015);
+          // Micro-blink: brief 100ms blinks every ~2.2s
+          final isBlinking = widget.isAnimated && (t > 0.48 && t < 0.52);
 
-          return Transform.scale(
-            scaleX: scaleX,
-            scaleY: scaleY,
-            alignment: Alignment.bottomCenter,
+          return Transform.translate(
+            offset: Offset(0, breathY),
             child: Container(
               width: s,
               height: s,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _getBackdropColor(),
+                color: bg,
                 border: Border.all(
-                  color: isDarkBackdrop ? const Color(0xFF3F3F46) : const Color(0xFF0F172A),
-                  width: s > 50 ? 2.0 : 1.3,
+                  color: isDarkBackdrop ? const Color(0xFF334155) : const Color(0xFFE4E4E7),
+                  width: (s * 0.03).clamp(1.0, 2.0),
                 ),
-                boxShadow: s > 50
+                boxShadow: s >= 44
                     ? [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          offset: const Offset(0, 2),
-                          blurRadius: 4,
+                          color: Colors.black.withOpacity(0.04),
+                          offset: const Offset(0, 3),
+                          blurRadius: 6,
                         ),
                       ]
                     : null,
@@ -215,7 +221,7 @@ class _NotionAvatarState extends State<NotionAvatar>
               child: ClipOval(
                 child: CustomPaint(
                   size: Size(s, s),
-                  painter: _NotionAvatarPainter(
+                  painter: _VocaAvatarPainter(
                     headShape: widget.headShape,
                     hairStyle: widget.hairStyle,
                     eyesStyle: widget.eyesStyle,
@@ -234,7 +240,7 @@ class _NotionAvatarState extends State<NotionAvatar>
   }
 }
 
-class _NotionAvatarPainter extends CustomPainter {
+class _VocaAvatarPainter extends CustomPainter {
   final int headShape;
   final int hairStyle;
   final int eyesStyle;
@@ -243,7 +249,7 @@ class _NotionAvatarPainter extends CustomPainter {
   final bool isDark;
   final bool isBlinking;
 
-  _NotionAvatarPainter({
+  _VocaAvatarPainter({
     required this.headShape,
     required this.hairStyle,
     required this.eyesStyle,
@@ -1063,7 +1069,7 @@ class _NotionAvatarPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _NotionAvatarPainter oldDelegate) {
+  bool shouldRepaint(covariant _VocaAvatarPainter oldDelegate) {
     return oldDelegate.headShape != headShape ||
         oldDelegate.hairStyle != hairStyle ||
         oldDelegate.eyesStyle != eyesStyle ||

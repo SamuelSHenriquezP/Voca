@@ -6,7 +6,7 @@ import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 import '../models/chat_message.dart';
 
 class SpeechBubble extends StatelessWidget {
@@ -30,7 +30,7 @@ class SpeechBubble extends StatelessWidget {
           if (!isUser) ...[
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: NotionAvatar.fromId(
+              child: VocaAvatar.fromId(
                 message.personaName ?? message.id,
                 size: 34,
                 isAnimated: false,
@@ -191,13 +191,13 @@ class SpeechBubble extends StatelessWidget {
               child: Builder(
                 builder: (_) {
                   final storage = LocalStorageService();
-                  return NotionAvatar(
-                    head: storage.getNotionHead(),
-                    hair: storage.getNotionHair(),
-                    eyes: storage.getNotionEyes(),
-                    mouth: storage.getNotionMouth(),
-                    outfit: storage.getNotionOutfit(),
-                    backdrop: storage.getNotionBackdrop(),
+                  return VocaAvatar(
+                    head: storage.getVocaHead(),
+                    hair: storage.getVocaHair(),
+                    eyes: storage.getVocaEyes(),
+                    mouth: storage.getVocaMouth(),
+                    outfit: storage.getVocaOutfit(),
+                    backdrop: storage.getVocaBackdrop(),
                     size: 34,
                     isAnimated: false,
                   );

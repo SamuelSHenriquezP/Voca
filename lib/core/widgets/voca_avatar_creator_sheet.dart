@@ -4,28 +4,28 @@ import '../storage/local_storage_service.dart';
 import '../utils/haptic_feedback_utils.dart';
 import '../utils/sound_effects.dart';
 import 'bouncy_tap.dart';
-import 'notion_avatar.dart';
+import 'voca_avatar.dart';
 import 'voca_button.dart';
 
-class NotionAvatarCreatorSheet extends StatefulWidget {
+class VocaAvatarCreatorSheet extends StatefulWidget {
   final VoidCallback? onSaved;
 
-  const NotionAvatarCreatorSheet({super.key, this.onSaved});
+  const VocaAvatarCreatorSheet({super.key, this.onSaved});
 
   static Future<void> show(BuildContext context, {VoidCallback? onSaved}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => NotionAvatarCreatorSheet(onSaved: onSaved),
+      builder: (_) => VocaAvatarCreatorSheet(onSaved: onSaved),
     );
   }
 
   @override
-  State<NotionAvatarCreatorSheet> createState() => _NotionAvatarCreatorSheetState();
+  State<VocaAvatarCreatorSheet> createState() => _VocaAvatarCreatorSheetState();
 }
 
-class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
+class _VocaAvatarCreatorSheetState extends State<VocaAvatarCreatorSheet> {
   late TextEditingController _nameController;
   late int _head;
   late int _hair;
@@ -83,7 +83,7 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     'Sonrisa sutil',
     'Sonrisa abierta',
     'Concentrado',
-    'Bigote Notion',
+    'Bigote Clásico',
     'Barba recortada',
     'Pipa intelectual',
     'Sonrisa pícara',
@@ -134,12 +134,12 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     super.initState();
     final storage = LocalStorageService();
     _nameController = TextEditingController(text: storage.getUserName());
-    _head = storage.getNotionHead();
-    _hair = storage.getNotionHair();
-    _eyes = storage.getNotionEyes();
-    _mouth = storage.getNotionMouth();
-    _outfit = storage.getNotionOutfit();
-    _backdrop = storage.getNotionBackdrop();
+    _head = storage.getVocaHead();
+    _hair = storage.getVocaHair();
+    _eyes = storage.getVocaEyes();
+    _mouth = storage.getVocaMouth();
+    _outfit = storage.getVocaOutfit();
+    _backdrop = storage.getVocaBackdrop();
     _goal = storage.getUserGoal();
   }
 
@@ -169,7 +169,7 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
     final storage = LocalStorageService();
     storage.setUserName(name);
     storage.setUserGoal(_goal);
-    await storage.saveNotionAvatar(
+    await storage.saveVocaAvatar(
       head: _head,
       hair: _hair,
       eyes: _eyes,
@@ -276,7 +276,7 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
 
           const SizedBox(height: 16),
 
-          // Live Notion Avatar Preview Stage
+          // Live VOCA Avatar Preview Stage
           Container(
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -294,7 +294,7 @@ class _NotionAvatarCreatorSheetState extends State<NotionAvatarCreatorSheet> {
               ],
             ),
             child: Center(
-              child: NotionAvatar(
+              child: VocaAvatar(
                 headShape: _head,
                 hairStyle: _hair,
                 eyesStyle: _eyes,

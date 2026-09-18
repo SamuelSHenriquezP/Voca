@@ -5,7 +5,7 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar_creator_sheet.dart';
+import '../../../core/widgets/voca_avatar_creator_sheet.dart';
 import '../../lesson/screens/lesson_screen.dart';
 import '../../shadowing/screens/shadowing_lab_screen.dart';
 import '../models/level_node.dart';
@@ -306,7 +306,7 @@ class _PathScreenState extends State<PathScreen> {
             hearts: LocalStorageService().getLives(),
             onProfileTap: () {
               VocaHaptics.selection();
-              NotionAvatarCreatorSheet.show(
+              VocaAvatarCreatorSheet.show(
                 context,
                 onSaved: () => setState(() {}),
               );

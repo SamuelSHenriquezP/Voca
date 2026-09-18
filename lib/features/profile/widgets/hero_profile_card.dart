@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 
 class HeroProfileCard extends StatelessWidget {
@@ -63,13 +63,13 @@ class HeroProfileCard extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                        child: NotionAvatar(
-                          head: storage.getNotionHead(),
-                          hair: storage.getNotionHair(),
-                          eyes: storage.getNotionEyes(),
-                          mouth: storage.getNotionMouth(),
-                          outfit: storage.getNotionOutfit(),
-                          backdrop: storage.getNotionBackdrop(),
+                        child: VocaAvatar(
+                          head: storage.getVocaHead(),
+                          hair: storage.getVocaHair(),
+                          eyes: storage.getVocaEyes(),
+                          mouth: storage.getVocaMouth(),
+                          outfit: storage.getVocaOutfit(),
+                          backdrop: storage.getVocaBackdrop(),
                           size: 72,
                         ),
                       ),

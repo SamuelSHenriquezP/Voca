@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar.dart';
-import '../../../core/widgets/notion_avatar_creator_sheet.dart';
+import '../../../core/widgets/voca_avatar.dart';
+import '../../../core/widgets/voca_avatar_creator_sheet.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../../navigation/main_nav_screen.dart';
 
@@ -63,12 +63,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.initState();
     final storage = LocalStorageService();
     _nameController = TextEditingController(text: storage.getUserName());
-    _head = storage.getNotionHead();
-    _hair = storage.getNotionHair();
-    _eyes = storage.getNotionEyes();
-    _mouth = storage.getNotionMouth();
-    _outfit = storage.getNotionOutfit();
-    _backdrop = storage.getNotionBackdrop();
+    _head = storage.getVocaHead();
+    _hair = storage.getVocaHair();
+    _eyes = storage.getVocaEyes();
+    _mouth = storage.getVocaMouth();
+    _outfit = storage.getVocaOutfit();
+    _backdrop = storage.getVocaBackdrop();
   }
 
   @override
@@ -92,17 +92,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void _openFullCreator() {
     VocaHaptics.medium();
-    NotionAvatarCreatorSheet.show(
+    VocaAvatarCreatorSheet.show(
       context,
       onSaved: () {
         final storage = LocalStorageService();
         setState(() {
-          _head = storage.getNotionHead();
-          _hair = storage.getNotionHair();
-          _eyes = storage.getNotionEyes();
-          _mouth = storage.getNotionMouth();
-          _outfit = storage.getNotionOutfit();
-          _backdrop = storage.getNotionBackdrop();
+          _head = storage.getVocaHead();
+          _hair = storage.getVocaHair();
+          _eyes = storage.getVocaEyes();
+          _mouth = storage.getVocaMouth();
+          _outfit = storage.getVocaOutfit();
+          _backdrop = storage.getVocaBackdrop();
         });
       },
     );
@@ -114,7 +114,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_currentStep == 0) {
       final name = _nameController.text.trim().isEmpty ? 'Estudiante' : _nameController.text.trim();
       storage.setUserName(name);
-      await storage.saveNotionAvatar(
+      await storage.saveVocaAvatar(
         head: _head,
         hair: _hair,
         eyes: _eyes,
@@ -203,10 +203,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Live Animated Notion Avatar Preview
+          // Live Animated VOCA Avatar Preview
           GestureDetector(
             onTap: _openFullCreator,
-            child: NotionAvatar(
+            child: VocaAvatar(
               head: _head,
               hair: _hair,
               eyes: _eyes,

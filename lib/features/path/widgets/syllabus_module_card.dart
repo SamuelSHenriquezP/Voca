@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
-import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/voca_avatar.dart';
 import '../models/level_node.dart';
 
 /// Minimalist, editorial syllabus module card for VOCA.
@@ -177,7 +177,7 @@ class SyllabusModuleCard extends StatelessWidget {
 
   Widget _buildLeadingIndicator(bool isCompleted, bool isActive, bool isBoss, bool isLocked) {
     if (isActive) {
-      // Perched Notion Avatar on active node
+      // Perched VOCA Avatar on active node
       return Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
@@ -193,13 +193,13 @@ class SyllabusModuleCard extends StatelessWidget {
               child: Builder(
                 builder: (context) {
                   final storage = LocalStorageService();
-                  return NotionAvatar(
-                    head: storage.getNotionHead(),
-                    hair: storage.getNotionHair(),
-                    eyes: storage.getNotionEyes(),
-                    mouth: storage.getNotionMouth(),
-                    outfit: storage.getNotionOutfit(),
-                    backdrop: storage.getNotionBackdrop(),
+                  return VocaAvatar(
+                    head: storage.getVocaHead(),
+                    hair: storage.getVocaHair(),
+                    eyes: storage.getVocaEyes(),
+                    mouth: storage.getVocaMouth(),
+                    outfit: storage.getVocaOutfit(),
+                    backdrop: storage.getVocaBackdrop(),
                     size: 40,
                   );
                 },

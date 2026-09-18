@@ -462,16 +462,16 @@ class LocalStorageService {
   }
 
   // =========================================================================
-  // Notion Modular Avatar Customization
+  // VOCA Modular Avatar Customization
   // =========================================================================
-  int getNotionHead() => _prefs?.getInt('voca_notion_head') ?? 0;
-  int getNotionHair() => _prefs?.getInt('voca_notion_hair') ?? 0;
-  int getNotionEyes() => _prefs?.getInt('voca_notion_eyes') ?? 0;
-  int getNotionMouth() => _prefs?.getInt('voca_notion_mouth') ?? 0;
-  int getNotionOutfit() => _prefs?.getInt('voca_notion_outfit') ?? 0;
-  int getNotionBackdrop() => _prefs?.getInt('voca_notion_backdrop') ?? 0;
+  int getVocaHead() => _prefs?.getInt('voca_avatar_head') ?? 0;
+  int getVocaHair() => _prefs?.getInt('voca_avatar_hair') ?? 0;
+  int getVocaEyes() => _prefs?.getInt('voca_avatar_eyes') ?? 0;
+  int getVocaMouth() => _prefs?.getInt('voca_avatar_mouth') ?? 0;
+  int getVocaOutfit() => _prefs?.getInt('voca_avatar_outfit') ?? 0;
+  int getVocaBackdrop() => _prefs?.getInt('voca_avatar_backdrop') ?? 0;
 
-  Future<void> saveNotionAvatar({
+  Future<void> saveVocaAvatar({
     required int head,
     required int hair,
     required int eyes,
@@ -479,12 +479,12 @@ class LocalStorageService {
     required int outfit,
     required int backdrop,
   }) async {
-    await _prefs?.setInt('voca_notion_head', head);
-    await _prefs?.setInt('voca_notion_hair', hair);
-    await _prefs?.setInt('voca_notion_eyes', eyes);
-    await _prefs?.setInt('voca_notion_mouth', mouth);
-    await _prefs?.setInt('voca_notion_outfit', outfit);
-    await _prefs?.setInt('voca_notion_backdrop', backdrop);
+    await _prefs?.setInt('voca_avatar_head', head);
+    await _prefs?.setInt('voca_avatar_hair', hair);
+    await _prefs?.setInt('voca_avatar_eyes', eyes);
+    await _prefs?.setInt('voca_avatar_mouth', mouth);
+    await _prefs?.setInt('voca_avatar_outfit', outfit);
+    await _prefs?.setInt('voca_avatar_backdrop', backdrop);
   }
 
   // =========================================================================
@@ -493,7 +493,7 @@ class LocalStorageService {
   String getUserName() => _prefs?.getString('voca_user_name') ?? 'Alex';
   void setUserName(String name) => _prefs?.setString('voca_user_name', name);
 
-  String getHeroArchetype() => _prefs?.getString('voca_hero_archetype') ?? 'notion';
+  String getHeroArchetype() => _prefs?.getString('voca_hero_archetype') ?? 'voca';
   void setHeroArchetype(String arch) => _prefs?.setString('voca_hero_archetype', arch);
 
   int getHeroColor() => _prefs?.getInt('voca_hero_color') ?? 0xFF18181B;

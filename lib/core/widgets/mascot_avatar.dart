@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'notion_avatar.dart';
+import 'voca_avatar.dart';
 
 /// Mascot avatar for VOCA coaching, onboarding, and feedback
 class MascotAvatar extends StatelessWidget {
@@ -16,7 +16,7 @@ class MascotAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NotionAvatar.fromId(
+    return VocaAvatar.fromId(
       'alex',
       size: size,
       isAnimated: isAnimated,
