@@ -29,12 +29,12 @@ class NotionAvatar extends StatefulWidget {
     this.size = 64,
     this.isAnimated = true,
     this.onTap,
-  }) : headShape = head ?? headShape,
-       hairStyle = hair ?? hairStyle,
-       eyesStyle = eyes ?? eyesStyle,
-       mouthStyle = mouth ?? mouthStyle,
-       outfitStyle = outfit ?? outfitStyle,
-       backdropIndex = backdrop ?? backdropIndex;
+  })  : headShape = head ?? headShape,
+        hairStyle = hair ?? hairStyle,
+        eyesStyle = eyes ?? eyesStyle,
+        mouthStyle = mouth ?? mouthStyle,
+        outfitStyle = outfit ?? outfitStyle,
+        backdropIndex = backdrop ?? backdropIndex;
 
   @override
   State<NotionAvatar> createState() => _NotionAvatarState();
@@ -662,3 +662,4 @@ class _NotionAvatarPainter extends CustomPainter {
         oldDelegate.isBlinking != isBlinking;
   }
 }
+

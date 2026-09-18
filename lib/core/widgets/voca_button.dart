@@ -55,19 +55,19 @@ class _VocaButtonState extends State<VocaButton> {
     if (!_isEnabled) return const Color(0xFFF1F5F9);
     switch (widget.variant) {
       case VocaButtonVariant.primary:
-        return const Color(0xFF6366F1); // Cheerful Violet
+        return const Color(0xFF0F172A); // Carbon Black
       case VocaButtonVariant.success:
-        return const Color(0xFF10B981); // Crisp Emerald
+        return const Color(0xFF1E293B); // Dark Slate
       case VocaButtonVariant.accent:
-        return const Color(0xFFF43F5E); // Bright Rose
+        return const Color(0xFF334155); // Slate
       case VocaButtonVariant.warning:
-        return const Color(0xFFF59E0B); // Sunny Amber
+        return const Color(0xFF334155);
       case VocaButtonVariant.cyan:
-        return const Color(0xFF0EA5E9); // Bright Sky Blue
+        return const Color(0xFF475569);
       case VocaButtonVariant.danger:
-        return const Color(0xFFEF4444); // Red
+        return const Color(0xFF1E293B);
       case VocaButtonVariant.gold:
-        return const Color(0xFFD97706); // Warm Amber
+        return const Color(0xFF0F172A);
       case VocaButtonVariant.neutral:
         return Colors.white;
       case VocaButtonVariant.ghost:
@@ -79,9 +79,9 @@ class _VocaButtonState extends State<VocaButton> {
     if (!_isEnabled) return const Color(0xFF94A3B8);
     switch (widget.variant) {
       case VocaButtonVariant.neutral:
-        return const Color(0xFF1E293B);
+        return const Color(0xFF0F172A);
       case VocaButtonVariant.ghost:
-        return const Color(0xFF6366F1);
+        return const Color(0xFF0F172A);
       default:
         return Colors.white;
     }

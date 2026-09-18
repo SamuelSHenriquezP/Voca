@@ -36,8 +36,8 @@ class LevelModal extends StatelessWidget {
       decoration: const BoxDecoration(
         color: VocaColors.cardBackground,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(32),
-          topRight: Radius.circular(32),
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
       ),
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -46,27 +46,29 @@ class LevelModal extends StatelessWidget {
         children: [
           // Drag handle
           Container(
-            width: 44,
-            height: 5,
+            width: 36,
+            height: 4,
             decoration: BoxDecoration(
-              color: VocaColors.borderSubtle,
+              color: const Color(0xFFCBD5E1),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           // Header Badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
-              color: VocaColors.cyanTint,
-              borderRadius: BorderRadius.circular(16),
+              color: const Color(0xFF0F172A),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              'UNIDAD ${node.unitNumber} • NIVEL ${node.levelNumber}',
-              style: VocaTypography.caption.copyWith(
-                color: VocaColors.electricCyanShadow,
-                letterSpacing: 1.1,
+              'UNIDAD ${node.unitNumber} • MÓDULO ${node.levelNumber} • ${node.focusLabel}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
               ),
             ),
           ),
@@ -74,50 +76,63 @@ class LevelModal extends StatelessWidget {
 
           Text(
             node.title,
-            style: VocaTypography.heading1.copyWith(fontSize: 22),
+            style: VocaTypography.heading1.copyWith(
+              fontSize: 20,
+              color: const Color(0xFF0F172A),
+              fontWeight: FontWeight.w800,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
           Text(
             node.subtitle,
-            style: VocaTypography.bodyMedium.copyWith(color: VocaColors.textMuted),
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF64748B),
+              height: 1.35,
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Lesson Objectives
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: VocaColors.backgroundNeutral,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: VocaColors.borderLight, width: 1.5),
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
-                    const Icon(Icons.school_rounded, color: VocaColors.primaryPurple, size: 20),
-                    const SizedBox(width: 8),
+                    Icon(Icons.format_list_bulleted_rounded, color: Color(0xFF0F172A), size: 18),
+                    SizedBox(width: 8),
                     Text(
-                      'Objetivos de la Lección',
-                      style: VocaTypography.heading3.copyWith(fontSize: 16),
+                      'Objetivos de Aprendizaje',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 ...node.objectives.map((obj) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 6),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: VocaColors.emeraldGreen, size: 18),
-                          const SizedBox(width: 10),
+                          const Icon(Icons.check_rounded, color: Color(0xFF0F172A), size: 15),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               obj,
-                              style: VocaTypography.bodySmall.copyWith(
-                                color: VocaColors.darkSlate,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF334155),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -128,9 +143,9 @@ class LevelModal extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Tactical Cards Deck Preview
+          // Tactical Cards Deck Preview (Monochrome)
           Builder(
             builder: (context) {
               final storage = LocalStorageService();
@@ -143,29 +158,29 @@ class LevelModal extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.style_rounded, size: 16, color: Color(0xFF6366F1)),
+                    const Icon(Icons.inventory_2_outlined, size: 15, color: Color(0xFF0F172A)),
                     const SizedBox(width: 8),
                     const Text(
-                      'Cartas listas:',
+                      'Inventario:',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF1E293B),
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F172A),
                       ),
                     ),
                     const Spacer(),
-                    _buildMiniBadge('🛡️', shields, const Color(0xFF0D9488)),
+                    _buildMiniBadge('🛡️', shields),
                     const SizedBox(width: 6),
-                    _buildMiniBadge('💡', clues, const Color(0xFFD97706)),
+                    _buildMiniBadge('💡', clues),
                     const SizedBox(width: 6),
-                    _buildMiniBadge('⏭️', skips, const Color(0xFF4F46E5)),
+                    _buildMiniBadge('⏭️', skips),
                     const SizedBox(width: 6),
-                    _buildMiniBadge('⚡', doubleXp, const Color(0xFFEA580C)),
+                    _buildMiniBadge('⚡', doubleXp),
                   ],
                 ),
               );
@@ -173,13 +188,13 @@ class LevelModal extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Large Start Button
+          // Large Start Button (Monochrome Carbon)
           VocaButton(
-            text: 'EMPEZAR LECCIÓN (+${node.xpReward} XP)',
-            icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-            variant: VocaButtonVariant.success,
+            text: 'INICIAR LECCIÓN (+${node.xpReward} XP)',
+            icon: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+            variant: VocaButtonVariant.primary,
             isFullWidth: true,
-            height: 56,
+            height: 52,
             onPressed: onStart,
           ),
         ],
@@ -187,25 +202,25 @@ class LevelModal extends StatelessWidget {
     );
   }
 
-  Widget _buildMiniBadge(String emoji, int count, Color color) {
+  Widget _buildMiniBadge(String emoji, int count) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 11)),
+          Text(emoji, style: const TextStyle(fontSize: 10)),
           const SizedBox(width: 3),
           Text(
             '$count',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w800,
-              color: color,
+              color: Color(0xFF0F172A),
             ),
           ),
         ],
@@ -213,4 +228,3 @@ class LevelModal extends StatelessWidget {
     );
   }
 }
-

@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'title': 'C2 • Native Fluency',
         'xp': '2,342 XP',
         'rank': '1',
-        'color': const Color(0xFF0284C7),
+        'color': const Color(0xFF0F172A),
         'initials': 'DB',
       },
       {
@@ -60,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'title': 'C1 • Advanced Speaker',
         'xp': '1,980 XP',
         'rank': '2',
-        'color': const Color(0xFFD97706),
+        'color': const Color(0xFF1E293B),
         'initials': 'LS',
       },
       {
@@ -68,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'title': 'B2 • Fluent Conversationalist',
         'xp': '1,720 XP',
         'rank': '3',
-        'color': const Color(0xFFE11D48),
+        'color': const Color(0xFF334155),
         'initials': 'JW',
       },
       {
@@ -76,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'title': 'A1 • Spoken Explorer',
         'xp': '$userXp XP',
         'rank': userXp > 500 ? '4' : '24',
-        'color': const Color(0xFF4F46E5),
+        'color': const Color(0xFF0F172A),
         'initials': LocalStorageService().getUserName().substring(0, LocalStorageService().getUserName().length >= 2 ? 2 : 1).toUpperCase(),
       },
     ];
@@ -89,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       description: 'Mantén 7 días consecutivos de práctica',
       icon: Icons.local_fire_department_rounded,
       isUnlocked: false,
-      accentColor: Color(0xFFD97706),
+      accentColor: Color(0xFF0F172A),
     ),
     BadgeItem(
       id: 'b2',
@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       description: 'Aprueba la simulación hablada de aduana en el aeropuerto',
       icon: Icons.shield_outlined,
       isUnlocked: false,
-      accentColor: Color(0xFF4F46E5),
+      accentColor: Color(0xFF0F172A),
     ),
     BadgeItem(
       id: 'b3',
@@ -105,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       description: 'Logra más del 90% de coincidencia en pronunciación nativa',
       icon: Icons.center_focus_strong_rounded,
       isUnlocked: false,
-      accentColor: Color(0xFF0284C7),
+      accentColor: Color(0xFF0F172A),
     ),
     BadgeItem(
       id: 'b4',
@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       description: 'Habla inglés durante más de 60 minutos en total',
       icon: Icons.mic_none_rounded,
       isUnlocked: false,
-      accentColor: Color(0xFF059669),
+      accentColor: Color(0xFF0F172A),
     ),
     BadgeItem(
       id: 'b5',
@@ -121,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       description: 'Domina 100 palabras de vocabulario en inglés hablado',
       icon: Icons.workspace_premium_rounded,
       isUnlocked: false,
-      accentColor: Color(0xFFB45309),
+      accentColor: Color(0xFF0F172A),
     ),
   ];
 
@@ -625,7 +625,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFF6366F1), width: 2.5),
+                              border: Border.all(color: const Color(0xFF0F172A), width: 2),
                             ),
                             child: NotionAvatar(
                               head: storage.getNotionHead(),
@@ -643,9 +643,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF6366F1),
+                                color: const Color(0xFF0F172A),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF0F172A), width: 1.5),
+                                border: Border.all(color: Colors.white, width: 1.5),
                               ),
                               child: const Icon(Icons.palette_rounded, color: Colors.white, size: 10),
                             ),
@@ -677,14 +677,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF6366F1).withOpacity(0.2),
+                                  color: const Color(0xFF334155),
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.5), width: 1),
+                                  border: Border.all(color: const Color(0xFF475569), width: 1),
                                 ),
                                 child: const Text(
                                   'ESTUDIANTE',
                                   style: TextStyle(
-                                    color: Color(0xFF818CF8),
+                                    color: Colors.white,
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.5,
