@@ -197,14 +197,21 @@ class VocaDatabase {
     if (results.isNotEmpty) {
       return results.first;
     }
-    return {
+    // If not found in DB, insert default row immediately
+    final defaultProfile = {
+      'id': 'current_user',
       'xp': 0,
       'streak': 1,
       'lives': 5,
       'highest_floor': 1,
       'unlocked_topics': 'a1_01',
       'collected_cards': 'card_strike_1,card_strike_2,card_defend_1,card_defend_2,card_skill_1',
+      'updated_at': DateTime.now().toIso8601String(),
     };
+    try {
+      await db.insert('user_profile', defaultProfile, conflictAlgorithm: ConflictAlgorithm.ignore);
+    } catch (_) {}
+    return defaultProfile;
   }
 
   Future<void> updateProfile({
@@ -217,6 +224,7 @@ class VocaDatabase {
   }) async {
     final db = await database;
     final data = <String, dynamic>{
+      'id': 'current_user',
       'updated_at': DateTime.now().toIso8601String(),
     };
     if (xp != null) data['xp'] = xp;
@@ -226,12 +234,21 @@ class VocaDatabase {
     if (unlockedTopics != null) data['unlocked_topics'] = unlockedTopics;
     if (collectedCards != null) data['collected_cards'] = collectedCards;
 
-    await db.update(
+    final rows = await db.update(
       'user_profile',
       data,
       where: 'id = ?',
       whereArgs: ['current_user'],
     );
+    if (rows == 0) {
+      data['xp'] ??= 0;
+      data['streak'] ??= 1;
+      data['lives'] ??= 5;
+      data['highest_floor'] ??= 1;
+      data['unlocked_topics'] ??= 'a1_01';
+      data['collected_cards'] ??= 'card_strike_1';
+      await db.insert('user_profile', data, conflictAlgorithm: ConflictAlgorithm.replace);
+    }
   }
 
   // --- VAULT METHODS ---

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 
 class HeroProfileCard extends StatelessWidget {
@@ -48,34 +48,29 @@ class HeroProfileCard extends StatelessWidget {
                 Builder(
                   builder: (context) {
                     final storage = LocalStorageService();
-                    final archStr = storage.getHeroArchetype();
-                    final arch = AdventureArchetype.values.firstWhere(
-                      (a) => a.name == archStr,
-                      orElse: () => AdventureArchetype.finn,
-                    );
-                    final heroColor = storage.getHeroColor();
-
                     return Container(
                       width: 76,
                       height: 76,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(heroColor).withOpacity(0.15),
-                        border: Border.all(color: Color(heroColor), width: 3),
+                        border: Border.all(color: const Color(0xFF0F172A), width: 2),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(heroColor).withOpacity(0.35),
+                            color: Colors.black.withOpacity(0.06),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: Center(
-                        child: AdventureCartoonAvatar(
-                          archetype: arch,
-                          size: 64,
-                          customColor: Color(heroColor),
-                          expression: storage.getHeroExpression(),
+                        child: NotionAvatar(
+                          head: storage.getNotionHead(),
+                          hair: storage.getNotionHair(),
+                          eyes: storage.getNotionEyes(),
+                          mouth: storage.getNotionMouth(),
+                          outfit: storage.getNotionOutfit(),
+                          backdrop: storage.getNotionBackdrop(),
+                          size: 72,
                         ),
                       ),
                     );

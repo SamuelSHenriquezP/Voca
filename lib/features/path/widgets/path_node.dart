@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../models/level_node.dart';
 
@@ -67,18 +67,14 @@ class PathNode extends StatelessWidget {
                 Builder(
                   builder: (context) {
                     final storage = LocalStorageService();
-                    final archStr = storage.getHeroArchetype();
-                    final arch = AdventureArchetype.values.firstWhere(
-                      (a) => a.name == archStr,
-                      orElse: () => AdventureArchetype.finn,
-                    );
-                    final heroColor = storage.getHeroColor();
-
-                    return AdventureCartoonAvatar(
-                      archetype: arch,
-                      size: 42,
-                      customColor: Color(heroColor),
-                      expression: 'happy',
+                    return NotionAvatar(
+                      head: storage.getNotionHead(),
+                      hair: storage.getNotionHair(),
+                      eyes: storage.getNotionEyes(),
+                      mouth: storage.getNotionMouth(),
+                      outfit: storage.getNotionOutfit(),
+                      backdrop: storage.getNotionBackdrop(),
+                      size: 40,
                     );
                   },
                 ),

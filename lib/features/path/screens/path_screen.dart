@@ -13,8 +13,8 @@ import '../widgets/milestone_decorations.dart';
 import '../widgets/path_node.dart';
 import '../widgets/top_sticky_bar.dart';
 import '../widgets/unit_header.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
-import '../../../core/widgets/adventure_hero_creator_sheet.dart';
+import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/notion_avatar_creator_sheet.dart';
 
 class PathScreen extends StatefulWidget {
   final VoidCallback? onOpenLesson;
@@ -41,7 +41,8 @@ class _PathScreenState extends State<PathScreen> {
     final endIndex = (startIndex + 6 <= allTopics.length) ? startIndex + 6 : allTopics.length;
     final unitTopics = allTopics.sublist(startIndex, endIndex);
 
-    final unlockedIds = LocalStorageService().getUnlockedTopicIds();
+    final storage = LocalStorageService();
+    final unlockedIds = storage.getUnlockedTopicIds();
     final firstTopic = unitTopics.first;
     final xOffsets = [0.0, -0.65, 0.65, 0.0, -0.65, 0.0];
 
@@ -52,18 +53,17 @@ class _PathScreenState extends State<PathScreen> {
       final topic = unitTopics[i];
       final isBoss = i == unitTopics.length - 1;
       final isUnlocked = unlockedIds.contains(topic.id);
+      final isCompleted = storage.isTopicCompleted(topic.id);
 
       final nextTopicIndex = allTopics.indexWhere((t) => t.id == topic.id) + 1;
       final isNextUnlocked = nextTopicIndex < allTopics.length && unlockedIds.contains(allTopics[nextTopicIndex].id);
 
       NodeState state;
-      if (isUnlocked) {
-        if (isNextUnlocked) {
-          state = NodeState.completed;
-          completedCount++;
-        } else {
-          state = isBoss ? NodeState.boss : NodeState.active;
-        }
+      if (isCompleted || isNextUnlocked) {
+        state = NodeState.completed;
+        completedCount++;
+      } else if (isUnlocked) {
+        state = isBoss ? NodeState.boss : NodeState.active;
       } else {
         state = NodeState.locked;
       }
@@ -163,14 +163,18 @@ class _PathScreenState extends State<PathScreen> {
     });
   }
 
-  void _onLevelCompleted(String completedTopicId) {
-    LocalStorageService().unlockTopic(completedTopicId);
+  void _onLevelCompleted(String completedTopicId) async {
+    final storage = LocalStorageService();
+    await storage.markTopicCompleted(completedTopicId);
+    await storage.unlockTopic(completedTopicId);
     final allTopics = ConversationTopicsCatalog.allTopics;
     final curIndex = allTopics.indexWhere((t) => t.id == completedTopicId);
     if (curIndex != -1 && curIndex < allTopics.length - 1) {
-      LocalStorageService().unlockTopic(allTopics[curIndex + 1].id);
+      await storage.unlockTopic(allTopics[curIndex + 1].id);
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   LevelNodeModel? _findCurrentActiveNode(List<LevelNodeModel> nodes) {
@@ -337,7 +341,7 @@ class _PathScreenState extends State<PathScreen> {
             hearts: LocalStorageService().getLives(),
             onProfileTap: () {
               VocaHaptics.selection();
-              AdventureHeroCreatorSheet.show(
+              NotionAvatarCreatorSheet.show(
                 context,
                 onSaved: () => setState(() {}),
               );
@@ -361,16 +365,10 @@ class _PathScreenState extends State<PathScreen> {
                   onJumpExamTap: () => _startUnitJumpExam(_selectedUnit),
                 ),
 
-                // Adventure Time Hero Session Banner
+                // Editorial Notion Profile Session Banner
                 Builder(
                   builder: (context) {
                     final storage = LocalStorageService();
-                    final archStr = storage.getHeroArchetype();
-                    final archetype = AdventureArchetype.values.firstWhere(
-                      (a) => a.name == archStr,
-                      orElse: () => AdventureArchetype.finn,
-                    );
-                    final heroColor = storage.getHeroColor();
                     final userName = storage.getUserName();
 
                     return Padding(
@@ -391,13 +389,16 @@ class _PathScreenState extends State<PathScreen> {
                         ),
                         child: Row(
                           children: [
-                            AdventureCartoonAvatar(
-                              archetype: archetype,
+                            NotionAvatar(
+                              head: storage.getNotionHead(),
+                              hair: storage.getNotionHair(),
+                              eyes: storage.getNotionEyes(),
+                              mouth: storage.getNotionMouth(),
+                              outfit: storage.getNotionOutfit(),
+                              backdrop: storage.getNotionBackdrop(),
                               size: 52,
-                              customColor: Color(heroColor),
-                              expression: 'happy',
                               onTap: () {
-                                AdventureHeroCreatorSheet.show(
+                                NotionAvatarCreatorSheet.show(
                                   context,
                                   onSaved: () => setState(() {}),
                                 );
@@ -422,15 +423,15 @@ class _PathScreenState extends State<PathScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFEEF2FF),
+                                          color: const Color(0xFFF1F5F9),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: const Text(
-                                          'HÉROE',
+                                          'ESTUDIANTE',
                                           style: TextStyle(
                                             fontSize: 9,
                                             fontWeight: FontWeight.w800,
-                                            color: Color(0xFF4F46E5),
+                                            color: Color(0xFF0F172A),
                                             letterSpacing: 0.5,
                                           ),
                                         ),
@@ -451,7 +452,7 @@ class _PathScreenState extends State<PathScreen> {
                             ),
                             BouncyTap(
                               onTap: () {
-                                AdventureHeroCreatorSheet.show(
+                                NotionAvatarCreatorSheet.show(
                                   context,
                                   onSaved: () => setState(() {}),
                                 );
@@ -459,16 +460,22 @@ class _PathScreenState extends State<PathScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF1F5F9),
+                                  color: const Color(0xFF0F172A),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Text(
-                                  'Personalizar',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF334155),
-                                  ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.face_rounded, size: 14, color: Colors.white),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Editar',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

@@ -1,8 +1,10 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
+import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/notion_avatar_creator_sheet.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../../navigation/main_nav_screen.dart';
 
@@ -16,62 +18,43 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentStep = 0;
   late TextEditingController _nameController;
-  AdventureArchetype _selectedArchetype = AdventureArchetype.finn;
-  int _selectedColor = 0xFF38BDF8;
+
+  int _head = 0;
+  int _hair = 1;
+  int _eyes = 0;
+  int _mouth = 0;
+  int _outfit = 0;
+  int _backdrop = 0;
+
   int _selectedGoal = 1; // 0: 10m, 1: 15m, 2: 25m
 
-  final List<Map<String, dynamic>> _archetypes = [
-    {
-      'archetype': AdventureArchetype.finn,
-      'name': 'Finn',
-      'defaultColor': 0xFF38BDF8,
-    },
-    {
-      'archetype': AdventureArchetype.jake,
-      'name': 'Jake',
-      'defaultColor': 0xFFFBBF24,
-    },
-    {
-      'archetype': AdventureArchetype.bmo,
-      'name': 'BMO',
-      'defaultColor': 0xFF14B8A6,
-    },
-    {
-      'archetype': AdventureArchetype.marceline,
-      'name': 'Marceline',
-      'defaultColor': 0xFFE2E8F0,
-    },
-    {
-      'archetype': AdventureArchetype.princess,
-      'name': 'Princesa',
-      'defaultColor': 0xFFFBCFE8,
-    },
+  final List<String> _hairNames = [
+    'Raya', 'Rulos', 'Moño', 'Bob', 'Flequillo', 'Gorro', 'Rapado', 'Coleta'
   ];
 
-  final List<int> _colors = [
-    0xFF38BDF8,
-    0xFFFBBF24,
-    0xFF14B8A6,
-    0xFFFB7185,
-    0xFFA855F7,
-    0xFF22C55E,
+  final List<Color> _backdropColors = [
+    const Color(0xFFF7F5F0), // Ivory
+    const Color(0xFFEBF3EE), // Sage
+    const Color(0xFFFDF0EA), // Terracotta
+    const Color(0xFFEFF2F6), // Slate
+    const Color(0xFFF4EFF8), // Lavender
   ];
 
   final List<Map<String, String>> _goals = [
     {
       'time': '10 min',
-      'title': 'Casual',
-      'desc': '1 lección diaria para mantener la racha activa.',
+      'title': 'Consistencia Diaria',
+      'desc': 'Práctica concisa para mantener el hábito y la retención léxica activa.',
     },
     {
       'time': '15 min',
-      'title': 'Recomendado',
-      'desc': 'Lecciones de gramática, fonética y práctica vocal.',
+      'title': 'Rigor Recomendado',
+      'desc': 'Sintaxis profunda, fonética nativa y entrenamiento de escucha activa.',
     },
     {
       'time': '25 min',
-      'title': 'Aventurero Total',
-      'desc': 'Inmersión rápida para hablar con soltura nativa.',
+      'title': 'Inmersión Intelectual',
+      'desc': 'Lectura crítica, desafíos sintácticos y dominio fluido de nivel CEFR.',
     },
   ];
 
@@ -80,6 +63,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.initState();
     final storage = LocalStorageService();
     _nameController = TextEditingController(text: storage.getUserName());
+    _head = storage.getNotionHead();
+    _hair = storage.getNotionHair();
+    _eyes = storage.getNotionEyes();
+    _mouth = storage.getNotionMouth();
+    _outfit = storage.getNotionOutfit();
+    _backdrop = storage.getNotionBackdrop();
   }
 
   @override
@@ -88,21 +77,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _handleNext() {
+  void _randomizeAvatar() {
+    final rand = Random();
+    VocaHaptics.selection();
+    setState(() {
+      _head = rand.nextInt(4);
+      _hair = rand.nextInt(8);
+      _eyes = rand.nextInt(6);
+      _mouth = rand.nextInt(5);
+      _outfit = rand.nextInt(5);
+      _backdrop = rand.nextInt(5);
+    });
+  }
+
+  void _openFullCreator() {
     VocaHaptics.medium();
+    NotionAvatarCreatorSheet.show(
+      context,
+      onSaved: () {
+        final storage = LocalStorageService();
+        setState(() {
+          _head = storage.getNotionHead();
+          _hair = storage.getNotionHair();
+          _eyes = storage.getNotionEyes();
+          _mouth = storage.getNotionMouth();
+          _outfit = storage.getNotionOutfit();
+          _backdrop = storage.getNotionBackdrop();
+        });
+      },
+    );
+  }
+
+  void _handleNext() async {
+    VocaHaptics.medium();
+    final storage = LocalStorageService();
     if (_currentStep == 0) {
-      final name = _nameController.text.trim().isEmpty ? 'Aventurero' : _nameController.text.trim();
-      final storage = LocalStorageService();
+      final name = _nameController.text.trim().isEmpty ? 'Estudiante' : _nameController.text.trim();
       storage.setUserName(name);
-      storage.setHeroArchetype(_selectedArchetype.name);
-      storage.setHeroColor(_selectedColor);
+      await storage.saveNotionAvatar(
+        head: _head,
+        hair: _hair,
+        eyes: _eyes,
+        mouth: _mouth,
+        outfit: _outfit,
+        backdrop: _backdrop,
+      );
       setState(() => _currentStep = 1);
     } else {
-      final storage = LocalStorageService();
       storage.setUserGoal(_goals[_selectedGoal]['time']!);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainNavScreen()),
-      );
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainNavScreen()),
+        );
+      }
     }
   }
 
@@ -141,24 +168,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: LinearProgressIndicator(
                         value: _currentStep == 0 ? 0.5 : 1.0,
                         backgroundColor: const Color(0xFFE2E8F0),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
-                        minHeight: 6,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0F172A)),
+                        minHeight: 5,
                       ),
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Content based on step
               Expanded(
-                child: _currentStep == 0 ? _buildStepHeroCreation() : _buildStepGoal(),
+                child: _currentStep == 0 ? _buildStepAvatarCreation() : _buildStepGoal(),
               ),
 
               // Bottom Primary Action
               VocaButton(
-                text: _currentStep == 0 ? 'CONTINUAR' : '¡COMENZAR LA AVENTURA!',
+                text: _currentStep == 0 ? 'CONTINUAR' : 'COMENZAR APRENDIZAJE',
                 variant: VocaButtonVariant.primary,
                 width: double.infinity,
                 onPressed: _handleNext,
@@ -170,141 +197,176 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildStepHeroCreation() {
+  Widget _buildStepAvatarCreation() {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Live Animated Avatar Preview
-          AdventureCartoonAvatar(
-            archetype: _selectedArchetype,
-            size: 104,
-            customColor: Color(_selectedColor),
-            expression: 'happy',
+          // Live Animated Notion Avatar Preview
+          GestureDetector(
+            onTap: _openFullCreator,
+            child: NotionAvatar(
+              head: _head,
+              hair: _hair,
+              eyes: _eyes,
+              mouth: _mouth,
+              outfit: _outfit,
+              backdrop: _backdrop,
+              size: 110,
+            ),
           ),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEEF2FF),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Text(
-              '¡CREA TU HÉROE!',
+
+          // Quick Action Buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              BouncyTap(
+                onTap: _randomizeAvatar,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.shuffle_rounded, size: 14, color: Color(0xFF0F172A)),
+                      SizedBox(width: 6),
+                      Text(
+                        'Aleatorio',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              BouncyTap(
+                onTap: _openFullCreator,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F172A),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.tune_rounded, size: 14, color: Colors.white),
+                      SizedBox(width: 6),
+                      Text(
+                        'Diseñar Avatar',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Name Input
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'TU NOMBRE O ALIAS',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF4F46E5),
+                color: Color(0xFF64748B),
                 letterSpacing: 0.8,
               ),
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            '¿Cómo te llamas en esta aventura?',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Name Input
           TextField(
             controller: _nameController,
-            textAlign: TextAlign.center,
             decoration: InputDecoration(
-              hintText: 'Tu nombre o apodo...',
+              hintText: 'Ej. Alex, Sofía, Elena...',
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFF4F46E5), width: 2.0),
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFF0F172A), width: 1.8),
               ),
             ),
             style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
               color: Color(0xFF0F172A),
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // Archetype Selector
+          // Quick Hair Selector
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'ELIGE TU PERSONAJE',
+              'ESTILO DE CABELLO',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF64748B),
-                letterSpacing: 1.0,
+                letterSpacing: 0.8,
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           SizedBox(
-            height: 96,
+            height: 38,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: _archetypes.length,
-              separatorBuilder: (_, index) => const SizedBox(width: 10),
+              itemCount: _hairNames.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final arch = _archetypes[index]['archetype'] as AdventureArchetype;
-                final name = _archetypes[index]['name'] as String;
-                final isSelected = _selectedArchetype == arch;
-
+                final isSelected = _hair == index;
                 return BouncyTap(
                   onTap: () {
                     VocaHaptics.selection();
-                    setState(() {
-                      _selectedArchetype = arch;
-                      _selectedColor = _archetypes[index]['defaultColor'] as int;
-                    });
+                    setState(() => _hair = index);
                   },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    width: 78,
-                    padding: const EdgeInsets.all(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFEEF2FF) : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(18),
+                      color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
-                        width: isSelected ? 2.2 : 1.2,
+                        color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
                       ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        AdventureCartoonAvatar(
-                          archetype: arch,
-                          size: 44,
-                          isAnimated: false,
+                    child: Center(
+                      child: Text(
+                        _hairNames[index],
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected ? Colors.white : const Color(0xFF475569),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          name,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                            color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF475569),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );
@@ -312,53 +374,53 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
-          // Color Palette
+          // Quick Backdrop Selector
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'COLOR PRINCIPAL',
+              'FONDO EDITORIAL',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF64748B),
-                letterSpacing: 1.0,
+                letterSpacing: 0.8,
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: _colors.map((c) {
-              final isSelected = _selectedColor == c;
+            children: List.generate(_backdropColors.length, (index) {
+              final isSelected = _backdrop == index;
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.only(right: 12),
                 child: BouncyTap(
                   onTap: () {
                     VocaHaptics.selection();
-                    setState(() => _selectedColor = c);
+                    setState(() => _backdrop = index);
                   },
                   child: Container(
-                    width: 36,
-                    height: 36,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
-                      color: Color(c),
+                      color: _backdropColors[index],
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF0F172A) : Colors.transparent,
-                        width: 3,
+                        color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+                        width: isSelected ? 2.5 : 1.2,
                       ),
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                        ? const Icon(Icons.check_rounded, size: 18, color: Color(0xFF0F172A))
                         : null,
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -373,22 +435,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFFEEF2FF),
+              color: const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
-              'RITMO DIARIO',
+              'RITMO DE ESTUDIO',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFF4F46E5),
+                color: Color(0xFF0F172A),
                 letterSpacing: 0.8,
               ),
             ),
           ),
           const SizedBox(height: 12),
           const Text(
-            'Elige tu meta diaria de habla',
+            'Elige tu compromiso diario',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -398,7 +460,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Aprende inglés de verdad por niveles secuenciales y sube de rango.',
+            'Aprende inglés riguroso a través de currículum CEFR adaptativo y lectura crítica.',
             style: TextStyle(
               fontSize: 13,
               color: Color(0xFF64748B),
@@ -442,14 +504,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           color: isSelected ? const Color(0xFFF8FAFC) : Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
             width: isSelected ? 2.0 : 1.2,
           ),
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? const Color(0xFF4F46E5).withOpacity(0.08)
-                  : Colors.black.withOpacity(0.02),
+                  ? Colors.black.withOpacity(0.04)
+                  : Colors.black.withOpacity(0.01),
               offset: const Offset(0, 4),
               blurRadius: 10,
             ),
@@ -460,7 +522,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFF1F5F9),
+                color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -499,7 +561,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             if (isSelected)
               const Icon(
                 Icons.check_circle_rounded,
-                color: Color(0xFF4F46E5),
+                color: Color(0xFF0F172A),
                 size: 22,
               ),
           ],

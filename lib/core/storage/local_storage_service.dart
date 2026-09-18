@@ -12,6 +12,7 @@ class LocalStorageService {
   static const String _kStreak = 'voca_streak';
   static const String _kLives = 'voca_lives';
   static const String _kUnlockedTopics = 'voca_unlocked_topics';
+  static const String _kCompletedTopics = 'voca_completed_topics';
   static const String _kCollectedCards = 'voca_collected_cards';
   static const String _kVaultWords = 'voca_vault_words';
   static const String _kHighestFloor = 'voca_highest_floor';
@@ -25,6 +26,7 @@ class LocalStorageService {
   int _cachedLives = 5;
   int _cachedHighestFloor = 1;
   List<String> _cachedUnlockedTopics = ['a1_01'];
+  List<String> _cachedCompletedTopics = [];
   List<String> _cachedCollectedCards = [
     'card_strike_1',
     'card_strike_2',
@@ -43,21 +45,31 @@ class LocalStorageService {
 
     try {
       // Initialize SQLite database
-      await _db.database;
-
-      // Sync user profile from SQLite
       final profile = await _db.getUserProfile();
-      _cachedXp = profile['xp'] as int? ?? _prefs?.getInt(_kXp) ?? 0;
-      _cachedStreak = profile['streak'] as int? ?? _prefs?.getInt(_kStreak) ?? 1;
+      final dbXp = profile['xp'] as int? ?? 0;
+      final prefsXp = _prefs?.getInt(_kXp) ?? 0;
+      _cachedXp = prefsXp > dbXp ? prefsXp : dbXp;
+
+      final dbStreak = profile['streak'] as int? ?? 1;
+      final prefsStreak = _prefs?.getInt(_kStreak) ?? 1;
+      _cachedStreak = prefsStreak > dbStreak ? prefsStreak : dbStreak;
+
       _cachedLives = profile['lives'] as int? ?? _prefs?.getInt(_kLives) ?? 5;
       _cachedHighestFloor = profile['highest_floor'] as int? ?? _prefs?.getInt(_kHighestFloor) ?? 1;
 
+      // Union of unlocked topics from both SharedPreferences and SQLite so progress is never lost
+      final prefsUnlocked = _prefs?.getStringList(_kUnlockedTopics) ?? ['a1_01'];
       final topicsStr = profile['unlocked_topics'] as String?;
-      if (topicsStr != null && topicsStr.isNotEmpty) {
-        _cachedUnlockedTopics = topicsStr.split(',').where((s) => s.isNotEmpty).toList();
-      } else {
-        _cachedUnlockedTopics = _prefs?.getStringList(_kUnlockedTopics) ?? ['a1_01'];
-      }
+      final dbUnlocked = (topicsStr != null && topicsStr.isNotEmpty)
+          ? topicsStr.split(',').where((s) => s.isNotEmpty).toList()
+          : <String>['a1_01'];
+      final Set<String> mergedUnlocked = {'a1_01'};
+      mergedUnlocked.addAll(prefsUnlocked);
+      mergedUnlocked.addAll(dbUnlocked);
+      _cachedUnlockedTopics = mergedUnlocked.toList();
+
+      // Load completed topics
+      _cachedCompletedTopics = _prefs?.getStringList(_kCompletedTopics) ?? [];
 
       final cardsStr = profile['collected_cards'] as String?;
       if (cardsStr != null && cardsStr.isNotEmpty) {
@@ -143,6 +155,26 @@ class LocalStorageService {
       await _prefs?.setInt(_kHighestFloor, floor);
       try {
         await _db.updateProfile(highestFloor: floor);
+      } catch (_) {}
+    }
+  }
+
+  // --- COMPLETED TOPICS ---
+  List<String> getCompletedTopicIds() => List.unmodifiable(_cachedCompletedTopics);
+
+  bool isTopicCompleted(String topicId) => _cachedCompletedTopics.contains(topicId);
+
+  Future<void> markTopicCompleted(String topicId) async {
+    bool changed = false;
+    if (!_cachedCompletedTopics.contains(topicId)) {
+      _cachedCompletedTopics.add(topicId);
+      await _prefs?.setStringList(_kCompletedTopics, _cachedCompletedTopics);
+      changed = true;
+    }
+    await unlockTopic(topicId);
+    if (changed) {
+      try {
+        await _db.updateProfile(unlockedTopics: _cachedUnlockedTopics.join(','));
       } catch (_) {}
     }
   }
@@ -430,21 +462,47 @@ class LocalStorageService {
   }
 
   // =========================================================================
-  // User Session & Hero Customization (Adventure Time)
+  // Notion Modular Avatar Customization
   // =========================================================================
-  String getUserName() => _prefs?.getString('voca_user_name') ?? 'Aventurero';
+  int getNotionHead() => _prefs?.getInt('voca_notion_head') ?? 0;
+  int getNotionHair() => _prefs?.getInt('voca_notion_hair') ?? 0;
+  int getNotionEyes() => _prefs?.getInt('voca_notion_eyes') ?? 0;
+  int getNotionMouth() => _prefs?.getInt('voca_notion_mouth') ?? 0;
+  int getNotionOutfit() => _prefs?.getInt('voca_notion_outfit') ?? 0;
+  int getNotionBackdrop() => _prefs?.getInt('voca_notion_backdrop') ?? 0;
+
+  Future<void> saveNotionAvatar({
+    required int head,
+    required int hair,
+    required int eyes,
+    required int mouth,
+    required int outfit,
+    required int backdrop,
+  }) async {
+    await _prefs?.setInt('voca_notion_head', head);
+    await _prefs?.setInt('voca_notion_hair', hair);
+    await _prefs?.setInt('voca_notion_eyes', eyes);
+    await _prefs?.setInt('voca_notion_mouth', mouth);
+    await _prefs?.setInt('voca_notion_outfit', outfit);
+    await _prefs?.setInt('voca_notion_backdrop', backdrop);
+  }
+
+  // =========================================================================
+  // User Session & Persona
+  // =========================================================================
+  String getUserName() => _prefs?.getString('voca_user_name') ?? 'Alex';
   void setUserName(String name) => _prefs?.setString('voca_user_name', name);
 
-  String getHeroArchetype() => _prefs?.getString('voca_hero_archetype') ?? 'finn';
+  String getHeroArchetype() => _prefs?.getString('voca_hero_archetype') ?? 'notion';
   void setHeroArchetype(String arch) => _prefs?.setString('voca_hero_archetype', arch);
 
-  int getHeroColor() => _prefs?.getInt('voca_hero_color') ?? 0xFF38BDF8;
+  int getHeroColor() => _prefs?.getInt('voca_hero_color') ?? 0xFF18181B;
   void setHeroColor(int color) => _prefs?.setInt('voca_hero_color', color);
 
-  String getHeroExpression() => _prefs?.getString('voca_hero_expression') ?? 'happy';
+  String getHeroExpression() => _prefs?.getString('voca_hero_expression') ?? 'focused';
   void setHeroExpression(String expr) => _prefs?.setString('voca_hero_expression', expr);
 
-  String getHeroAccessory() => _prefs?.getString('voca_hero_accessory') ?? 'backpack';
+  String getHeroAccessory() => _prefs?.getString('voca_hero_accessory') ?? 'glasses';
   void setHeroAccessory(String acc) => _prefs?.setString('voca_hero_accessory', acc);
 
   String getUserGoal() => _prefs?.getString('voca_user_goal') ?? '15 min';

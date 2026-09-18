@@ -3,7 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/storage/local_storage_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 
 class TopStickyBar extends StatelessWidget {
@@ -171,27 +171,23 @@ class TopStickyBar extends StatelessWidget {
               ),
             ),
 
-            // User Adventure Time Hero Avatar & Session Button
+            // User Notion Avatar & Session Button
             if (onProfileTap != null)
               BouncyTap(
                 onTap: onProfileTap,
                 child: Builder(
                   builder: (context) {
                     final storage = LocalStorageService();
-                    final archStr = storage.getHeroArchetype();
-                    final archetype = AdventureArchetype.values.firstWhere(
-                      (a) => a.name == archStr,
-                      orElse: () => AdventureArchetype.finn,
-                    );
-                    final heroColor = storage.getHeroColor();
-
                     return Tooltip(
-                      message: 'Tu Héroe y Sesión',
-                      child: AdventureCartoonAvatar(
-                        archetype: archetype,
+                      message: 'Tu Perfil y Avatar Notion',
+                      child: NotionAvatar(
+                        head: storage.getNotionHead(),
+                        hair: storage.getNotionHair(),
+                        eyes: storage.getNotionEyes(),
+                        mouth: storage.getNotionMouth(),
+                        outfit: storage.getNotionOutfit(),
+                        backdrop: storage.getNotionBackdrop(),
                         size: 34,
-                        customColor: Color(heroColor),
-                        isAnimated: false,
                       ),
                     );
                   },

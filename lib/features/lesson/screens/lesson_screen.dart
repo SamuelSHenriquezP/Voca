@@ -17,7 +17,7 @@ import '../widgets/scramble_drill.dart';
 import '../widgets/shadowing_drill.dart';
 import '../widgets/story_passage_drill.dart';
 import '../widgets/syllable_stress_drill.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
+import '../../../core/widgets/notion_avatar.dart';
 import '../widgets/tactical_cards_bar.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -676,40 +676,33 @@ class _LessonScreenState extends State<LessonScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Animated Adventure Time Hero Companion Banner
+                  // Notion Companion Feedback Banner
                   Builder(
                     builder: (context) {
                       final storage = LocalStorageService();
-                      final archStr = storage.getHeroArchetype();
-                      final archetype = AdventureArchetype.values.firstWhere(
-                        (a) => a.name == archStr,
-                        orElse: () => AdventureArchetype.finn,
-                      );
-                      final heroColor = storage.getHeroColor();
                       final userName = storage.getUserName();
 
-                      String expression;
                       String speech;
                       if (_drawerState == DrawerState.success) {
-                        expression = 'victory';
-                        speech = '¡Matemático, $userName! ¡Respuesta perfecta!';
+                        speech = '¡Precisión impecable, $userName! Deducción sintáctica correcta.';
                       } else if (_drawerState == DrawerState.error) {
-                        expression = 'sweat';
-                        speech = '¡Ouch! No te rindas, $userName, ¡vamos!';
+                        speech = 'Analiza la estructura con calma, $userName. El error consolida la memoria.';
                       } else {
-                        expression = 'happy';
-                        speech = '¡Hora de aprender inglés, $userName!';
+                        speech = 'Enfócate en la fluidez y el contexto comunicativo, $userName.';
                       }
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 14),
                         child: Row(
                           children: [
-                            AdventureCartoonAvatar(
-                              archetype: archetype,
-                              size: 50,
-                              customColor: Color(heroColor),
-                              expression: expression,
+                            NotionAvatar(
+                              head: storage.getNotionHead(),
+                              hair: storage.getNotionHair(),
+                              eyes: storage.getNotionEyes(),
+                              mouth: storage.getNotionMouth(),
+                              outfit: storage.getNotionOutfit(),
+                              backdrop: storage.getNotionBackdrop(),
+                              size: 48,
                             ),
                             const SizedBox(width: 10),
                             Expanded(

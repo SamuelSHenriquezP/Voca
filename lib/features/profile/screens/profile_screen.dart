@@ -3,8 +3,8 @@ import '../../../core/storage/local_storage_service.dart';
 import '../../../core/network/network_service.dart';
 import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
-import '../../../core/widgets/adventure_cartoon_avatar.dart';
-import '../../../core/widgets/adventure_hero_creator_sheet.dart';
+import '../../../core/widgets/notion_avatar.dart';
+import '../../../core/widgets/notion_avatar_creator_sheet.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../../lesson/models/tactical_card.dart';
 import '../widgets/activity_velocity_chart.dart';
@@ -607,20 +607,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               builder: (context) {
                 final storage = LocalStorageService();
                 final userName = storage.getUserName();
-                final archStr = storage.getHeroArchetype();
-                final archetype = AdventureArchetype.values.firstWhere(
-                  (a) => a.name == archStr,
-                  orElse: () => AdventureArchetype.finn,
-                );
-                final heroColor = storage.getHeroColor();
-                final heroExpression = storage.getHeroExpression();
 
                 return Row(
                   children: [
-                    // Adventure Time Interactive Avatar
+                    // Notion Interactive Avatar
                     BouncyTap(
                       onTap: () {
-                        AdventureHeroCreatorSheet.show(
+                        NotionAvatarCreatorSheet.show(
                           context,
                           onSaved: () => setState(() {}),
                         );
@@ -632,13 +625,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: Color(heroColor), width: 2.5),
+                              border: Border.all(color: const Color(0xFF6366F1), width: 2.5),
                             ),
-                            child: AdventureCartoonAvatar(
-                              archetype: archetype,
+                            child: NotionAvatar(
+                              head: storage.getNotionHead(),
+                              hair: storage.getNotionHair(),
+                              eyes: storage.getNotionEyes(),
+                              mouth: storage.getNotionMouth(),
+                              outfit: storage.getNotionOutfit(),
+                              backdrop: storage.getNotionBackdrop(),
                               size: 58,
-                              customColor: Color(heroColor),
-                              expression: heroExpression,
                             ),
                           ),
                           Positioned(
@@ -647,7 +643,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: Color(heroColor),
+                                color: const Color(0xFF6366F1),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: const Color(0xFF0F172A), width: 1.5),
                               ),
@@ -681,14 +677,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Color(heroColor).withOpacity(0.2),
+                                  color: const Color(0xFF6366F1).withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Color(heroColor).withOpacity(0.5), width: 1),
+                                  border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.5), width: 1),
                                 ),
-                                child: Text(
-                                  archetype.name.toUpperCase(),
+                                child: const Text(
+                                  'ESTUDIANTE',
                                   style: TextStyle(
-                                    color: Color(heroColor),
+                                    color: Color(0xFF818CF8),
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.5,
@@ -710,10 +706,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
 
-                    // Quick Customize Hero Button
+                    // Quick Customize Avatar Button
                     BouncyTap(
                       onTap: () {
-                        AdventureHeroCreatorSheet.show(
+                        NotionAvatarCreatorSheet.show(
                           context,
                           onSaved: () => setState(() {}),
                         );
@@ -730,7 +726,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             Icon(Icons.tune_rounded, color: Colors.white70, size: 13),
                             SizedBox(width: 4),
-                            Text('Héroe', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                            Text('Avatar', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                           ],
                         ),
                       ),
