@@ -7,6 +7,7 @@ import '../../../core/widgets/bouncy_tap.dart';
 import '../../../core/widgets/voca_button.dart';
 import '../cards/linguistic_card.dart';
 import '../models/battle_state.dart';
+import '../models/linguistic_relic.dart';
 import '../widgets/boss_canvas_painter.dart';
 import '../widgets/card_widget.dart';
 
@@ -16,6 +17,7 @@ class CardBattleScreen extends StatefulWidget {
   final int playerHp;
   final int playerMaxHp;
   final int floor;
+  final List<LinguisticRelic> relics;
 
   const CardBattleScreen({
     super.key,
@@ -24,6 +26,7 @@ class CardBattleScreen extends StatefulWidget {
     required this.playerHp,
     required this.playerMaxHp,
     required this.floor,
+    this.relics = const [],
   });
 
   @override
@@ -39,7 +42,7 @@ class _CardBattleScreenState extends State<CardBattleScreen>
   late int _playerMaxHp;
   int _playerBlock = 0;
   int _energy = 3;
-  final int _maxEnergy = 3;
+  late int _maxEnergy;
   int _turn = 1;
   bool _isPlayerTurn = true;
 
@@ -78,6 +81,11 @@ class _CardBattleScreenState extends State<CardBattleScreen>
   }
 
   void _initCombat() {
+    final hasExtraEnergy = widget.relics.any((r) => r.id == 'connected_speech_prism');
+    _maxEnergy = hasExtraEnergy ? 4 : 3;
+    if (widget.relics.any((r) => r.id == 'phonetic_aegis')) {
+      _playerBlock = 8;
+    }
     _drawPile.addAll(_runDeck..shuffle());
     _startPlayerTurn();
   }
@@ -87,7 +95,8 @@ class _CardBattleScreenState extends State<CardBattleScreen>
       _isPlayerTurn = true;
       _energy = _maxEnergy;
       _playerBlock = 0; // Block expires at start of turn
-      _drawCards(4);
+      final count = widget.relics.any((r) => r.id == 'lexical_codex') ? 5 : 4;
+      _drawCards(count);
       _monster.planNextIntent(_turn);
     });
   }
@@ -156,14 +165,18 @@ class _CardBattleScreenState extends State<CardBattleScreen>
       _discardPile.add(card);
 
       final multiplier = isCritical ? 2.0 : 1.0;
+      final hasPocketwatch = widget.relics.any((r) => r.id == 'pocketwatch');
+      final relicBonus = (isCritical && hasPocketwatch) ? 1.35 : 1.0;
 
       // 1. Attack
       if (card.damage > 0) {
-        final totalDamage = (card.damage * multiplier).toInt();
+        final totalDamage = (card.damage * multiplier * relicBonus).toInt();
         _monster.takeDamage(totalDamage);
         _triggerShake();
         _showFloatingBanner(
-          isCritical ? 'CRITICAL STRIKE! -$totalDamage' : '-$totalDamage DMG',
+          isCritical
+              ? (hasPocketwatch ? 'SYNCHRONIZED STRIKE! -$totalDamage' : 'CRITICAL STRIKE! -$totalDamage')
+              : '-$totalDamage DMG',
           const Color(0xFFE11D48),
         );
       }
@@ -552,6 +565,26 @@ class _CardBattleScreenState extends State<CardBattleScreen>
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ],
+              if (widget.relics.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                ...widget.relics.take(4).map(
+                  (relic) => Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Tooltip(
+                      message: '${relic.name}: ${relic.description}',
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E293B),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: relic.color.withOpacity(0.6), width: 1.2),
+                        ),
+                        child: Icon(relic.icon, size: 12, color: Colors.white),
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -8,6 +8,9 @@ enum MapNodeType {
   restShrine,
   merchantShop,
   boss,
+  intonationWave,
+  minimalPairDuel,
+  speedBlitz,
 }
 
 class MapNode {
@@ -47,23 +50,35 @@ class MapNode {
         return Icons.storefront_rounded;
       case MapNodeType.boss:
         return Icons.shield_rounded;
+      case MapNodeType.intonationWave:
+        return Icons.waves_rounded;
+      case MapNodeType.minimalPairDuel:
+        return Icons.hearing_rounded;
+      case MapNodeType.speedBlitz:
+        return Icons.timer_rounded;
     }
   }
 
   Color get color {
     switch (type) {
       case MapNodeType.battle:
-        return const Color(0xFFE11D48); // Red
+        return const Color(0xFF0F172A); // Dark slate
       case MapNodeType.elite:
         return const Color(0xFFD97706); // Amber
       case MapNodeType.mysteryEvent:
-        return const Color(0xFF7C3AED); // Purple
+        return const Color(0xFF64748B); // Slate neutral
       case MapNodeType.restShrine:
         return const Color(0xFF059669); // Emerald
       case MapNodeType.merchantShop:
         return const Color(0xFF0284C7); // Cyan
       case MapNodeType.boss:
-        return const Color(0xFFBE123C); // Crimson Boss
+        return const Color(0xFF0F172A); // Midnight boss
+      case MapNodeType.intonationWave:
+        return const Color(0xFF0284C7); // Cyan intonation
+      case MapNodeType.minimalPairDuel:
+        return const Color(0xFF059669); // Emerald acoustic
+      case MapNodeType.speedBlitz:
+        return const Color(0xFFE11D48); // Rose reflex sprint
     }
   }
 }
@@ -168,22 +183,30 @@ class ProceduralMap {
           }
         } else {
           final roll = random.nextDouble();
-          if (roll < 0.45) {
+          if (roll < 0.28) {
             type = MapNodeType.battle;
             title = 'Linguistic Duel';
             subtitle = 'Combat against grammatical blunders';
-          } else if (roll < 0.75) {
+          } else if (roll < 0.46) {
+            type = MapNodeType.intonationWave;
+            title = 'Intonation Wave';
+            subtitle = 'Ride native pitch contours with your vocal rhythm';
+          } else if (roll < 0.64) {
+            type = MapNodeType.minimalPairDuel;
+            title = 'Minimal Pair Duel';
+            subtitle = 'Acoustic vowel & consonant discrimination under pressure';
+          } else if (roll < 0.82) {
+            type = MapNodeType.speedBlitz;
+            title = 'Speed Blitz 45s';
+            subtitle = 'Fast reflex conversational sprint against the clock';
+          } else if (roll < 0.92) {
             type = MapNodeType.mysteryEvent;
             title = 'Parchment Shrine';
             subtitle = 'A mystical dilemma of speech and choice';
-          } else if (roll < 0.90) {
+          } else {
             type = MapNodeType.merchantShop;
             title = 'Lexicon Trader';
             subtitle = 'Exchange fluency credits for deck cards';
-          } else {
-            type = MapNodeType.restShrine;
-            title = 'Whisper Campfire';
-            subtitle = 'Calm breathing and pronunciation meditation';
           }
         }
 

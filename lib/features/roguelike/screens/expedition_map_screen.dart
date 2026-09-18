@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../cards/linguistic_card.dart';
+import '../games/intonation_rider_game.dart';
+import '../games/minimal_pair_game.dart';
+import '../games/speed_blitz_game.dart';
 import '../map/procedural_map_engine.dart';
 import '../models/battle_state.dart';
+import '../models/linguistic_relic.dart';
 import '../story/chronicles_lore.dart';
 import '../widgets/card_widget.dart';
+import '../widgets/relic_draft_dialog.dart';
 import 'card_battle_screen.dart';
 import 'mystery_event_screen.dart';
 
@@ -27,8 +32,9 @@ class _ExpeditionMapScreenState extends State<ExpeditionMapScreen>
   late ProceduralMap _map;
   late List<LinguisticCard> _deck;
   late int _playerHp;
-  final int _playerMaxHp = 25;
+  int _playerMaxHp = 25;
   int _score = 0;
+  final List<LinguisticRelic> _activeRelics = [];
   late AnimationController _pulseAnim;
 
   @override
@@ -74,6 +80,7 @@ class _ExpeditionMapScreenState extends State<ExpeditionMapScreen>
               playerHp: _playerHp,
               playerMaxHp: _playerMaxHp,
               floor: node.floor,
+              relics: _activeRelics,
             ),
           ),
         );
@@ -88,6 +95,73 @@ class _ExpeditionMapScreenState extends State<ExpeditionMapScreen>
               _map.visitNode(node.id);
             }
           });
+
+          // Relic draft for elite or boss victory
+          if ((node.type == MapNodeType.elite || node.type == MapNodeType.boss) && _playerHp > 0) {
+            final draftOptions = RelicCatalog.getRandomDraft(
+              excludeIds: _activeRelics.map((r) => r.id).toList(),
+            );
+            if (draftOptions.isNotEmpty) {
+              final newRelic = await RelicDraftDialog.show(context, options: draftOptions);
+              if (newRelic != null && mounted) {
+                setState(() {
+                  _activeRelics.add(newRelic);
+                  if (newRelic.id == 'vocal_cord_elixir') {
+                    _playerMaxHp += 8;
+                    _playerHp += 8;
+                  }
+                });
+              }
+            }
+          }
+        }
+        break;
+
+      case MapNodeType.intonationWave:
+        final bool? won = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => IntonationRiderGame(
+              onVictory: () => Navigator.of(context).pop(true),
+              onDefeat: () => Navigator.of(context).pop(false),
+            ),
+          ),
+        );
+        if (won == true && mounted) {
+          _handleMinigameVictory(node, xp: 140, isAcoustic: true);
+        } else if (won == false && mounted) {
+          _handleMinigameDefeat(damage: 6);
+        }
+        break;
+
+      case MapNodeType.minimalPairDuel:
+        final bool? won = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => MinimalPairDuelGame(
+              onVictory: () => Navigator.of(context).pop(true),
+              onDefeat: () => Navigator.of(context).pop(false),
+            ),
+          ),
+        );
+        if (won == true && mounted) {
+          _handleMinigameVictory(node, xp: 150, isAcoustic: true);
+        } else if (won == false && mounted) {
+          _handleMinigameDefeat(damage: 8);
+        }
+        break;
+
+      case MapNodeType.speedBlitz:
+        final bool? won = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => SpeedBlitzGame(
+              onVictory: () => Navigator.of(context).pop(true),
+              onDefeat: () => Navigator.of(context).pop(false),
+            ),
+          ),
+        );
+        if (won == true && mounted) {
+          _handleMinigameVictory(node, xp: 160, isAcoustic: false);
+        } else if (won == false && mounted) {
+          _handleMinigameDefeat(damage: 7);
         }
         break;
 
@@ -121,6 +195,46 @@ class _ExpeditionMapScreenState extends State<ExpeditionMapScreen>
         _showMerchantDialog(node);
         break;
     }
+  }
+
+  void _handleMinigameVictory(MapNode node, {required int xp, bool isAcoustic = false}) async {
+    setState(() {
+      _score += xp;
+      if (isAcoustic && _activeRelics.any((r) => r.id == 'tuning_fork')) {
+        _playerHp = (_playerHp + 12).clamp(0, _playerMaxHp);
+      }
+      _map.visitNode(node.id);
+    });
+
+    if (node.floor >= 3 && math.Random().nextDouble() < 0.35) {
+      final draftOptions = RelicCatalog.getRandomDraft(
+        excludeIds: _activeRelics.map((r) => r.id).toList(),
+      );
+      if (draftOptions.isNotEmpty) {
+        final newRelic = await RelicDraftDialog.show(context, options: draftOptions);
+        if (newRelic != null && mounted) {
+          setState(() {
+            _activeRelics.add(newRelic);
+            if (newRelic.id == 'vocal_cord_elixir') {
+              _playerMaxHp += 8;
+              _playerHp += 8;
+            }
+          });
+        }
+      }
+    }
+  }
+
+  void _handleMinigameDefeat({required int damage}) {
+    setState(() {
+      _playerHp = math.max(1, _playerHp - damage);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Vocal setback: -$damage HP. Regroup and formulate your strategy!'),
+        backgroundColor: const Color(0xFF0F172A),
+      ),
+    );
   }
 
   void _showRestShrineDialog(MapNode node) {
@@ -342,9 +456,13 @@ class _ExpeditionMapScreenState extends State<ExpeditionMapScreen>
         color: Color(0xFF0F172A),
         border: Border(bottom: BorderSide(color: Color(0xFF1E293B), width: 1.5)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
           Row(
             children: [
               IconButton(
@@ -428,8 +546,50 @@ class _ExpeditionMapScreenState extends State<ExpeditionMapScreen>
           ),
         ],
       ),
-    );
-  }
+      if (_activeRelics.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 32,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _activeRelics.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final relic = _activeRelics[index];
+              return Tooltip(
+                message: '${relic.name}\n${relic.description}',
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: relic.color.withOpacity(0.5), width: 1.2),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(relic.icon, size: 14, color: Colors.white),
+                      const SizedBox(width: 5),
+                      Text(
+                        relic.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    ],
+  ),
+);
+}
 
   Widget _buildFloorRow(int floor, List<MapNode> nodes) {
     return Padding(

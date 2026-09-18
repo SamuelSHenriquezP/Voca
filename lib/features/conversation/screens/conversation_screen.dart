@@ -58,6 +58,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   String _currentGrammarTip = 'Use natural modal formulas like "Could I get..." or "I\'ll be staying...".';
   String _currentPronunciationTip = 'Maintain smooth connected speech rhythm.';
   int _currentFluencyScore = 92;
+  int _composure = 100;
   String? _dynamicSuggestedPhrase;
   String? _dynamicHint;
 
@@ -220,6 +221,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _currentGrammarTip = firstTurn.coachGrammarTip;
     _currentPronunciationTip = firstTurn.coachPronunciationTip;
     _currentFluencyScore = 92;
+    _composure = 100;
     _dynamicSuggestedPhrase = firstTurn.suggestedUserResponse;
     _dynamicHint = firstTurn.hintContext;
 
@@ -313,6 +315,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
       _currentFluencyScore = result.accuracyScore;
       _dynamicSuggestedPhrase = result.suggestedFollowUp;
       _dynamicHint = result.hint;
+
+      // Realistic composure dynamics
+      if (result.accuracyScore >= 85) {
+        _composure = (_composure + 10).clamp(0, 100);
+      } else if (result.accuracyScore < 70) {
+        _composure = (_composure - 16).clamp(0, 100);
+        VocaHaptics.error();
+      }
+
+      if (_composure < 35) {
+        _statusText = '⚠️ High Stakes • ${_activeScenario.personaName} requires clarity';
+      }
     });
 
     // NPC response after natural conversational pause
@@ -641,7 +655,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     statusText: _statusText,
                   ),
 
-                  const SizedBox(height: 12),
+                  // Real-Time High-Stakes Composure Indicator
+                  _buildComposureBar(),
+
+                  const SizedBox(height: 8),
 
                   // Animated Harmonic Spectrum Canvas (Multi-sine waves & sound particles)
                   HarmonicSpectrumVisualizer(
@@ -789,6 +806,52 @@ class _ConversationScreenState extends State<ConversationScreen> {
             onHint: _handleHint,
             onSurrender: _handleSurrender,
             onSendText: (text) => _processUserTurn(text),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComposureBar() {
+    Color barColor;
+    String statusLabel;
+    IconData barIcon;
+
+    if (_composure >= 70) {
+      barColor = const Color(0xFF10B981); // Emerald
+      statusLabel = 'STEADY & COMPOSED';
+      barIcon = Icons.psychology_rounded;
+    } else if (_composure >= 40) {
+      barColor = const Color(0xFFF59E0B); // Amber
+      statusLabel = 'UNDER PRESSURE';
+      barIcon = Icons.speed_rounded;
+    } else {
+      barColor = const Color(0xFFEF4444); // Crimson
+      statusLabel = 'CRITICAL HESITATION';
+      barIcon = Icons.warning_amber_rounded;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: barColor.withOpacity(0.4), width: 1.0),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(barIcon, color: barColor, size: 13),
+          const SizedBox(width: 6),
+          Text(
+            '$_composure% $statusLabel',
+            style: TextStyle(
+              color: barColor,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+            ),
           ),
         ],
       ),

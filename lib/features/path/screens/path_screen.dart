@@ -7,6 +7,7 @@ import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../../../core/widgets/notion_avatar_creator_sheet.dart';
 import '../../lesson/screens/lesson_screen.dart';
+import '../../shadowing/screens/shadowing_lab_screen.dart';
 import '../models/level_node.dart';
 import '../widgets/level_modal.dart';
 import '../widgets/syllabus_module_card.dart';
@@ -432,6 +433,65 @@ class _PathScreenState extends State<PathScreen> {
                       ),
                     ),
                   ),
+
+                // Shadowing & Connected Speech Laboratory Quick Access Card
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  child: BouncyTap(
+                    onTap: () {
+                      VocaHaptics.selection();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ShadowingLabScreen()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.graphic_eq_rounded, size: 18, color: Color(0xFF0F172A)),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'LABORATORIO DE SHADOWING',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                                Text(
+                                  'Connected speech, linking y reducciones acústicas',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: Color(0xFF64748B),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded, size: 13, color: Color(0xFF94A3B8)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 4),
 
