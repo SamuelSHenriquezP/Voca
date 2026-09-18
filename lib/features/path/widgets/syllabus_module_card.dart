@@ -280,3 +280,4 @@ class SyllabusModuleCard extends StatelessWidget {
     );
   }
 }
+
