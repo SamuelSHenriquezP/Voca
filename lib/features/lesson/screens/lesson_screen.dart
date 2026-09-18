@@ -2,6 +2,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/voca_colors.dart';
+import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/utils/sound_effects.dart';
 import '../../../core/widgets/celebration_dialog.dart';
 import '../../../core/storage/local_storage_service.dart';
@@ -17,7 +18,6 @@ import '../widgets/scramble_drill.dart';
 import '../widgets/shadowing_drill.dart';
 import '../widgets/story_passage_drill.dart';
 import '../widgets/syllable_stress_drill.dart';
-import '../../../core/widgets/notion_avatar.dart';
 import '../widgets/tactical_cards_bar.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -511,6 +511,67 @@ class _LessonScreenState extends State<LessonScreen> {
     });
   }
 
+  void _showTacticalPerksModal() {
+    VocaHaptics.selection();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'RECURSOS TÁCTICOS DISPONIBLES',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TacticalCardsBar(
+                isShieldActive: _isShieldActive,
+                isDoubleXpActive: _isDoubleXpActive,
+                onUseShield: () {
+                  Navigator.of(ctx).pop();
+                  _onUseShield();
+                },
+                onUseClue: () {
+                  Navigator.of(ctx).pop();
+                  _onUseClue();
+                },
+                onUseSkip: () {
+                  Navigator.of(ctx).pop();
+                  _onUseSkip();
+                },
+                onUseDoubleXp: () {
+                  Navigator.of(ctx).pop();
+                  _onUseDoubleXp();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showCompletionDialog(int xpGained, String awardedCard, int accuracy) {
     CelebrationDialog.show(
       context,
@@ -657,117 +718,84 @@ class _LessonScreenState extends State<LessonScreen> {
             progress: progress,
             hearts: _hearts,
             onClose: () => Navigator.of(context).pop(),
+            onPerksTap: _showTacticalPerksModal,
           ),
 
-          // Roguelike Tactical Support Cards Bar
-          TacticalCardsBar(
-            isShieldActive: _isShieldActive,
-            isDoubleXpActive: _isDoubleXpActive,
-            onUseShield: _onUseShield,
-            onUseClue: _onUseClue,
-            onUseSkip: _onUseSkip,
-            onUseDoubleXp: _onUseDoubleXp,
-          ),
+          // Active Perk Status Indicator (Compact & only if active)
+          if (_isShieldActive || _isDoubleXpActive)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_isShieldActive)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.shield_rounded, size: 12, color: Colors.white),
+                          SizedBox(width: 4),
+                          Text(
+                            'Escudo activo',
+                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (_isShieldActive && _isDoubleXpActive)
+                    const SizedBox(width: 8),
+                  if (_isDoubleXpActive)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF59E0B),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt_rounded, size: 12, color: Colors.white),
+                          SizedBox(width: 4),
+                          Text(
+                            '2x XP',
+                            style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
 
           // Drill Content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Notion Companion Feedback Banner
-                  Builder(
-                    builder: (context) {
-                      final storage = LocalStorageService();
-                      final userName = storage.getUserName();
-
-                      String speech;
-                      if (_drawerState == DrawerState.success) {
-                        speech = '¡Precisión impecable, $userName! Deducción sintáctica correcta.';
-                      } else if (_drawerState == DrawerState.error) {
-                        speech = 'Analiza la estructura con calma, $userName. El error consolida la memoria.';
-                      } else {
-                        speech = 'Enfócate en la fluidez y el contexto comunicativo, $userName.';
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: Row(
-                          children: [
-                            NotionAvatar(
-                              head: storage.getNotionHead(),
-                              hair: storage.getNotionHair(),
-                              eyes: storage.getNotionEyes(),
-                              mouth: storage.getNotionMouth(),
-                              outfit: storage.getNotionOutfit(),
-                              backdrop: storage.getNotionBackdrop(),
-                              size: 48,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: _drawerState == DrawerState.success
-                                        ? const Color(0xFF10B981)
-                                        : (_drawerState == DrawerState.error
-                                            ? const Color(0xFFE11D48)
-                                            : const Color(0xFFE2E8F0)),
-                                    width: 1.5,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.02),
-                                      offset: const Offset(0, 2),
-                                      blurRadius: 4,
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  speech,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: _drawerState == DrawerState.success
-                                        ? const Color(0xFF047857)
-                                        : (_drawerState == DrawerState.error
-                                            ? const Color(0xFFBE123C)
-                                            : const Color(0xFF334155)),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 320),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0.06, 0.0),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: KeyedSubtree(
-                      key: ValueKey<int>(_currentIndex),
-                      child: drillBody,
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.04, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
                     ),
-                  ),
-                ],
+                  );
+                },
+                child: KeyedSubtree(
+                  key: ValueKey<int>(_currentIndex),
+                  child: drillBody,
+                ),
               ),
             ),
           ),

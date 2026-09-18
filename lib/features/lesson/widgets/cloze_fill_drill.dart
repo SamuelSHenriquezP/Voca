@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/voca_colors.dart';
-import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
 import '../../../core/widgets/bouncy_tap.dart';
 import '../models/exercise.dart';
@@ -36,132 +34,147 @@ class _ClozeFillDrillState extends State<ClozeFillDrill> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Prompt & Subtitle
+          // 1. Academic Category Tracker
+          const Text(
+            'COMPLETA LA ORACIÓN',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.0,
+              color: Color(0xFF64748B),
+            ),
+          ),
+          const SizedBox(height: 4),
+
+          // 2. Prompt & Subtitle
           Text(
             ex.prompt,
-            style: VocaTypography.heading2.copyWith(fontSize: 20),
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0F172A),
+              letterSpacing: -0.3,
+            ),
           ),
           if (ex.subtitle.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               ex.subtitle,
-              style: VocaTypography.bodyMedium.copyWith(color: VocaColors.textMuted),
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF64748B),
+              ),
             ),
           ],
 
-          const SizedBox(height: 16),
-
-          // 2. Trick Toggle Pill (Duolingo mnemonic hack)
-          if (ex.trickTip.isNotEmpty)
+          // 3. Subtle Linguistic Rule Toggle
+          if (ex.trickTip.isNotEmpty) ...[
+            const SizedBox(height: 8),
             BouncyTap(
               onTap: () {
                 setState(() => _showTrick = !_showTrick);
                 VocaHaptics.selection();
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF059669).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF10B981).withOpacity(0.5)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.tips_and_updates_rounded,
-                        color: Color(0xFF059669), size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      _showTrick ? 'HIDE TRICK' : 'NATIVE TRICK',
-                      style: const TextStyle(
-                        color: Color(0xFF059669),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 11,
-                        letterSpacing: 0.6,
-                      ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _showTrick ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                    color: const Color(0xFF64748B),
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _showTrick ? 'Ocultar regla lingüística' : 'Ver regla lingüística',
+                    style: const TextStyle(
+                      color: Color(0xFF64748B),
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-
-          if (_showTrick && ex.trickTip.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFA7F3D0)),
-              ),
-              child: Text(
-                ex.trickTip,
-                style: const TextStyle(
-                  color: Color(0xFF065F46),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  height: 1.35,
+            if (_showTrick) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Text(
+                  ex.trickTip,
+                  style: const TextStyle(
+                    color: Color(0xFF475569),
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // 3. Sentence Cloze Area
+          // 4. Sentence Card
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  offset: const Offset(0, 4),
-                  blurRadius: 12,
+                  color: Colors.black.withOpacity(0.02),
+                  offset: const Offset(0, 2),
+                  blurRadius: 8,
                 ),
               ],
             ),
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               spacing: 8,
-              runSpacing: 10,
+              runSpacing: 12,
               children: [
                 if (ex.clozePrefix.isNotEmpty)
                   Text(
                     ex.clozePrefix,
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF0F172A),
+                      height: 1.4,
                     ),
                   ),
 
-                // Blank Slot
+                // Inline Blank / Selected Slot
                 AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                   decoration: BoxDecoration(
                     color: hasSelection
-                        ? const Color(0xFF4F46E5).withOpacity(0.1)
+                        ? const Color(0xFF0F172A)
                         : const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: hasSelection
-                          ? const Color(0xFF4F46E5)
+                          ? const Color(0xFF0F172A)
                           : const Color(0xFFCBD5E1),
-                      width: 2,
+                      width: 1.2,
                     ),
                   ),
                   child: Text(
-                    hasSelection ? widget.selectedAnswer! : '      ',
+                    hasSelection ? widget.selectedAnswer! : '        ',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: hasSelection ? const Color(0xFF4F46E5) : Colors.transparent,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: hasSelection ? Colors.white : Colors.transparent,
+                      height: 1.3,
                     ),
                   ),
                 ),
@@ -171,89 +184,100 @@ class _ClozeFillDrillState extends State<ClozeFillDrill> {
                     ex.clozeSuffix,
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF0F172A),
+                      height: 1.4,
                     ),
                   ),
               ],
             ),
           ),
 
-          const Spacer(),
+          const SizedBox(height: 28),
 
-          // 4. Options Grid
-          Center(
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: ex.clozeOptions.map((opt) {
-                final isSelected = widget.selectedAnswer == opt;
-                final isDisabled = widget.disabledOptions?.contains(opt) ?? false;
-                if (isDisabled) {
-                  return Opacity(
-                    opacity: 0.25,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+          // 5. Symmetric 2x2 Options Grid
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = (constraints.maxWidth - 12) / 2;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: ex.clozeOptions.map((opt) {
+                  final isSelected = widget.selectedAnswer == opt;
+                  final isDisabled = widget.disabledOptions?.contains(opt) ?? false;
+
+                  if (isDisabled) {
+                    return SizedBox(
+                      width: itemWidth,
+                      child: Opacity(
+                        opacity: 0.25,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Text(
+                            opt,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF94A3B8),
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        ),
                       ),
-                      child: Text(
-                        opt,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF94A3B8),
-                          decoration: TextDecoration.lineThrough,
+                    );
+                  }
+
+                  return SizedBox(
+                    width: itemWidth,
+                    child: BouncyTap(
+                      onTap: () {
+                        VocaHaptics.selection();
+                        widget.onAnswerSelected(opt);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 160),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isSelected ? const Color(0xFF0F172A) : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFF0F172A)
+                                : const Color(0xFFCBD5E1),
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(isSelected ? 0.08 : 0.02),
+                              offset: const Offset(0, 2),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          opt,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                          ),
                         ),
                       ),
                     ),
                   );
-                }
-
-                return BouncyTap(
-                  onTap: () {
-                    VocaHaptics.selection();
-                    widget.onAnswerSelected(opt);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF4F46E5)
-                            : const Color(0xFFE2E8F0),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isSelected
-                              ? const Color(0xFF4F46E5).withOpacity(0.3)
-                              : Colors.black.withOpacity(0.04),
-                          offset: const Offset(0, 3),
-                          blurRadius: 6,
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      opt,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: isSelected ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
+                }).toList(),
+              );
+            },
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
         ],
       ),
     );

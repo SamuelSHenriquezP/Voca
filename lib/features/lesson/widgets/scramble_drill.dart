@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/theme/voca_colors.dart';
 import '../../../core/theme/voca_typography.dart';
 import '../../../core/utils/audio_tts_service.dart';
 import '../../../core/utils/haptic_feedback_utils.dart';
@@ -40,9 +39,10 @@ class ScrambleDrill extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             exercise.subtitle,
-            style: VocaTypography.bodyMedium.copyWith(
-              color: const Color(0xFF4F46E5),
-              fontWeight: FontWeight.w700,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF64748B),
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -60,20 +60,20 @@ class ScrambleDrill extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.volume_up_rounded, color: Color(0xFF4F46E5), size: 18),
+                  Icon(Icons.volume_up_rounded, color: Color(0xFF0F172A), size: 16),
                   SizedBox(width: 6),
                   Text(
-                    'Pista de pronunciación',
+                    'Escuchar pronunciación',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF4F46E5),
+                      color: Color(0xFF0F172A),
                     ),
                   ),
                 ],
@@ -81,39 +81,32 @@ class ScrambleDrill extends StatelessWidget {
             ),
           ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 18),
 
         // Active Sentence Slot Box
         Container(
           width: double.infinity,
-          constraints: const BoxConstraints(minHeight: 110),
+          constraints: const BoxConstraints(minHeight: 100),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: VocaColors.borderLight, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
           ),
           child: assembledWords.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text(
-                    'Toca las palabras de abajo en el orden correcto',
-                    style: VocaTypography.bodySmall.copyWith(
+                    'Toca las palabras inferiores en orden',
+                    style: TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: VocaColors.textMuted,
-                      fontSize: 14,
+                      color: Color(0xFF94A3B8),
+                      fontSize: 13,
                     ),
                   ),
                 )
               : Wrap(
                   spacing: 8,
-                  runSpacing: 10,
+                  runSpacing: 8,
                   children: List.generate(assembledWords.length, (pos) {
                     final word = assembledWords[pos];
                     return BouncyTap(
@@ -124,21 +117,15 @@ class ScrambleDrill extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4F46E5),
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0xFF3730A3),
-                              offset: Offset(0, 3),
-                              blurRadius: 0,
-                            ),
-                          ],
+                          color: const Color(0xFF0F172A),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           word,
-                          style: VocaTypography.buttonText.copyWith(
+                          style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
@@ -150,17 +137,18 @@ class ScrambleDrill extends StatelessWidget {
                 ),
         ),
 
-        const SizedBox(height: 26),
+        const SizedBox(height: 24),
 
         // Word Bank Title
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'BANCO DE PALABRAS',
-              style: VocaTypography.caption.copyWith(
-                letterSpacing: 1.2,
-                color: VocaColors.textMuted,
+              style: TextStyle(
+                letterSpacing: 1.0,
+                color: Color(0xFF64748B),
+                fontSize: 11,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -179,14 +167,14 @@ class ScrambleDrill extends StatelessWidget {
 
         // Word Bank Chips
         Wrap(
-          spacing: 10,
-          runSpacing: 12,
+          spacing: 8,
+          runSpacing: 10,
           children: List.generate(exercise.bankWords.length, (bankIndex) {
             final word = exercise.bankWords[bankIndex];
             final isUsed = selectedBankIndices.contains(bankIndex);
 
             return Opacity(
-              opacity: isUsed ? 0.28 : 1.0,
+              opacity: isUsed ? 0.25 : 1.0,
               child: BouncyTap(
                 onTap: isUsed
                     ? null
@@ -195,29 +183,21 @@ class ScrambleDrill extends StatelessWidget {
                         onBankIndexSelected(bankIndex);
                       },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
                   decoration: BoxDecoration(
                     color: isUsed ? const Color(0xFFF1F5F9) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isUsed ? const Color(0xFFE2E8F0) : VocaColors.borderSubtle,
-                      width: 2,
+                      color: isUsed ? const Color(0xFFE2E8F0) : const Color(0xFFCBD5E1),
+                      width: 1.2,
                     ),
-                    boxShadow: isUsed
-                        ? null
-                        : const [
-                            BoxShadow(
-                              color: VocaColors.borderSubtle,
-                              offset: Offset(0, 3.5),
-                              blurRadius: 0,
-                            ),
-                          ],
                   ),
                   child: Text(
                     word,
-                    style: VocaTypography.buttonText.copyWith(
-                      color: isUsed ? const Color(0xFF94A3B8) : VocaColors.darkSlate,
-                      fontSize: 16,
+                    style: TextStyle(
+                      color: isUsed ? const Color(0xFF94A3B8) : const Color(0xFF0F172A),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),

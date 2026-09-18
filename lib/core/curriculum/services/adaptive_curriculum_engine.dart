@@ -62,7 +62,7 @@ class AdaptiveCurriculumEngine {
           id: '${topic.id}_story_cloze',
           type: DrillType.clozeFill,
           prompt: 'Completa la frase clave de la historia:',
-          subtitle: 'Gramática de la aventura • ${topic.title}',
+          subtitle: '${topic.title} • Contexto gramatical',
           trickTip: cl1['trick'] as String,
           clozePrefix: cl1['prefix'] as String,
           clozeSuffix: cl1['suffix'] as String,

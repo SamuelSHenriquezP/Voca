@@ -29,55 +29,50 @@ class TacticalCardsBar extends StatelessWidget {
     final doubleXpCount = TacticalCard.getCount(TacticalCardType.doubleXp);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            offset: const Offset(0, 2),
-            blurRadius: 6,
-          ),
-        ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildChip(
-            card: TacticalCard.shieldCard,
-            count: shieldCount,
-            isActive: isShieldActive,
-            activeLabel: 'Activo',
-            onTap: onUseShield,
-          ),
-          _buildDivider(),
-          _buildChip(
-            card: TacticalCard.clueCard,
-            count: clueCount,
-            isActive: false,
-            activeLabel: null,
-            onTap: onUseClue,
-          ),
-          _buildDivider(),
-          _buildChip(
-            card: TacticalCard.skipCard,
-            count: skipCount,
-            isActive: false,
-            activeLabel: null,
-            onTap: onUseSkip,
-          ),
-          _buildDivider(),
-          _buildChip(
-            card: TacticalCard.doubleXpCard,
-            count: doubleXpCount,
-            isActive: isDoubleXpActive,
-            activeLabel: '2x Activo',
-            onTap: onUseDoubleXp,
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildChip(
+              card: TacticalCard.shieldCard,
+              count: shieldCount,
+              isActive: isShieldActive,
+              activeLabel: 'Activo',
+              onTap: onUseShield,
+            ),
+            _buildDivider(),
+            _buildChip(
+              card: TacticalCard.clueCard,
+              count: clueCount,
+              isActive: false,
+              activeLabel: null,
+              onTap: onUseClue,
+            ),
+            _buildDivider(),
+            _buildChip(
+              card: TacticalCard.skipCard,
+              count: skipCount,
+              isActive: false,
+              activeLabel: null,
+              onTap: onUseSkip,
+            ),
+            _buildDivider(),
+            _buildChip(
+              card: TacticalCard.doubleXpCard,
+              count: doubleXpCount,
+              isActive: isDoubleXpActive,
+              activeLabel: '2x Activo',
+              onTap: onUseDoubleXp,
+            ),
+          ],
+        ),
       ),
     );
   }

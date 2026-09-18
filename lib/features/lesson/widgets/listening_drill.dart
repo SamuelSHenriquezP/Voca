@@ -97,23 +97,23 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFBFDBFE)),
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.headphones_rounded, size: 14, color: Color(0xFF2563EB)),
-                    SizedBox(width: 5),
+                    Icon(Icons.headphones_rounded, size: 13, color: Color(0xFF0F172A)),
+                    SizedBox(width: 6),
                     Text(
                       'COMPRENSIÓN AUDITIVA',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF1D4ED8),
+                        color: Color(0xFF0F172A),
                         letterSpacing: 0.6,
                       ),
                     ),
@@ -128,24 +128,25 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                     VocaHaptics.selection();
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
                     child: Text(
-                      _showTranscript ? 'Ocultar Texto' : 'Ver Texto',
+                      _showTranscript ? 'Ocultar transcripción' : 'Ver transcripción',
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF475569),
+                        color: Color(0xFF64748B),
                       ),
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           // Prompt
           Text(
@@ -153,29 +154,22 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
             style: VocaTypography.heading2.copyWith(fontSize: 19),
           ),
           if (ex.subtitle.isNotEmpty) ...[
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             Text(
               ex.subtitle,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           // Interactive Audio Player Card
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  offset: const Offset(0, 4),
-                  blurRadius: 10,
-                ),
-              ],
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
             ),
             child: Column(
               children: [
@@ -194,25 +188,16 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                         }
                       },
                       child: Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                          ),
+                        width: 52,
+                        height: 52,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0F172A),
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF2563EB).withOpacity(0.35),
-                              offset: const Offset(0, 4),
-                              blurRadius: 12,
-                            ),
-                          ],
                         ),
                         child: Icon(
                           _isPlaying ? Icons.stop_rounded : Icons.volume_up_rounded,
                           color: Colors.white,
-                          size: 28,
+                          size: 26,
                         ),
                       ),
                     ),
@@ -224,11 +209,11 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _isPlaying ? 'Reproduciendo audio nativo...' : 'Toca para escuchar el audio',
+                            _isPlaying ? 'Reproduciendo audio...' : 'Toca para escuchar',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: _isPlaying ? const Color(0xFF2563EB) : const Color(0xFF1E293B),
+                              color: _isPlaying ? const Color(0xFF0F172A) : const Color(0xFF475569),
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -243,7 +228,7 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                                 margin: const EdgeInsets.symmetric(horizontal: 2),
                                 decoration: BoxDecoration(
                                   color: _isPlaying
-                                      ? const Color(0xFF3B82F6)
+                                      ? const Color(0xFF0F172A)
                                       : const Color(0xFFCBD5E1),
                                   borderRadius: BorderRadius.circular(2),
                                 ),
@@ -264,18 +249,16 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _isSlowSpeed ? const Color(0xFFFEF3C7) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: _isSlowSpeed ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
-                          ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
                         ),
                         child: Text(
-                          _isSlowSpeed ? '🐢 0.75x' : '⚡ 1.0x',
-                          style: TextStyle(
-                            fontSize: 11,
+                          _isSlowSpeed ? '0.75x' : '1.0x',
+                          style: const TextStyle(
+                            fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: _isSlowSpeed ? const Color(0xFFB45309) : const Color(0xFF475569),
+                            color: Color(0xFF0F172A),
                           ),
                         ),
                       ),
@@ -290,15 +273,15 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
                     child: Text(
                       ex.audioScript,
                       style: const TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: Color(0xFF334155),
                         fontStyle: FontStyle.italic,
                       ),
@@ -309,7 +292,7 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
             ),
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
 
           // Comprehension Question
           if (ex.comprehensionQuestion.isNotEmpty) ...[
@@ -345,37 +328,29 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      color: isSelected ? const Color(0xFFF8FAFC) : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                        color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
                         width: isSelected ? 2.0 : 1.2,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isSelected
-                              ? const Color(0xFF2563EB).withOpacity(0.12)
-                              : Colors.black.withOpacity(0.02),
-                          offset: const Offset(0, 3),
-                          blurRadius: 6,
-                        ),
-                      ],
                     ),
                     child: Row(
                       children: [
                         Container(
-                          width: 26,
-                          height: 26,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9),
+                            color: isSelected ? const Color(0xFF0F172A) : Colors.transparent,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFCBD5E1),
+                              color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFCBD5E1),
+                              width: 1.5,
                             ),
                           ),
                           child: Center(
                             child: isSelected
-                                ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
+                                ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
                                 : null,
                           ),
                         ),
@@ -384,9 +359,9 @@ class _ListeningDrillState extends State<ListeningDrill> with SingleTickerProvid
                           child: Text(
                             option,
                             style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                              color: isSelected ? const Color(0xFF1D4ED8) : const Color(0xFF1E293B),
+                              fontSize: 15,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF334155),
                             ),
                           ),
                         ),
